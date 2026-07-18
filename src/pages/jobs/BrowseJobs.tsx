@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { getJobOptions, getPublicJobs } from '../../api/job.api';
 import { useAuthStore } from '../../store/authStore';
 import ApplicationPopup from '../../components/ApplicationPopup';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const CATEGORY_IMAGES: Record<string, string> = {
   'Actors & Extras': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/actors_image.jpg',
@@ -53,13 +54,13 @@ const MultiSelectDropdown = ({
         type="button"
         onClick={() => setOpen(!open)}
         style={{
-          width: '100%', textAlign: 'left', background: '#1c1c24', color: selected.length ? '#fff' : '#888',
+          width: '100%', textAlign: 'left', background: '#1c1c24', color: selected.length ? '#fff' : '#ffffffff',
           border: '1px solid #333', padding: '10px 14px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}
       >
         {summary}
-        <span style={{ fontSize: '10px', color: '#666' }}>{open ? '▲' : '▼'}</span>
+        <span style={{ fontSize: '10px', color: '#ffffffff' }}>{open ? <ChevronUp style={{ width: '15px', height: '15px' }} /> : <ChevronDown style={{ width: '15px', height: '15px' }} />}</span>
       </button>
 
       {open && (
@@ -92,6 +93,24 @@ const daysUntil = (dateStr: string) => {
 
 const truncate = (str: string, len: number) =>
   str && str.length > len ? str.slice(0, len) + '...' : str;
+
+const formatBudget = (role: any): string | null => {
+  if (!role?.payment) return null;
+  const p = role.payment;
+  switch (role.paymentType) {
+    case 'per_hour': return p.hourBudgetPerHour ? `${p.hourBudgetPerHour} AED / HOUR` : null;
+    case 'per_day': {
+      if (p.dayBudgetFullDay && p.dayBudgetHalfDay) return `${p.dayBudgetFullDay} AED / DAY (Full) • ${p.dayBudgetHalfDay} AED / HALF DAY`;
+      if (p.dayBudgetFullDay) return `${p.dayBudgetFullDay} AED / DAY`;
+      if (p.dayBudgetHalfDay) return `${p.dayBudgetHalfDay} AED / HALF DAY`;
+      return p.dayTotalBudget ? `${p.dayTotalBudget} AED` : null;
+    }
+    case 'per_week': return p.weekBudgetPerWeek ? `${p.weekBudgetPerWeek} AED / WEEK` : null;
+    case 'per_month': return p.monthBudgetPerMonth ? `${p.monthBudgetPerMonth} AED / MONTH` : null;
+    case 'package': return p.packageTotalBudget ? `${p.packageTotalBudget} AED` : null;
+    default: return null;
+  }
+};
 
 const shimmerStyle: CSSProperties = {
   background: 'linear-gradient(90deg, #1c1c24 25%, #2a2a35 50%, #1c1c24 75%)',
@@ -186,6 +205,13 @@ const BrowseJobs = () => {
 
       {/* TOP DARK FILTERS PANEL */}
       <div style={{ position: 'relative', background: '#111115', color: '#fff', padding: '24px 40px', borderBottom: '1px solid #222' }}>
+        
+        {/* BACKGROUND VIDEO */}
+        <video autoPlay loop muted playsInline style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0, opacity: 0.55 }}>
+          <source src="https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/casting_video/casting_video_10107.mp4" type="video/mp4" />
+        </video>
+        {/* <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(180deg, rgba(17, 17, 21, 0.49) 0%, rgba(17,17,21,0.95) 100%)', zIndex: 1 }} /> */}
+
         <div style={{ position: 'relative', zIndex: 2 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <h2 style={{ margin: 0, fontSize: '22px', fontWeight: 900, letterSpacing: '-0.02em' }}>
@@ -216,7 +242,7 @@ const BrowseJobs = () => {
               {/* Primary Core Row */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
                 <div>
-                  <span style={{ fontSize: '11px', color: '#888', fontWeight: 'bold', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>CATEGORY</span>
+                  {/* <span style={{ fontSize: '11px', color: '#888', fontWeight: 'bold', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>CATEGORY</span> */}
                   <select value={draftFilters.categoryIds || ''} onChange={e => handleFilterChange('categoryIds', e.target.value)} style={{ width: '100%', background: '#1c1c24', color: '#fff', border: '1px solid #333', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
                     <option value="">All Categories</option>
                     {options.categories?.filter((c: any) => c.name !== 'Additional Category').map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -224,7 +250,7 @@ const BrowseJobs = () => {
                 </div>
 
                 <div>
-                  <span style={{ fontSize: '11px', color: '#888', fontWeight: 'bold', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>GENDER</span>
+                  {/* <span style={{ fontSize: '11px', color: '#888', fontWeight: 'bold', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>GENDER</span> */}
                   <select value={draftFilters.gender || ''} onChange={e => handleFilterChange('gender', e.target.value)} style={{ width: '100%', background: '#1c1c24', color: '#fff', border: '1px solid #333', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
                     <option value="">All Genders</option>
                     <option value="male">Male</option>
@@ -234,7 +260,7 @@ const BrowseJobs = () => {
                 </div>
 
                 <div>
-                  <span style={{ fontSize: '11px', color: '#888', fontWeight: 'bold', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>PAYMENT</span>
+                  {/* <span style={{ fontSize: '11px', color: '#888', fontWeight: 'bold', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>PAYMENT</span> */}
                   <select value={draftFilters.paymentType || ''} onChange={e => handleFilterChange('paymentType', e.target.value)} style={{ width: '100%', background: '#1c1c24', color: '#fff', border: '1px solid #333', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
                     <option value="">All Payment</option>
                     <option value="paid">Paid</option>
@@ -243,7 +269,7 @@ const BrowseJobs = () => {
                 </div>
 
                 <div>
-                  <span style={{ fontSize: '11px', color: '#888', fontWeight: 'bold', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>PROJECT TYPE</span>
+                  {/* <span style={{ fontSize: '11px', color: '#888', fontWeight: 'bold', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>PROJECT TYPE</span> */}
                   <select value={draftFilters.projectTypeId || ''} onChange={e => handleFilterChange('projectTypeId', e.target.value)} style={{ width: '100%', background: '#1c1c24', color: '#fff', border: '1px solid #333', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
                     <option value="">All Project Types</option>
                     {options.projectTypes?.map((pt: any) => <option key={pt.id} value={pt.id}>{pt.name}</option>)}
@@ -323,148 +349,134 @@ const BrowseJobs = () => {
           </div>
         ) : (
           <>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '24px' }}>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
               {jobs.length === 0 ? (
                 <p style={{ color: '#666' }}>No jobs found matching your criteria.</p>
               ) : (
-                  jobs.map(job => {
+                  jobs.map((job: any) => {
                   const firstRole = job.roles?.[0];
                   const daysLeft = job.lastDateToApply ? daysUntil(job.lastDateToApply) : null;
-                  const isExpired = daysLeft !== null && daysLeft < 0;
+                  const isExpired = daysLeft !== null && daysLeft <= 0;
 
                   return (
                     <div
                       key={job.id}
-                      style={{
-                        background: '#fff', borderRadius: '20px', overflow: 'hidden',
-                        border: '1.5px solid #eaeaea', height: '100%',
-                        display: 'flex', flexDirection: 'column',
-                        transition: 'all 0.25s ease',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-                        cursor: 'pointer',
-                      }}
-                      onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 12px 28px rgba(0,0,0,0.08)'; e.currentTarget.style.borderColor = '#3835A4'; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)'; e.currentTarget.style.borderColor = '#eaeaea'; }}
+                      className="bg-white flex flex-col rounded-[2.25rem] overflow-hidden border border-neutral-200 hover:border-[#3835A4]/40 hover:shadow-2xl transition-all duration-500 cursor-pointer h-full group relative"
                     >
-                        {/* Top Accent Bar */}
-                        <div style={{
-                          height: '4px',
-                          background: isExpired ? '#bbb' : 'linear-gradient(90deg, #C6007E 0%, #3835A4 100%)',
-                        }} />
+                      <div className="relative h-56 w-full overflow-hidden bg-neutral-100 shrink-0">
+                        <img
+                          src={getCategoryImage(job.category?.name)}
+                          alt={job.title}
+                          className="h-full w-full object-cover transition-transform duration-[1000ms] ease-out group-hover:scale-105 filter brightness-95 group-hover:brightness-90"
+                          referrerPolicy="no-referrer"
+                          loading="lazy"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/75 via-neutral-950/25 to-transparent transition-opacity group-hover:via-neutral-950/30" />
+                        <div className="absolute top-5 left-5 right-5 flex items-center justify-between z-10">
+                          <span className="bg-white/95 backdrop-blur-md text-neutral-900 text-[9px] font-mono font-black tracking-[0.15em] uppercase px-3.5 py-1.5 rounded-xl shadow-md border border-neutral-200/50">
+                            {job.category?.name || 'General'}
+                          </span>
+                          {job.paymentInfo && (
+                            <span className="bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white text-[9px] font-mono font-black tracking-[0.15em] px-3.5 py-1.5 rounded-xl border border-white/10 shadow-lg">
+                              {job.paymentInfo === 'paid' ? 'PAID' : 'UNPAID'}
+                            </span>
+                          )}
+                        </div>
+                        
+                        {!isExpired && daysLeft !== null && (
+                          <div className="absolute bottom-5 left-5 z-10 flex items-center gap-1.5 text-[9px] font-mono text-neutral-200 bg-neutral-950/80 backdrop-blur-md py-2 px-3.5 rounded-xl border border-white/10 shadow-sm font-bold">
+                            <svg className="h-3.5 w-3.5 text-[#C6007E] animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span>EXPIRES IN {daysLeft} DAYS</span>
+                          </div>
+                        )}
+                      </div>
 
-                        {/* Category Background Image */}
-                        {(() => {
-                          const img = getCategoryImage(job.category?.name);
-                          return img ? (
-                            <div style={{
-                              height: '120px',
-                              backgroundImage: `url(${img})`,
-                              backgroundSize: 'cover',
-                              backgroundPosition: 'center',
-                              position: 'relative',
-                            }}>
-                              <div style={{
-                                position: 'absolute',
-                                inset: 0,
-                                background: 'linear-gradient(to bottom, transparent 40%, rgba(255,255,255,0.9) 100%)',
-                              }} />
-                            </div>
-                          ) : null;
-                        })()}
-
-                        <div style={{ padding: '20px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                          {/* Company + Category Row */}
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
-                            {job.company?.user?.image ? (
-                              <img src={job.company.user.image} alt="" style={{ width: '28px', height: '28px', borderRadius: '8px', objectFit: 'cover' }} />
-                            ) : (
-                              <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: '#3835A4', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 'black' }}>
-                                {job.company?.companyName?.[0] || 'C'}
-                              </div>
-                            )}
-                            <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#888' }}>{job.company?.companyName || 'Company'}</span>
+                      <div className="p-8 flex flex-col flex-grow justify-between relative bg-white">
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-1.5 text-[9px] text-neutral-400 tracking-wider uppercase font-black">
+                            <svg className="h-3 w-3 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                            <span>{job.company?.companyName || 'Company'}</span>
                             {job.company?.user?.isVerified && (
-                              <span style={{ background: '#C6007E', color: '#fff', fontSize: '7px', fontWeight: 'black', padding: '2px 6px', borderRadius: '4px', letterSpacing: '0.5px' }}>✓</span>
+                              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                             )}
-                            <div style={{ marginLeft: 'auto' }}>
-                              <span style={{ background: '#f0f0f5', color: '#3835A4', fontSize: '10px', fontWeight: 'bold', padding: '3px 10px', borderRadius: '6px' }}>
-                                {job.category?.name || 'General'}
-                              </span>
-                            </div>
                           </div>
 
-                          {/* Title */}
-                          <Link to={`/jobs/${job.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                            <h3 style={{ margin: '0 0 8px', fontSize: '17px', fontWeight: 900, color: '#111', lineHeight: 1.2 }}>
+                          <Link to={`/jobs/${job.id}`} className="no-underline">
+                            <h3 className="font-display text-xl sm:text-2xl font-black text-neutral-900 hover:text-[#3835A4] transition-colors tracking-tight line-clamp-1 leading-tight">
                               {job.title || 'Untitled'}
                             </h3>
                           </Link>
 
-                          {/* Description */}
-                          {job.description && (
-                            <p style={{ margin: '0 0 14px', fontSize: '12px', color: '#888', lineHeight: 1.5, flex: 1 }}>
-                              {truncate(stripHtml(job.description), 120)}
-                            </p>
+                          <p className="text-xs text-neutral-500 line-clamp-3 leading-relaxed font-medium">
+                            {job.description ? stripHtml(job.description) : ''}
+                          </p>
+                        </div>
+
+                        <div className="pt-6 mt-6 border-t border-neutral-100 flex flex-col gap-4">
+                          {job.castingCity && (
+                            <div className="flex items-start gap-3.5 group/meta">
+                              <div className="h-9 w-9 rounded-xl bg-neutral-50 border border-neutral-200/80 flex items-center justify-center text-neutral-500 shrink-0 group-hover/meta:border-neutral-900/40 transition-colors">
+                                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                              </div>
+                              <div className="space-y-0.5">
+                                <span className="text-xs text-neutral-900 font-extrabold tracking-wide">
+                                  {job.castingCity.name}{job.castingCity.country ? `, ${job.castingCity.country.name}` : ''}
+                                </span>
+                              </div>
+                            </div>
                           )}
 
-                          {/* Meta Tags Row */}
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '14px' }}>
-                            {job.castingCity && (
-                              <span style={{ background: '#f5f5ff', color: '#3835A4', fontSize: '10px', fontWeight: 'bold', padding: '4px 10px', borderRadius: '6px' }}>
-                                📍 {job.castingCity.name}{job.castingCity.country ? `, ${job.castingCity.country.name}` : ''}
+                          {firstRole && (formatBudget(firstRole) || firstRole.paymentType) && (
+                            <div className="flex items-start gap-3.5 group/meta">
+                              <div className="h-9 w-9 rounded-xl bg-[#3835A4]/5 border border-[#3835A4]/10 flex items-center justify-center text-[#3835A4] shrink-0 group-hover/meta:border-[#3835A4] transition-colors">
+                                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                              </div>
+                              <div className="space-y-0.5">
+                                <span className="text-xs text-neutral-950 font-black font-mono tracking-wide">
+                                  {formatBudget(firstRole) || firstRole.paymentType?.replace(/_/g, ' ').toUpperCase()}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="pt-6 mt-6 border-t border-dashed border-neutral-200 flex items-center justify-between">
+                          <div>
+                            {isExpired ? (
+                              <span className="inline-flex items-center text-[9px] font-mono font-black bg-red-50 text-red-600 border border-red-200/60 px-2.5 py-1 rounded-lg tracking-wider">
+                                EXPIRED
                               </span>
-                            )}
-                            {firstRole?.paymentType && (
-                              <span style={{ background: '#fff0f7', color: '#C6007E', fontSize: '10px', fontWeight: 'bold', padding: '4px 10px', borderRadius: '6px' }}>
-                                💰 {firstRole.paymentType.replace(new RegExp('_', 'g'), ' ')}
-                              </span>
-                            )}
-                            {job.paymentInfo && (
-                              <span style={{ background: '#f0fdf4', color: '#16a34a', fontSize: '10px', fontWeight: 'bold', padding: '4px 10px', borderRadius: '6px' }}>
-                                {job.paymentInfo === 'paid' ? 'Paid' : 'Unpaid'}
-                              </span>
-                            )}
-                            {job._count?.roles > 0 && (
-                              <span style={{ background: '#f0f0f5', color: '#666', fontSize: '10px', fontWeight: 'bold', padding: '4px 10px', borderRadius: '6px' }}>
-                                🎭 {job._count.roles} role{job._count.roles > 1 ? 's' : ''}
-                              </span>
+                            ) : (
+                              <div className="w-1" />
                             )}
                           </div>
 
-                          {/* Bottom: Expiry + Apply */}
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #f0f0f0', paddingTop: '14px', marginTop: 'auto' }}>
-                            <div>
-                              {job.lastDateToApply ? (
-                                <span style={{ fontSize: '11px', fontWeight: 'bold', color: isExpired ? '#ef4444' : '#f59e0b' }}>
-                                  {isExpired ? 'Expired' : `${daysLeft} day${daysLeft !== 1 ? 's' : ''} left`}
-                                </span>
-                              ) : (
-                                <span style={{ fontSize: '11px', color: '#aaa' }}>No deadline</span>
-                              )}
-                              <span style={{ fontSize: '10px', color: '#bbb', marginLeft: '8px' }}>
-                                Ends {job.lastDateToApply ? new Date(job.lastDateToApply).toLocaleDateString() : '—'}
-                              </span>
-                            </div>
-                            <button
+                          {!isExpired && (
+                            <div
                               onClick={(e) => {
+                                e.preventDefault();
                                 e.stopPropagation();
-                                if (!isExpired) {
-                                  if (!user) { alert('Please login to apply'); return; }
-                                  setQuickJob(job);
-                                }
+                                if (!user) { alert('Please login to apply'); return; }
+                                setQuickJob(job);
                               }}
-                              style={{
-                                background: isExpired ? '#e5e5e5' : '#C6007E', color: isExpired ? '#999' : '#fff',
-                                fontSize: '10px', fontWeight: 'black', padding: '7px 16px', borderRadius: '8px',
-                                letterSpacing: '0.5px', textTransform: 'uppercase', border: 'none',
-                                cursor: isExpired ? 'not-allowed' : 'pointer',
-                              }}
+                              className="flex items-center gap-2 cursor-pointer"
                             >
-                              {isExpired ? 'Closed' : 'Quick Apply'}
-                            </button>
-                          </div>
+                              <span className="text-[10px] font-mono font-black uppercase text-neutral-500 group-hover:text-[#3835A4] transition-colors duration-300">
+                                Quick Apply
+                              </span>
+                              <div className="p-1.5 rounded-xl bg-neutral-50 border border-neutral-200/60 group-hover:bg-gradient-to-br group-hover:from-[#C6007E] group-hover:to-[#3835A4] group-hover:text-white group-hover:border-transparent transition-all duration-300">
+                                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                              </div>
+                            </div>
+                          )}
+                          {isExpired && (
+                            <span className="text-[10px] font-mono font-black uppercase text-neutral-500">
+                              Application Closed
+                            </span>
+                          )}
                         </div>
                       </div>
+                    </div>
                   );
                 })
               )}

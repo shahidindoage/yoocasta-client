@@ -149,7 +149,11 @@ export default function ManageJobs() {
                         <div className="font-bold text-[#3835A4] truncate max-w-[200px]">{job.title || 'Untitled'}</div>
                         <div className="text-xs text-[#3835A4]/50">{job._count?.roles || 0} Roles</div>
                       </td>
-                      <td className="p-4 text-center font-bold text-[#C6007E]">{job.totalApplications || 0}</td>
+                      <td className="p-4 text-center">
+                        <Link to={`/dashboard/recruiter/jobs/${job.id}/applications`} className="font-bold text-[#C6007E] hover:text-[#3835A4] transition-colors">
+                          {job.totalApplications || 0}
+                        </Link>
+                      </td>
                       <td className="p-4 text-center font-bold text-orange-500">{job.shortlistedCount || 0}</td>
                       <td className="p-4 text-center font-bold text-green-600">{job.selectedCount || 0}</td>
                       <td className="p-4 text-center text-sm text-[#3835A4]/70">{job.views || 0}</td>

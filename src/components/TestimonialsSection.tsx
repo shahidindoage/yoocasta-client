@@ -17,14 +17,14 @@ export default function TestimonialsSection() {
   const active = INITIAL_TESTIMONIALS[currentIndex];
 
   return (
-    <div id="testimonials" className="w-full bg-neutral-900 text-white py-12 border-b border-[#f2f2f2] relative overflow-hidden">
+    <div id="testimonials" className="w-full bg-[#222222] text-white py-12 border-b border-[#f2f2f2] relative overflow-hidden">
       
       {/* Decorative High-Contrast Glow Elements */}
       <div className="absolute right-0 top-1/4 h-[500px] w-[500px] rounded-full bg-amber-500/[0.03] filter blur-[150px] pointer-events-none" />
       <div className="absolute left-[-10%] bottom-0 h-[400px] w-[400px] rounded-full bg-amber-600/[0.02] filter blur-[120px] pointer-events-none" />
       
       {/* Editorial Watermark background */}
-      <div className="absolute top-12 left-1/2 -translate-x-1/2 select-none pointer-events-none text-[15vw] font-black text-white/[0.01] tracking-[0.1em] uppercase font-mono leading-none">
+      <div className="absolute top-12 left-1/2 -translate-x-1/2 select-none pointer-events-none text-[15vw] font-black text-white/[0.03] tracking-[0.1em] uppercase font-mono leading-none">
         DIARIES
       </div>
 
@@ -80,7 +80,7 @@ export default function TestimonialsSection() {
 
             {/* Right Column: Immersive quote and metadata */}
             <div className="lg:col-span-7 space-y-8 relative">
-              <Quote className="absolute -top-10 -left-6 h-20 w-20 text-white/[0.02] pointer-events-none" />
+              <Quote className="absolute -top-10 -left-6 h-20 w-20 text-white/[0.05] pointer-events-none" />
 
               <div className="min-h-[220px] flex flex-col justify-between">
                 <AnimatePresence mode="wait">

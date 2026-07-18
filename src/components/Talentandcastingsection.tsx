@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import * as Icons from 'lucide-react';
 import {
   MapPin,
@@ -8,7 +8,7 @@ import {
   DollarSign,
   AlertCircle,
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import { CATEGORIES } from '../data';
 import { CastingCall } from '../types';
 
@@ -48,168 +48,113 @@ const CATEGORY_COLORS: Record<string, { bg: string; border: string; glow: string
   'Voice Over Artists': { bg: 'from-indigo-500/10 to-indigo-600/5', border: 'group-hover:border-indigo-400/40', glow: 'bg-indigo-400/[0.03]', textAccent: 'text-indigo-400' },
 };
 
-type ViewMode = 'categories' | 'castings';
-
 export default function TalentAndCastingSection({
   selectedCategory,
   onSelectCategory,
   castings,
   onCastingClick,
 }: TalentAndCastingSectionProps) {
-  const [view, setView] = useState<ViewMode>('categories');
-
-  const headerCopy =
-    view === 'categories'
-      ? {
-          title: 'Browse Specialization Hubs',
-          desc: 'Every division is carefully vetted for screen presence, professional reliability, and regional experience. Click any sector to seamlessly filter the active audition catalog below.',
-        }
-      : {
-          title: 'Active Casting Bulletins',
-          desc: 'Explore high-budget commercial campaigns, feature films, and VIP event hosting roles. Secure your next major placement with zero intermediate agency fees.',
-        };
-
   return (
-    <div id="directors-board" className="w-full bg-white py-8 border-y border-[#f2f2f2] relative overflow-hidden">
-      <div className="absolute right-1/4 top-1/2 h-96 w-96 rounded-full bg-[#3835A4]/[0.035] filter blur-[100px] pointer-events-none" />
-      <div className="absolute left-10 bottom-10 h-80 w-80 rounded-full bg-[#C6007E]/[0.02] filter blur-[80px] pointer-events-none" />
+    <div id="directors-board" className="w-full bg-white py-16 border-y border-[#f2f2f2] relative overflow-hidden space-y-24">
+      {/* Background Ornaments */}
+      <div className="absolute right-1/4 top-1/4 h-96 w-96 rounded-full bg-[#3835A4]/[0.035] filter blur-[100px] pointer-events-none" />
+      <div className="absolute left-10 bottom-1/4 h-80 w-80 rounded-full bg-[#C6007E]/[0.02] filter blur-[80px] pointer-events-none" />
       <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:24px_24px] opacity-40 pointer-events-none" />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
-
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-16 pb-10 border-b border-neutral-200/65">
-          <div className="space-y-3 max-w-2xl">
+        
+        {/* SECTION 1: Talent Departments */}
+        <section className="mb-20">
+          <div className="space-y-3 max-w-7xl mb-12 pb-6 border-b border-neutral-200/65">
             <h2 className="font-display text-3xl font-black text-neutral-900 sm:text-5xl tracking-tight leading-none">
-              {headerCopy.title}
+              Browse Specialization Hubs
             </h2>
             <p className="text-xs sm:text-sm text-neutral-500 max-w-lg font-medium leading-relaxed">
-              {headerCopy.desc}
+              Every division is carefully vetted for screen presence, professional reliability, and regional experience. Click any sector to seamlessly filter the active audition catalog below.
             </p>
           </div>
 
-          <div className="flex items-center p-1.5 bg-neutral-100/80 backdrop-blur-md rounded-2xl border border-neutral-200/60 shrink-0 self-start lg:self-auto relative">
-            <button
-              onClick={() => setView('categories')}
-              className={`relative px-5 py-3 text-xs font-black rounded-xl tracking-wider transition-colors duration-300 z-10 cursor-pointer whitespace-nowrap ${
-                view === 'categories' ? 'text-white' : 'text-neutral-500 hover:text-[#3835A4]'
-              }`}
-            >
-              {view === 'categories' && (
-                <motion.div
-                  layoutId="activeSectionTab"
-                  className="absolute inset-0 bg-gradient-to-r from-[#C6007E] to-[#3835A4] rounded-xl -z-10 shadow-md"
-                  transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                />
-              )}
-              Talent Departments
-            </button>
-            <button
-              onClick={() => setView('castings')}
-              className={`relative px-5 py-3 text-xs font-black rounded-xl tracking-wider transition-colors duration-300 z-10 cursor-pointer whitespace-nowrap ${
-                view === 'castings' ? 'text-white' : 'text-neutral-500 hover:text-[#3835A4]'
-              }`}
-            >
-              {view === 'castings' && (
-                <motion.div
-                  layoutId="activeSectionTab"
-                  className="absolute inset-0 bg-gradient-to-r from-[#C6007E] to-[#3835A4] rounded-xl -z-10 shadow-md"
-                  transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                />
-              )}
-              Casting Opportunities
-            </button>
-          </div>
-        </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            {CATEGORIES.map((cat) => {
+              const IconComponent = (Icons as any)[cat.icon || 'Sparkles'] || Icons.Sparkles;
+              
+              // FIX: Ensure casing equality handles normalization if one part uses raw text vs ID
+              const isActive = 
+                selectedCategory.toLowerCase() === cat.id.toLowerCase() || 
+                selectedCategory.toLowerCase() === cat.name.toLowerCase();
 
-        <AnimatePresence mode="wait">
-          {view === 'categories' ? (
-            <motion.div
-              key="categories"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6"
-            >
-              {CATEGORIES.map((cat) => {
-                const IconComponent = (Icons as any)[cat.icon || 'Sparkles'] || Icons.Sparkles;
-                const isActive =
-                  (cat.id === 'all' && selectedCategory === 'all') ||
-                  selectedCategory === cat.name;
+              const subTag = CATEGORY_TAGS[cat.name] || CATEGORY_TAGS['all'];
+              const colorMeta = CATEGORY_COLORS[cat.name] || CATEGORY_COLORS['all'];
 
-                const subTag = CATEGORY_TAGS[cat.name] || CATEGORY_TAGS['all'];
-                const colorMeta = CATEGORY_COLORS[cat.name] || CATEGORY_COLORS['all'];
+              return (
+                <motion.button
+                  key={cat.id}
+                  // FIX: Pass the normalized values so FeaturedTalent filters reliably
+                  onClick={() => onSelectCategory(cat.id === 'all' ? 'all' : cat.name)}
+                  whileHover={{ y: -6, scale: 1.015 }}
+                  whileTap={{ scale: 0.985 }}
+                  className={`group relative p-6 pt-10 rounded-3xl flex flex-col justify-between items-stretch text-left transition-all duration-300 cursor-pointer overflow-hidden border ${
+                    isActive
+                      ? 'border-transparent bg-gradient-to-br from-[#3835A4] to-[#C6007E] text-white shadow-xl shadow-[#3835A4]/25'
+                      : `border-neutral-200/80 bg-neutral-50/60 hover:bg-white ${colorMeta.border} hover:shadow-lg hover:shadow-neutral-100`
+                  }`}
+                  style={{ contentVisibility: 'auto' }}
+                >
+                  {!isActive && (
+                    <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br ${colorMeta.bg} pointer-events-none`} />
+                  )}
 
-                return (
-                  <motion.button
-                    key={cat.id}
-                    onClick={() => onSelectCategory(cat.id === 'all' ? 'all' : cat.name)}
-                    whileHover={{ y: -6, scale: 1.015 }}
-                    whileTap={{ scale: 0.985 }}
-                    className={`group relative p-6 pt-10 rounded-3xl flex flex-col justify-between items-stretch text-left transition-all duration-300 cursor-pointer overflow-hidden border ${
+                  <div className="mb-6 relative z-10">
+                    <div className={`inline-flex p-3.5 rounded-2xl transition-all duration-300 ${
                       isActive
-                        ? 'border-transparent bg-gradient-to-br from-[#3835A4] to-[#C6007E] text-white shadow-xl shadow-[#3835A4]/25'
-                        : `border-neutral-200/80 bg-neutral-50/60 hover:bg-white ${colorMeta.border} hover:shadow-lg hover:shadow-neutral-100`
-                    }`}
-                    style={{ contentVisibility: 'auto' }}
-                  >
-                    {!isActive && (
-                      <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br ${colorMeta.bg} pointer-events-none`} />
-                    )}
+                        ? 'bg-white text-[#3835A4] shadow-lg shadow-white/20'
+                        : 'bg-white text-neutral-800 border border-neutral-200 shadow-sm group-hover:bg-gradient-to-br group-hover:from-[#C6007E] group-hover:to-[#3835A4] group-hover:text-white group-hover:border-transparent'
+                    }`}>
+                      <IconComponent className="h-5 w-5" />
+                    </div>
+                  </div>
 
-                    <div className="mb-6 relative z-10">
-                      <div className={`inline-flex p-3.5 rounded-2xl transition-all duration-300 ${
-                        isActive
-                          ? 'bg-white text-[#3835A4] shadow-lg shadow-white/20'
-                          : 'bg-white text-neutral-800 border border-neutral-200 shadow-sm group-hover:bg-gradient-to-br group-hover:from-[#C6007E] group-hover:to-[#3835A4] group-hover:text-white group-hover:border-transparent'
-                      }`}>
-                        <IconComponent className="h-5 w-5" />
-                      </div>
+                  <div className="space-y-2.5 relative z-10 mt-auto">
+                    <div>
+                      <h3 className={`font-display text-base font-black tracking-tight ${isActive ? 'text-white' : 'text-neutral-900'}`}>
+                        {cat.name}
+                      </h3>
+                      <p className={`text-[10px] font-medium tracking-wide mt-0.5 ${isActive ? 'text-neutral-200' : 'text-neutral-400 group-hover:text-neutral-600'}`}>
+                        {subTag}
+                      </p>
                     </div>
 
-                    <div className="space-y-2.5 relative z-10 mt-auto">
-                      <div>
-                        <h3 className={`font-display text-base font-black tracking-tight ${
-                          isActive ? 'text-white' : 'text-neutral-900'
-                        }`}>
-                          {cat.name}
-                        </h3>
-                        <p className={`text-[10px] font-medium tracking-wide mt-0.5 ${
-                          isActive ? 'text-neutral-200' : 'text-neutral-400 group-hover:text-neutral-600'
-                        }`}>
-                          {subTag}
-                        </p>
-                      </div>
-
-                      <div className="flex items-center justify-between pt-2 border-t border-dashed border-neutral-200/50 group-hover:border-neutral-300/80">
-                        <span className={`text-[10px] font-mono font-bold ${
-                          isActive ? 'text-pink-100' : 'text-neutral-500 group-hover:text-[#3835A4]'
-                        }`}>
-                          {cat.count.toLocaleString()} ACTIVE
+                    <div className="flex items-center justify-between pt-2 border-t border-dashed border-neutral-200/50 group-hover:border-neutral-300/80">
+                      <span className={`text-[10px] font-mono font-bold ${isActive ? 'text-pink-100' : 'text-neutral-500 group-hover:text-[#3835A4]'}`}>
+                        {cat.count.toLocaleString()} ACTIVE
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <span className={`text-[8px] uppercase tracking-wider font-mono font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${isActive ? 'text-white' : 'text-neutral-700'}`}>
+                          View
                         </span>
-                        <div className="flex items-center gap-1">
-                          <span className={`text-[8px] uppercase tracking-wider font-mono font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
-                            isActive ? 'text-white' : 'text-neutral-700'
-                          }`}>
-                            View
-                          </span>
-                          <ArrowUpRight className={`h-3.5 w-3.5 transition-transform duration-300 ${
-                            isActive ? 'text-white translate-x-0.5 -translate-y-0.5' : 'text-neutral-400 group-hover:text-[#3835A4] group-hover:translate-x-0.5 group-hover:-translate-y-0.5'
-                          }`} />
-                        </div>
+                        <ArrowUpRight className={`h-3.5 w-3.5 transition-transform duration-300 ${isActive ? 'text-white translate-x-0.5 -translate-y-0.5' : 'text-neutral-400 group-hover:text-[#3835A4] group-hover:translate-x-0.5 group-hover:-translate-y-0.5'}`} />
                       </div>
                     </div>
-                  </motion.button>
-                );
-              })}
-            </motion.div>
-          ) : castings.length === 0 ? (
-            <motion.div
-              key="empty"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              className="text-center py-24 bg-neutral-50 border border-dashed border-neutral-200/80 rounded-[2rem] max-w-2xl mx-auto"
-            >
+                  </div>
+                </motion.button>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* SECTION 2: Casting Opportunities */}
+        <section>
+          <div className="space-y-3 max-w-7xl mb-12 pb-6 border-b border-neutral-200/65">
+            <h2 className="font-display text-3xl font-black text-neutral-900 sm:text-5xl tracking-tight leading-none">
+              Active Casting Bulletins
+            </h2>
+            <p className="text-xs sm:text-sm text-neutral-500 max-w-lg font-medium leading-relaxed">
+              Explore high-budget commercial campaigns, feature films, and VIP event hosting roles. Secure your next major placement with zero intermediate agency fees.
+            </p>
+          </div>
+
+          {castings.length === 0 ? (
+            <div className="text-center py-24 bg-neutral-50 border border-dashed border-neutral-200/80 rounded-[2rem] max-w-2xl mx-auto">
               <div className="h-14 w-14 rounded-2xl bg-neutral-100 flex items-center justify-center mx-auto mb-6">
                 <AlertCircle className="h-7 w-7 text-neutral-400" />
               </div>
@@ -217,16 +162,9 @@ export default function TalentAndCastingSection({
               <p className="text-sm text-neutral-500 mt-2 max-w-sm mx-auto leading-relaxed">
                 There are currently no open roles published under this segment. Check back shortly as new campaigns launch daily.
               </p>
-            </motion.div>
+            </div>
           ) : (
-            <motion.div
-              key="castings"
-              layout
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10"
-            >
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
               {castings.map((casting, index) => {
                 const expiryTime = new Date(casting.expiryDate).getTime();
                 const calculatedDaysLeft = Math.ceil((expiryTime - TIME_ANCHOR) / MS_IN_DAY);
@@ -238,10 +176,10 @@ export default function TalentAndCastingSection({
                 return (
                   <motion.div
                     key={casting.id}
-                    layout
                     initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: index * 0.05 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-40px" }}
+                    transition={{ duration: 0.4, delay: (index % 3) * 0.05 }}
                     onClick={() => onCastingClick(casting)}
                     className="bg-white flex flex-col rounded-[2.25rem] overflow-hidden border border-neutral-200 hover:border-[#3835A4]/40 hover:shadow-2xl transition-all duration-500 cursor-pointer h-full group relative"
                     style={{ contentVisibility: 'auto' }}
@@ -309,7 +247,6 @@ export default function TalentAndCastingSection({
                         </div>
                       </div>
 
-                      {/* Cleaned Bottom Application Bar */}
                       <div className="pt-6 mt-6 border-t border-dashed border-neutral-200 flex items-center justify-between">
                         <div>
                           {isExpired ? (
@@ -317,7 +254,7 @@ export default function TalentAndCastingSection({
                               EXPIRED
                             </span>
                           ) : (
-                            <div className="w-1" /> // Structural placeholder when active
+                            <div className="w-1" />
                           )}
                         </div>
 
@@ -334,9 +271,10 @@ export default function TalentAndCastingSection({
                   </motion.div>
                 );
               })}
-            </motion.div>
+            </div>
           )}
-        </AnimatePresence>
+        </section>
+
       </div>
     </div>
   );

@@ -31,18 +31,18 @@ export default function Hero({ onSearch }: HeroProps) {
     <div className="relative min-h-[58vh] lg:min-h-[64vh] w-full overflow-hidden flex flex-col justify-center items-center bg-neutral-950 text-white px-4 sm:px-6 lg:px-8 py-12 lg:py-14">
       
       {/* CSS Injection for smooth running two-color text gradient animation */}
-      <style>{`
-        @keyframes brandGradientText {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-        .animate-brand-gradient {
-          background-size: 200% auto;
-          animation: brandGradientText 6s ease infinite;
-          background-image: linear-gradient(to right, #C6007E, #3835A4, #C6007E);
-        }
-      `}</style>
+    <style>{`
+  @keyframes brandGradientText {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  .animate-brand-gradient {
+    background-size: 200% auto;
+    animation: brandGradientText 6s ease infinite;
+    background-image: linear-gradient(to right, #FF00A0, #3375faa8, #FF00A0);
+  }
+`}</style>
 
       {/* Full Screen Background Video Autoplay */}
       <div className="absolute inset-0 z-0 overflow-hidden">
@@ -55,7 +55,7 @@ export default function Hero({ onSearch }: HeroProps) {
           src="https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/casting_video/casting_video_10107.mp4" 
         />
         {/* Cinematic dark gradient overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/70 to-neutral-950/50" />
+        {/* <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/70 to-neutral-950/50" /> */}
       </div>
 
       {/* Main Content (Centered) */}

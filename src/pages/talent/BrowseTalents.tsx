@@ -14,6 +14,7 @@ import {
 } from 'react-icons/fa';
 import { FaPersonWalkingLuggage, FaPersonDress } from 'react-icons/fa6'; // hostess, dancer
 import { GiWalk } from 'react-icons/gi'; // models
+import { MapPin, X, Send, Ruler, ChevronDown, ChevronUp } from 'lucide-react';
 
 
 const MultiSelectDropdown = ({
@@ -49,13 +50,13 @@ const MultiSelectDropdown = ({
         type="button"
         onClick={() => setOpen(!open)}
         style={{
-          width: '100%', textAlign: 'left', background: '#1c1c24', color: selected.length ? '#fff' : '#888',
+          width: '100%', textAlign: 'left', background: '#1c1c24', color: selected.length ? '#fff' : '#ffffffff',
           border: '1px solid #333', padding: '10px 14px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}
       >
         {summary}
-        <span style={{ fontSize: '10px', color: '#666' }}>{open ? '▲' : '▼'}</span>
+        <span style={{ fontSize: '10px', color: '#ffffffff' }}>{open ? <ChevronUp style={{ width: '15px', height: '15px' }} /> : <ChevronDown style={{ width: '15px', height: '15px' }} />}</span>
       </button>
 
       {open && (
@@ -201,6 +202,9 @@ const BrowseTalents = () => {
   const [appliedFilters, setAppliedFilters] = useState<any>(DEFAULT_FILTERS);
   // const [showFilters, setShowFilters] = useState(false);
   const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
+  const [detailTalent, setDetailTalent] = useState<any>(null);
+  const [detailPhoto, setDetailPhoto] = useState<string>('');
+  const [bioExpanded, setBioExpanded] = useState(false);
 
   const [showFilters, setShowFilters] = useState(false); // now: Professional Attributes only
 const [showPhysicalFilters, setShowPhysicalFilters] = useState(false); // new: Physical Filters tab
@@ -291,18 +295,18 @@ const setProfessionalText = (key: string, val: string) => {
 
 
 
-<div style={{ position: 'relative', background: '#111115', color: '#fff', padding: '24px 40px', borderBottom: '1px solid #222', overflow: 'hidden' }}>
+<div style={{ position: 'relative', background: '#111115', color: '#fff', padding: '24px 40px', borderBottom: '1px solid #222' }}>
 
   {/* BACKGROUND VIDEO */}
   <video
     autoPlay loop muted playsInline
-    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0, opacity: 0.25 }}
+    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0, opacity: 0.55 }}
   >
     <source src="https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/casting_video/casting_video_10107.mp4" type="video/mp4" />
   </video>
 
   {/* DARK OVERLAY for contrast */}
-  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(180deg, rgba(17, 17, 21, 0.49) 0%, rgba(17,17,21,0.95) 100%)', zIndex: 1 }} />
+  {/* <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(180deg, rgba(17, 17, 21, 0.49) 0%, rgba(17,17,21,0.95) 100%)', zIndex: 1 }} /> */}
 
   {/* ⬇️ NEW WRAPPER — everything below must go INSIDE this div */}
   <div style={{ position: 'relative', zIndex: 2 }}>
@@ -649,123 +653,93 @@ const setProfessionalText = (key: string, val: string) => {
       {talents.length === 0 ? (
         <p style={{ color: '#666' }}>No talents found matching your criteria.</p>
       ) : (
-        talents.map(talent => {
+        talents.map((talent) => {
+          const sortedCategories = [...(talent.categories || [])].sort();
           const isHovered = hoveredCardId === talent.id;
-          const themeColor = talent.gender === 'female' ? '#C6007E' : '#3835A4';
 
           return (
-            <Link 
-              to={`/talent/${talent.username}`} 
-              key={talent.id} 
-              style={{ textDecoration: 'none', color: 'inherit' }}
+            <div
+              key={talent.id}
               onMouseEnter={() => setHoveredCardId(talent.id)}
               onMouseLeave={() => setHoveredCardId(null)}
+              className="snap-start group relative h-[520px] w-full shrink-0 rounded-[2.25rem] overflow-hidden cursor-pointer bg-neutral-950 border border-neutral-200/90 shadow-lg hover:shadow-2xl transition-all duration-500"
             >
-              <div style={{ 
-                        position: 'relative',
-                        height: '440px',
-                        borderRadius: '24px', 
-                        overflow: 'hidden', 
-                        background: '#111', 
-                        boxShadow: isHovered ? '0 20px 40px rgba(0,0,0,0.3)' : '0 4px 12px rgba(0,0,0,0.05)',
-                        transform: isHovered ? 'translateY(-4px)' : 'none',
-                        transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
-                      }}>
-                        
-                        {/* Real Photo Element Layer */}
-                        <img 
-                          src={talent.image || 'https://via.placeholder.com/400x500?text=No+Photo'} 
-                          alt={talent.firstName} 
-                          style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: isHovered ? 0.65 : 0.85, transition: 'opacity 0.3s' }} 
-                        />
+              <div className="absolute inset-3 border border-white/10 rounded-[1.75rem] pointer-events-none z-20 transition-all duration-500 group-hover:inset-2.5 group-hover:border-[#C6007E]/35" />
 
-                        {/* Top Utility Plan Badges Overlay */}
-                        <div style={{ position: 'absolute', top: '16px', left: '16px', right: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 2 }}>
-                          <div>
-                            {talent.plan === 'premium' && (
-                              <span style={{ background: 'linear-gradient(90deg, #C6007E 0%, #3835A4 100%)', color: '#fff', fontSize: '9px', fontWeight: 'black', padding: '6px 12px', borderRadius: '20px', letterSpacing: '1px', textTransform: 'uppercase' }}>
-                                ★ PREMIUM
-                              </span>
-                            )}
-                          </div>
-                          {talent.physical?.height && (
-                            <span style={{ background: 'rgba(17, 17, 21, 0.75)', color: '#fff', fontSize: '10px', fontFamily: 'monospace', padding: '6px 12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.15)' }}>
-                              📏 {talent.physical.height} CM
-                            </span>
-                          )}
-                        </div>
+              <div className="absolute inset-0 h-full w-full">
+                <img
+                  src={talent.image || 'https://via.placeholder.com/400x600?text=No+Photo'}
+                  alt={talent.firstName}
+                  className="h-full w-full object-cover transition-transform duration-1000 ease-out scale-100 group-hover:scale-105 filter brightness-95 group-hover:brightness-[0.82]"
+                  referrerPolicy="no-referrer"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/60 to-transparent to-20% z-10" />
+              </div>
 
-                        {/* Shadow Gradient Vignette Cover */}
-                        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '70%', background: 'linear-gradient(to top, rgba(11,11,13,0.95) 0%, rgba(11,11,13,0.6) 40%, transparent 100%)', zIndex: 1 }} />
+              <div className="absolute top-6 left-6 right-6 flex items-center justify-between z-30">
+                {talent.plan === 'premium' || talent.plan === 'PREMIUM' ? (
+                  <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white text-[9px] uppercase font-mono font-black tracking-[0.2em] px-3.5 py-1.5 rounded-xl shadow-lg">
+                    <svg className="h-3 w-3 fill-current text-white" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+                    <span>PREMIUM</span>
+                  </div>
+                ) : <div />}
 
-                        {/* Dynamic Context Fields Container */}
-                        <div style={{ position: 'absolute', bottom: '20px', left: '20px', right: '20px', zIndex: 2 }}>
-                          
-                          {/* Top Tag Classifications Mapping */}
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '10px' }}>
-                            {talent.categories?.slice(0, 2).map((cat: string) => (
-                              <span key={cat} style={{ fontSize: '9px', fontWeight: 'black', background: themeColor, color: '#fff', padding: '4px 10px', borderRadius: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                                {cat}
-                              </span>
-                            ))}
-                          </div>
+                {talent.physical?.height && (
+                  <div className="bg-neutral-950/80 backdrop-blur-md text-white/90 text-[10px] font-mono tracking-wider px-3.5 py-1.5 rounded-xl border border-white/10 flex items-center gap-1">
+                    <Ruler className="h-3 w-3 text-neutral-400" />
+                    <span>{talent.physical.height} CM</span>
+                  </div>
+                )}
+              </div>
 
-                          <h3 style={{ margin: 0, color: '#fff', fontSize: '24px', fontWeight: 900, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            {talent.firstName} {talent.lastName} {talent.isVerified && <span style={{ fontSize: '14px' }}>✅</span>}
-                          </h3>
+              <div className="absolute inset-x-0 bottom-0 p-7 z-30 flex flex-col justify-end">
+                <div className="flex items-end justify-between gap-4">
+                  <div className="space-y-2">
+                    <div className="flex flex-wrap gap-1.5">
+                      {sortedCategories.slice(0, 2).map((cat: string, idx: number) => (
+                        <span key={idx} className="text-[9px] uppercase font-mono tracking-widest font-black text-[#FFF] px-2 py-0.5 bg-[#3835A4] rounded-md group-hover:bg-[#C6007E]">
+                          {cat}
+                        </span>
+                      ))}
+                    </div>
+                    <Link to={`/talent/${talent.username}`} className="block no-underline">
+                      <h3 className="font-display text-2xl sm:text-3xl font-black text-white hover:text-[#C6007E] transition-colors leading-none">
+                        {talent.firstName} {talent.lastName}
+                      </h3>
+                    </Link>
+                    <div className="flex items-center gap-1.5 text-xs text-neutral-300 font-bold">
+                      <MapPin className="h-3.5 w-3.5 text-[#FFF] group-hover:text-[#FFF]" />
+                      <span>{talent.city}{talent.country ? `, ${talent.country}` : ''}</span>
+                    </div>
+                  </div>
 
-                          <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#bbb' }}>
-                            📍 {talent.city}{talent.country ? `, ${talent.country}` : ''} {talent.age && `• ${talent.age} yrs`}
-                          </p>
+                    <div
+                    onClick={(e) => { e.stopPropagation(); e.preventDefault(); setDetailTalent(talent); setDetailPhoto(talent.image); setBioExpanded(false); }}
+                    className="p-4 rounded-2xl bg-[#3835A4] text-white transition-all duration-300 shadow-xl group-hover:bg-[#C6007E] shrink-0 border border-white/10 cursor-pointer"
+                  >
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                  </div>
+                </div>
 
-                          {/* Dynamic Attribute Metrics Grid Revealed On Hover State */}
-                          <div style={{ 
-                            maxHeight: isHovered ? '85px' : '0px', 
-                            opacity: isHovered ? 1 : 0,
-                            overflow: 'hidden',
-                            transition: 'all 0.35s cubic-bezier(0.16, 1, 0.3, 1)',
-                            marginTop: isHovered ? '16px' : '0px',
-                            borderTop: isHovered ? '1px solid rgba(255,255,255,0.1)' : 'none',
-                            paddingTop: isHovered ? '12px' : '0px',
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(3, 1fr)',
-                            gap: '8px'
-                          }}>
-                            <div>
-                              <span style={{ display: 'block', fontSize: '8px', color: '#777', fontWeight: 'bold' }}>SHOE SIZE</span>
-                              <span style={{ color: '#fff', fontSize: '12px', fontWeight: 'bold' }}>{talent.physical?.shoeSize || '—'} EU</span>
-                            </div>
-                            <div>
-                              <span style={{ display: 'block', fontSize: '8px', color: '#777', fontWeight: 'bold' }}>HAIR COLOR</span>
-                              <span style={{ color: '#fff', fontSize: '12px', fontWeight: 'bold', textTransform: 'capitalize' }}>{talent.physical?.hairColor || '—'}</span>
-                            </div>
-                            <div>
-                              <span style={{ display: 'block', fontSize: '8px', color: '#777', fontWeight: 'bold' }}>WAISTLINE</span>
-                            <span style={{ color: '#fff', fontSize: '12px', fontWeight: 'bold' }}>{talent.physical?.waist ? `${talent.physical.waist} CM` : '—'}</span>
-                            </div>
-                          </div>
-
-                          {/* Float Action Node */}
-                          {/* <div style={{ 
-                            position: 'absolute', 
-                            right: '0px', 
-                            bottom: '0px', 
-                            background: themeColor, 
-                            width: '42px', 
-                            height: '42px', 
-                            borderRadius: '12px', 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            justifyContent: 'center',
-                            transform: isHovered ? 'scale(1.05)' : 'scale(1)',
-                            transition: 'transform 0.2s'
-                          }}>
-                            <span style={{ color: '#fff', fontSize: '14px' }}>👁</span>
-                          </div> */}
-
-                        </div>
-                      </div>
-            </Link>
+                <div className="h-0 opacity-0 overflow-hidden group-hover:h-16 group-hover:opacity-100 group-hover:mt-6 transition-all duration-500 ease-out border-t border-white/10 pt-4">
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    <div>
+                      <p className="text-[8px] text-[#fff] uppercase font-mono">Shoe Size</p>
+                      <p className="text-xs font-black text-white font-mono">{talent.physical?.shoeSize || 'N/A'} EU</p>
+                    </div>
+                    <div>
+                      <p className="text-[8px] text-[#fff] uppercase font-mono">Hair Color</p>
+                      <p className="text-xs font-black text-white font-mono">{talent.physical?.hairColor || '—'}</p>
+                    </div>
+                    <div>
+                      <p className="text-[8px] text-[#fff] uppercase font-mono">Waistline</p>
+                      <p className="text-xs font-black text-white font-mono">{talent.physical?.waist ? `${talent.physical.waist} CM` : 'N/A'}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           );
         })
       )}
@@ -798,7 +772,146 @@ const setProfessionalText = (key: string, val: string) => {
 )}
 </div>
 
-      
+       
+      {/* Talent Detail Modal */}
+      {detailTalent && (() => {
+        const allMedia = detailTalent.media?.filter((m: any) => m.type === 'IMAGE' || !m.type) || [];
+        const galleryImages = [detailTalent.image, ...allMedia.map((m: any) => m.url)].filter(Boolean);
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-950/70 backdrop-blur-md">
+            <div className="relative w-full max-w-4xl rounded-3xl border border-neutral-200 bg-white shadow-2xl overflow-y-auto md:overflow-hidden flex flex-col md:flex-row max-h-[92vh] md:h-[700px]">
+              <button
+                onClick={() => setDetailTalent(null)}
+                className="absolute right-4 top-4 z-10 p-2 rounded-full bg-white/80 hover:bg-neutral-100 text-neutral-500 hover:text-neutral-900 border border-neutral-200 shadow-sm transition-colors cursor-pointer"
+              >
+                <X className="h-5 w-5" />
+              </button>
+
+              <div className="w-full md:w-[45%] bg-neutral-50 p-6 flex flex-col justify-between shrink-0 border-r border-neutral-200">
+                <div className="h-[380px] md:h-[450px] rounded-2xl overflow-hidden bg-white border border-neutral-100 relative shadow-sm">
+                  <img
+                    src={detailPhoto}
+                    alt={`${detailTalent.firstName} ${detailTalent.lastName}`}
+                    className="h-full w-full object-cover transition-all"
+                    referrerPolicy="no-referrer"
+                  />
+                  {(detailTalent.plan === 'premium' || detailTalent.plan === 'PREMIUM') && (
+                    <span className="absolute top-4 left-4 inline-flex items-center gap-1 bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white text-[9px] uppercase font-black px-2 py-0.5 rounded-full shadow-md tracking-wider">
+                      PREMIUM
+                    </span>
+                  )}
+                </div>
+
+                <div className="mt-4 flex gap-2.5 overflow-x-auto pb-1">
+                  {galleryImages.slice(0, 4).map((imgUrl: string, i: number) => (
+                    <button
+                      key={i}
+                      onClick={() => setDetailPhoto(imgUrl)}
+                      className={`h-16 w-16 rounded-xl overflow-hidden bg-neutral-100 shrink-0 border-2 transition-all cursor-pointer ${
+                        detailPhoto === imgUrl ? 'border-[#C6007E] scale-[1.03]' : 'border-transparent hover:border-neutral-300'
+                      }`}
+                    >
+                      <img src={imgUrl} alt="" className="h-full w-full object-cover" referrerPolicy="no-referrer" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="w-full md:w-[55%] flex flex-col justify-between md:overflow-y-auto p-6 md:p-8">
+                <div className="space-y-5">
+                  <div>
+                    <div className="flex flex-wrap gap-1 mb-1">
+                      {(detailTalent.categories || []).map((cat: string, idx: number) => (
+                        <span key={idx} className="text-[10px] uppercase font-mono text-[#C6007E] font-bold tracking-wider">
+                          {idx > 0 && ' • '} {cat}
+                        </span>
+                      ))}
+                    </div>
+                    <h1 className="font-display text-3xl font-black text-neutral-900">
+                      {detailTalent.firstName} {detailTalent.lastName}
+                    </h1>
+                    <div className="mt-1 flex items-center gap-1.5 text-xs text-neutral-600">
+                      <MapPin className="h-4 w-4 text-neutral-400" />
+                      <span>Based in {detailTalent.city}{detailTalent.country ? `, ${detailTalent.country}` : ''}</span>
+                      <span className="text-neutral-300">•</span>
+                      <span className="text-[#C6007E] font-mono font-bold">Verified</span>
+                    </div>
+                  </div>
+
+                  {detailTalent.bio && (() => {
+                    const isLong = detailTalent.bio.length > 150;
+                    return (
+                      <div>
+                        <h3 className="text-xs font-mono uppercase tracking-widest text-neutral-500">Bio</h3>
+                        <p className="mt-1 text-xs text-neutral-700 leading-relaxed">
+                          {isLong && !bioExpanded ? detailTalent.bio.slice(0, 150) + '...' : detailTalent.bio}
+                        </p>
+                        {isLong && (
+                          <button
+                            onClick={() => setBioExpanded(!bioExpanded)}
+                            className="text-[10px] font-bold text-[#C6007E] hover:text-[#3835A4] mt-1 transition-colors cursor-pointer bg-none border-none p-0"
+                          >
+                            {bioExpanded ? 'Show less' : 'Read more'}
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })()}
+
+                  <div className="p-4 rounded-2xl bg-neutral-50 border border-neutral-200 space-y-4">
+                    <h3 className="text-[10px] font-mono uppercase tracking-widest text-[#C6007E] font-bold">Physical Specifications</h3>
+                    <div className="grid grid-cols-3 gap-y-4 gap-x-2 text-center">
+                      <div>
+                        <p className="text-[9px] uppercase tracking-wider text-neutral-500 font-mono">Height</p>
+                        <p className="text-sm font-black text-neutral-900 font-mono mt-0.5">{detailTalent.physical?.height || '—'} cm</p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] uppercase tracking-wider text-neutral-500 font-mono">Weight</p>
+                        <p className="text-sm font-black text-neutral-900 font-mono mt-0.5">{detailTalent.physical?.weight || '—'} kg</p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] uppercase tracking-wider text-neutral-500 font-mono">Chest</p>
+                        <p className="text-sm font-black text-neutral-900 font-mono mt-0.5">{detailTalent.physical?.chest || '—'} cm</p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] uppercase tracking-wider text-neutral-500 font-mono">Waist</p>
+                        <p className="text-sm font-black text-neutral-900 font-mono mt-0.5">{detailTalent.physical?.waist || '—'} cm</p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] uppercase tracking-wider text-neutral-500 font-mono">Shoe Size</p>
+                        <p className="text-sm font-black text-neutral-900 font-mono mt-0.5">{detailTalent.physical?.shoeSize || '—'} EU</p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] uppercase tracking-wider text-neutral-500 font-mono">Hair Color</p>
+                        <p className="text-sm font-black text-neutral-900 font-mono mt-0.5">{detailTalent.physical?.hairColor || '—'}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {detailTalent.skillDescription && (
+                    <div>
+                      <h3 className="text-xs font-mono uppercase tracking-widest text-neutral-500">Skills</h3>
+                      <p className="mt-1 text-xs text-neutral-700 leading-relaxed">{detailTalent.skillDescription}</p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-6 pt-4 border-t border-neutral-100">
+                  <Link
+                    to={`/talent/${detailTalent.username}`}
+                    onClick={() => setDetailTalent(null)}
+                    className="w-full bg-[#C6007E] text-white hover:bg-[#a10065] font-bold py-3.5 px-4 rounded-xl text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-sm hover:shadow no-underline"
+                  >
+                    <Send className="h-3.5 w-3.5" />
+                    <span>View Full Profile</span>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 };

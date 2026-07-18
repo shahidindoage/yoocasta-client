@@ -22,6 +22,8 @@ import RecruiterProfileSetup from './pages/recruiter/RecruiterProfileSetup';
 import RecruiterDashboard from './pages/recruiter/RecruiterDashboard';
 import PostJob from './pages/recruiter/post-job/PostJob';
 import ManageJobs from './pages/recruiter/ManageJobs';
+import JobApplications from './pages/recruiter/JobApplications';
+import ApplicationDetails from './pages/recruiter/ApplicationDetails';
 import PublicJobPage from './pages/jobs/PublicJobPage';
 import BrowseJobs from './pages/jobs/BrowseJobs';
 
@@ -64,6 +66,8 @@ function App() {
             <Route path="/dashboard/recruiter/profile-setup" element={<RecruiterProfileSetup />} /> 
             <Route path="/dashboard/recruiter/post-job" element={<PostJob />} />
             <Route path="/dashboard/recruiter/jobs" element={<ManageJobs />} />
+            <Route path="/dashboard/recruiter/jobs/:jobId/applications" element={<JobApplications />} />
+            <Route path="/dashboard/recruiter/applications/:applicationId" element={<ApplicationDetails />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" />} />

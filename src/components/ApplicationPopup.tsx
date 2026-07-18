@@ -115,7 +115,7 @@ export default function ApplicationPopup({ jobId, role, isExpired, onClose, onAp
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
         {/* Header */}
         <div className="sticky top-0 bg-white z-10 border-b border-stone-100 px-6 py-4 flex items-center justify-between rounded-t-3xl">
           <div>
@@ -134,9 +134,11 @@ export default function ApplicationPopup({ jobId, role, isExpired, onClose, onAp
               }`}>
                 {i < step ? '✓' : i + 1}
               </div>
-              <span className={`text-[9px] font-bold uppercase tracking-wider hidden sm:block ${i === step ? 'text-[#3835A4]' : 'text-stone-300'}`}>
-                {s}
-              </span>
+              {i === step && (
+                <span className="text-[9px] font-bold uppercase tracking-wider text-[#3835A4]">
+                  {s}
+                </span>
+              )}
               {i < STEPS.length - 1 && <div className="flex-1 h-px bg-stone-200" />}
             </div>
           ))}

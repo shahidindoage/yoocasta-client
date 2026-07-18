@@ -67,11 +67,6 @@ export default function Home() {
   // Live filtered list computed cleanly
   const filteredTalents = useMemo(() => {
     return talents.filter((talent) => {
-      // Check category match
-      const matchesCategory =
-        selectedCategory === 'all' ||
-        talent.categories.includes(selectedCategory);
-
       // Check gender match
       const matchesGender =
         selectedGender === 'All' ||
@@ -91,9 +86,9 @@ export default function Home() {
         talent.stats.eyeColor.toLowerCase().includes(searchKeyword.toLowerCase()) ||
         talent.categories.some(cat => cat.toLowerCase().includes(searchKeyword.toLowerCase()));
 
-      return matchesCategory && matchesGender && matchesLocation && matchesKeyword;
+      return matchesGender && matchesLocation && matchesKeyword;
     });
-  }, [talents, selectedCategory, selectedGender, selectedLocation, searchKeyword]);
+  }, [talents, selectedGender, selectedLocation, searchKeyword]);
 
   // Handle adding new talent profile live
   const handleNewTalentPublish = (newTalent: Talent) => {
