@@ -26,6 +26,15 @@ import JobApplications from './pages/recruiter/JobApplications';
 import ApplicationDetails from './pages/recruiter/ApplicationDetails';
 import PublicJobPage from './pages/jobs/PublicJobPage';
 import BrowseJobs from './pages/jobs/BrowseJobs';
+import MyApplications from './pages/talent/MyApplications';
+import ShortlistedApplicants from './pages/talent/ShortlistedApplicants';
+import MyJobInvitations from './pages/talent/MyJobInvitations';
+import MatchingJobs from './pages/talent/MatchingJobs';
+import CastBags from './pages/recruiter/CastBags';
+import Favourites from './pages/recruiter/Favourites';
+import SentInvitations from './pages/recruiter/SentInvitations';
+import PublicJobInvitation from './pages/jobs/PublicJobInvitation';
+import PublicCastBag from './pages/PublicCastBag';
 
 // Placeholder dashboard pages (we'll build these next)
 
@@ -53,12 +62,18 @@ function App() {
           <Route path="/browse-talents" element={<BrowseTalents />} />
           <Route path="/browse-jobs" element={<BrowseJobs />} />
           <Route path="/jobs/:jobId" element={<PublicJobPage />} />
+          <Route path="/invitation/:jobId" element={<PublicJobInvitation />} />
+          <Route path="/cast-bag/:token" element={<PublicCastBag />} />
 
           {/* Protected routes */}
           <Route element={<ProtectedRoute allowedRoles={['TALENT']} />}>
             <Route path="/dashboard/talent" element={<TalentDashboard />} />
             <Route path="/dashboard/talent/profile-setup" element={<ProfileSetup />} />
             <Route path="/dashboard/talent/profile" element={<ViewProfile />} />
+            <Route path="/dashboard/talent/applications" element={<MyApplications />} />
+            <Route path="/dashboard/talent/applications/shortlisted/:roleId" element={<ShortlistedApplicants />} />
+            <Route path="/dashboard/talent/my-invitations" element={<MyJobInvitations />} />
+            <Route path="/dashboard/talent/matching-jobs" element={<MatchingJobs />} />
           </Route>
 
           <Route element={<ProtectedRoute allowedRoles={['RECRUITER']} />}>
@@ -66,6 +81,9 @@ function App() {
             <Route path="/dashboard/recruiter/profile-setup" element={<RecruiterProfileSetup />} /> 
             <Route path="/dashboard/recruiter/post-job" element={<PostJob />} />
             <Route path="/dashboard/recruiter/jobs" element={<ManageJobs />} />
+            <Route path="/dashboard/recruiter/cast-bags" element={<CastBags />} />
+            <Route path="/dashboard/recruiter/favourites" element={<Favourites />} />
+            <Route path="/dashboard/recruiter/sent-invitations" element={<SentInvitations />} />
             <Route path="/dashboard/recruiter/jobs/:jobId/applications" element={<JobApplications />} />
             <Route path="/dashboard/recruiter/applications/:applicationId" element={<ApplicationDetails />} />
           </Route>

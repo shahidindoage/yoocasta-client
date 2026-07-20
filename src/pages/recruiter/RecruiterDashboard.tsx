@@ -86,7 +86,7 @@ const RecruiterDashboard = () => {
       </div>
 
       {/* Main Grid: Control Core Dashboard Framework */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
         {[
           { to: "/dashboard/recruiter/profile-setup", icon: "🏢", title: "Company Profile", desc: "Verify or restructure systemic corporate identity attributes.", action: "Inspect Blueprint →" },
@@ -94,7 +94,7 @@ const RecruiterDashboard = () => {
           { to: "/dashboard/recruiter/cast-bags", icon: "🎒", title: "Cast Bag", desc: "Curate and share talent syndication folders.", action: "Manage Collections →" },
           { to: "/dashboard/recruiter/favourites", icon: "❤️", title: "Favourite List", desc: "Access saved talent profiles and shortlists.", action: "View Archives →" },
           { to: "/dashboard/recruiter/post-job", icon: "➕", title: "Post a New Job", desc: "Deploy new casting calls and auditions to the network.", action: "Create Deployment →" },
-          { to: "/dashboard/recruiter/invitations", icon: "📩", title: "Sent Invitations", desc: "Track external syndication requests sent to talents.", action: "Track Vectors →" },
+          { to: "/dashboard/recruiter/sent-invitations", icon: "📩", title: "Sent Invitations", desc: "Track external syndication requests sent to talents.", action: "Track Vectors →" },
         ].map((item, idx) => (
           <Link 
             key={idx}
@@ -111,10 +111,35 @@ const RecruiterDashboard = () => {
             </span>
           </Link>
         ))}
+
+        <div
+          onClick={() => navigate('/forgot-password')}
+          className="group border border-[#3835A4]/10 bg-white hover:border-[#3835A4] p-6 rounded-2xl flex flex-col justify-between aspect-[4/3] transition-all duration-300 hover:shadow-sm cursor-pointer"
+        >
+          <div className="space-y-1.5">
+            <span className="text-xl group-hover:scale-110 transition-transform duration-300 block origin-left">🔑</span>
+            <h3 className="text-sm font-black tracking-tight text-[#3835A4]">Reset Password</h3>
+            <p className="text-xs text-[#3835A4]/50 font-medium">Change your account password and security credentials.</p>
+          </div>
+          <span className="text-[10px] font-black tracking-widest uppercase text-[#3835A4]/40 group-hover:text-[#3835A4] group-hover:translate-x-1 transition-all duration-150 block mt-4">
+            Update Credentials →
+          </span>
+        </div>
+        <div
+          onClick={() => { useAuthStore.getState().clearAuth(); navigate('/login'); }}
+          className="group border border-[#C6007E]/10 bg-white hover:border-[#C6007E] p-6 rounded-2xl flex flex-col justify-between aspect-[4/3] transition-all duration-300 hover:shadow-sm cursor-pointer"
+        >
+          <div className="space-y-1.5">
+            <span className="text-xl group-hover:scale-110 transition-transform duration-300 block origin-left">🚪</span>
+            <h3 className="text-sm font-black tracking-tight text-[#C6007E]">Logout</h3>
+            <p className="text-xs text-[#C6007E]/50 font-medium">End your current session and sign out securely.</p>
+          </div>
+          <span className="text-[10px] font-black tracking-widest uppercase text-[#C6007E]/40 group-hover:text-[#C6007E] group-hover:translate-x-1 transition-all duration-150 block mt-4">
+            Sign Out →
+          </span>
+        </div>
       </div>
 
-      {/* Real-time Metric Manifest / Company Summary */}
-      
     </div>
   );
 };

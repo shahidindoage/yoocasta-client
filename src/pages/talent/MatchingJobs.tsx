@@ -1,26 +1,11 @@
 import { useState, useEffect, useRef, CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import { getJobOptions, getPublicJobs } from '../../api/job.api';
+import { getMyProfile } from '../../api/profile.api';
 import { getMyApplications } from '../../api/application.api';
 import { useAuthStore } from '../../store/authStore';
 import ApplicationPopup from '../../components/ApplicationPopup';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-
-const CATEGORY_IMAGES: Record<string, string> = {
-  'Actors & Extras': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/actors_image.jpg',
-  'Dancers': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/category.jpg',
-  'Models': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/WhatsApp_Image_2024-10-11_at_3_22_56_PM.jpeg',
-  'Photographers': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/2892613_8705625.jpg',
-  'Makeup & Hairstylists': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/makeup.jpg',
-  'Singers': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/singers.jpg',
-  'Directors': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/Directors.jpg',
-  'Cinematographers / Videographers': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/Videographers.jpg',
-};
-
-const DEFAULT_CATEGORY_IMAGE = 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/pexels-bertellifotografia-2608515.jpg';
-const getCategoryImage = (name: string | undefined) => CATEGORY_IMAGES[name || ''] || DEFAULT_CATEGORY_IMAGE;
-
-const stripHtml = (str: string) => str.replace(new RegExp('<[^>]*>', 'g'), '');
 
 const MultiSelectDropdown = ({
   label,
@@ -63,7 +48,6 @@ const MultiSelectDropdown = ({
         {summary}
         <span style={{ fontSize: '10px', color: '#C6007E' }}>{open ? <ChevronUp style={{ width: '15px', height: '15px' }} /> : <ChevronDown style={{ width: '15px', height: '15px' }} />}</span>
       </button>
-
       {open && (
         <div style={{
           position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, zIndex: 20,
@@ -82,18 +66,25 @@ const MultiSelectDropdown = ({
   );
 };
 
-const DEFAULT_FILTERS = {
-  status: 'all',
-  sort: 'latest',
+const CATEGORY_IMAGES: Record<string, string> = {
+  'Actors & Extras': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/actors_image.jpg',
+  'Dancers': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/category.jpg',
+  'Models': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/WhatsApp_Image_2024-10-11_at_3_22_56_PM.jpeg',
+  'Photographers': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/2892613_8705625.jpg',
+  'Makeup & Hairstylists': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/makeup.jpg',
+  'Singers': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/singers.jpg',
+  'Directors': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/Directors.jpg',
+  'Cinematographers / Videographers': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/Videographers.jpg',
 };
+const DEFAULT_CATEGORY_IMAGE = 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/pexels-bertellifotografia-2608515.jpg';
+const getCategoryImage = (name: string | undefined) => CATEGORY_IMAGES[name || ''] || DEFAULT_CATEGORY_IMAGE;
+
+const stripHtml = (str: string) => str.replace(new RegExp('<[^>]*>', 'g'), '');
 
 const daysUntil = (dateStr: string) => {
   const diff = new Date(dateStr).getTime() - Date.now();
   return Math.ceil(diff / (1000 * 60 * 60 * 24));
 };
-
-const truncate = (str: string, len: number) =>
-  str && str.length > len ? str.slice(0, len) + '...' : str;
 
 const formatBudget = (role: any): string | null => {
   if (!role?.payment) return null;
@@ -120,28 +111,22 @@ const shimmerStyle: CSSProperties = {
   borderRadius: '8px',
 };
 
-const SkeletonBlock = ({ width = '100%', height = '40px' }: { width?: string; height?: string } & { [key: string]: any }) => (
-  <div style={{ ...shimmerStyle, width, height }} />
-);
-
 const JobCardSkeleton = () => (
-  <div style={{
-    borderRadius: '24px', overflow: 'hidden', background: '#fff',
-    border: '1.5px solid transparent', height: '320px',
-  }}>
+  <div style={{ borderRadius: '24px', overflow: 'hidden', background: '#fff', border: '1px solid #f5d0e3', height: '320px' }}>
     <div style={{ ...shimmerStyle, width: '100%', height: '100%', borderRadius: 0 }} />
   </div>
 );
 
-const BrowseJobs = () => {
+const MatchingJobs = () => {
   const { user } = useAuthStore();
   const [options, setOptions] = useState<any>(null);
   const [optionsLoading, setOptionsLoading] = useState(true);
   const [jobs, setJobs] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({ total: 0, page: 1, totalPages: 1 });
-  const [draftFilters, setDraftFilters] = useState<any>(DEFAULT_FILTERS);
-  const [appliedFilters, setAppliedFilters] = useState<any>(DEFAULT_FILTERS);
+  const [draftFilters, setDraftFilters] = useState<any>({ status: 'all', sort: 'latest' });
+  const [appliedFilters, setAppliedFilters] = useState<any>({ status: 'all', sort: 'latest' });
+  const [profileReady, setProfileReady] = useState(false);
   const [quickJob, setQuickJob] = useState<any>(null);
   const [applyRole, setApplyRole] = useState<any>(null);
   const [appliedRoleIds, setAppliedRoleIds] = useState<Set<string>>(new Set());
@@ -157,24 +142,66 @@ const BrowseJobs = () => {
   }, []);
 
   useEffect(() => {
-    const fetch = async () => {
-      setLoading(true);
-      try {
-        const res = await getPublicJobs({ ...appliedFilters, page: pagination.page, limit: 12 });
-        setJobs(res.data.data.data);
-        setPagination(res.data.data.pagination);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
+    if (!options) return;
+    getMyProfile().then(res => {
+      const userData = res.data.data;
+      const profile = userData?.talentProfile;
+      const auto: Record<string, any> = { status: 'all', sort: 'latest' };
+
+      if (profile) {
+        if (profile.categories?.length) {
+          auto.categoryIds = profile.categories.map((c: any) => c.category?.id || c.id).filter(Boolean);
+        }
+        if (profile.gender) auto.gender = profile.gender;
+        if (profile.languages?.length) {
+          auto.languageIds = profile.languages.map((l: any) => l.language?.id || l.id).filter(Boolean);
+        }
+        if (profile.dialects?.length) {
+          auto.dialectIds = profile.dialects.map((d: any) => d.dialect?.id || d.id).filter(Boolean);
+        }
+        if (profile.ethnicity?.id) {
+          auto.ethnicityIds = [profile.ethnicity.id];
+        }
+        if (profile.city?.country?.id) {
+          auto.countryIds = [profile.city.country.id];
+        }
+        const age = profile.age || (profile.dob ? Math.floor((Date.now() - new Date(profile.dob).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null);
+        if (age != null) {
+          auto.ageTo = String(age);
+        }
       }
-    };
-    fetch();
-  }, [appliedFilters, pagination.page]);
+      if (userData?.nationality?.id) {
+        auto.nationalityIds = [userData.nationality.id];
+      }
+
+      setDraftFilters(auto);
+      setAppliedFilters(auto);
+      setProfileReady(true);
+    }).catch(() => {
+      setProfileReady(true);
+    });
+  }, [options]);
+
+  const fetchJobs = async (filters: any, page: number) => {
+    setLoading(true);
+    try {
+      const res = await getPublicJobs({ ...filters, page, limit: 12 });
+      setJobs(res.data.data.data);
+      setPagination(res.data.data.pagination);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (profileReady) fetchJobs(appliedFilters, pagination.page);
+  }, [appliedFilters, pagination.page, profileReady]);
 
   const applyFilters = () => {
     setPagination(prev => ({ ...prev, page: 1 }));
-    setAppliedFilters(draftRef.current);
+    setAppliedFilters({ ...draftRef.current });
   };
 
   const handleFilterChange = (key: string, value: any) => {
@@ -196,7 +223,7 @@ const BrowseJobs = () => {
   };
 
   const resetFilters = () => {
-    const defaults = { ...DEFAULT_FILTERS };
+    const defaults = { status: 'all', sort: 'latest' };
     setDraftFilters(defaults);
     setAppliedFilters(defaults);
     draftRef.current = defaults;
@@ -204,11 +231,11 @@ const BrowseJobs = () => {
   };
 
   return (
-    <div style={{ background: '#ffffffff', minHeight: '100vh', fontFamily: 'system-ui, sans-serif', margin: 0 }}>
+    <div style={{ background: '#ffffff', minHeight: '100vh', fontFamily: 'system-ui, sans-serif', margin: 0 }}>
 
       {/* TOP FILTERS PANEL */}
       <div style={{ position: 'relative', color: '#333', padding: '24px 40px', borderBottom: '1px solid #ffffffff' }}>
-        
+
         <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0 }}>
           <video autoPlay loop muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.6 }}>
             <source src="https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/casting_video/casting_video_10107.mp4" type="video/mp4" />
@@ -219,7 +246,7 @@ const BrowseJobs = () => {
         <div style={{ position: 'relative', zIndex: 2 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <h2 style={{ margin: 0, fontSize: '22px', fontWeight: 900, letterSpacing: '-0.02em' }}>
-              Browse Jobs
+              Matching Jobs
             </h2>
             <button onClick={resetFilters} style={{ fontSize: '12px', color: '#C6007E', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>
               Reset All
@@ -229,14 +256,14 @@ const BrowseJobs = () => {
           {optionsLoading ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '10px' }}>
-                {Array.from({ length: 8 }).map((_, i) => <SkeletonBlock key={i} height="60px" />)}
+                {Array.from({ length: 8 }).map((_, i) => <div key={i} style={{ ...shimmerStyle, height: '60px' }} />)}
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
-                {Array.from({ length: 6 }).map((_, i) => <SkeletonBlock key={i} height="40px" />)}
+                {Array.from({ length: 6 }).map((_, i) => <div key={i} style={{ ...shimmerStyle, height: '40px' }} />)}
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', padding: '20px', background: '#fff', borderRadius: '12px', border: '1px solid #f5d0e3' }}>
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i}><SkeletonBlock height="12px" width="60%" /><div style={{ marginTop: '8px' }}><SkeletonBlock height="40px" /></div></div>
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i}><div style={{ ...shimmerStyle, height: '12px', width: '60%' }} /><div style={{ marginTop: '8px' }}><div style={{ ...shimmerStyle, height: '40px' }} /></div></div>
                 ))}
               </div>
             </div>
@@ -246,7 +273,6 @@ const BrowseJobs = () => {
               {/* Primary Core Row */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
                 <div>
-                  {/* <span style={{ fontSize: '11px', color: '#888', fontWeight: 'bold', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>CATEGORY</span> */}
                   <select value={draftFilters.categoryIds || ''} onChange={e => handleFilterChange('categoryIds', e.target.value)} style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
                     <option value="">All Categories</option>
                     {options.categories?.filter((c: any) => c.name !== 'Additional Category').map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -254,7 +280,6 @@ const BrowseJobs = () => {
                 </div>
 
                 <div>
-                  {/* <span style={{ fontSize: '11px', color: '#888', fontWeight: 'bold', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>GENDER</span> */}
                   <select value={draftFilters.gender || ''} onChange={e => handleFilterChange('gender', e.target.value)} style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
                     <option value="">All Genders</option>
                     <option value="male">Male</option>
@@ -264,7 +289,6 @@ const BrowseJobs = () => {
                 </div>
 
                 <div>
-                  {/* <span style={{ fontSize: '11px', color: '#888', fontWeight: 'bold', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>PAYMENT</span> */}
                   <select value={draftFilters.paymentType || ''} onChange={e => handleFilterChange('paymentType', e.target.value)} style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
                     <option value="">All Payment</option>
                     <option value="paid">Paid</option>
@@ -273,11 +297,20 @@ const BrowseJobs = () => {
                 </div>
 
                 <div>
-                  {/* <span style={{ fontSize: '11px', color: '#888', fontWeight: 'bold', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>PROJECT TYPE</span> */}
                   <select value={draftFilters.projectTypeId || ''} onChange={e => handleFilterChange('projectTypeId', e.target.value)} style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
                     <option value="">All Project Types</option>
                     {options.projectTypes?.map((pt: any) => <option key={pt.id} value={pt.id}>{pt.name}</option>)}
                   </select>
+                </div>
+
+                <div>
+                  <input
+                    type="text"
+                    placeholder="Search jobs..."
+                    value={draftFilters.search || ''}
+                    onChange={e => handleFilterChange('search', e.target.value)}
+                    style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px 14px', borderRadius: '8px', fontSize: '13px', outline: 'none', boxSizing: 'border-box' }}
+                  />
                 </div>
               </div>
 
@@ -300,6 +333,8 @@ const BrowseJobs = () => {
                 <MultiSelectDropdown label="Country" options={options.countries || []} selected={draftFilters.countryIds || []} onToggle={(id) => handleMultiChange('countryIds', id)} />
                 <MultiSelectDropdown label="Language" options={options.languages || []} selected={draftFilters.languageIds || []} onToggle={(id) => handleMultiChange('languageIds', id)} />
                 <MultiSelectDropdown label="Nationality" options={options.nationalities || []} selected={draftFilters.nationalityIds || []} onToggle={(id) => handleMultiChange('nationalityIds', id)} />
+                <MultiSelectDropdown label="Dialect" options={options.dialects || []} selected={draftFilters.dialectIds || []} onToggle={(id) => handleMultiChange('dialectIds', id)} />
+                <MultiSelectDropdown label="Ethnicity" options={options.ethnicities || []} selected={draftFilters.ethnicityIds || []} onToggle={(id) => handleMultiChange('ethnicityIds', id)} />
               </div>
 
               <button
@@ -353,11 +388,11 @@ const BrowseJobs = () => {
           </div>
         ) : (
           <>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
               {jobs.length === 0 ? (
                 <p style={{ color: '#666' }}>No jobs found matching your criteria.</p>
               ) : (
-                  jobs.map((job: any) => {
+                jobs.map((job: any) => {
                   const firstRole = job.roles?.[0];
                   const daysLeft = job.lastDateToApply ? daysUntil(job.lastDateToApply) : null;
                   const isExpired = daysLeft !== null && daysLeft <= 0;
@@ -386,7 +421,7 @@ const BrowseJobs = () => {
                             </span>
                           )}
                         </div>
-                        
+
                         {!isExpired && daysLeft !== null && (
                           <div className="absolute bottom-5 left-5 z-10 flex items-center gap-1.5 text-[9px] font-mono text-neutral-200 bg-neutral-950/80 backdrop-blur-md py-2 px-3.5 rounded-xl border border-white/10 shadow-sm font-bold">
                             <svg className="h-3.5 w-3.5 text-[#C6007E] animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -590,4 +625,4 @@ const BrowseJobs = () => {
   );
 };
 
-export default BrowseJobs;
+export default MatchingJobs;

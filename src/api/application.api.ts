@@ -6,6 +6,9 @@ export const submitApplication = (roleId: string, formData: any) =>
 export const getMyApplications = () =>
   api.get('/applications');
 
+export const getShortlistedForRole = (roleId: string) =>
+  api.get(`/applications/shortlisted/${roleId}`);
+
 export const getJobApplications = (jobId: string) =>
   api.get(`/applications/job/${jobId}`);
 
