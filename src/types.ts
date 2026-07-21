@@ -57,6 +57,7 @@ export interface BlogItem {
   id: string;
   title: string;
   category: string;
+  categoryId?: number;
   readTime: string;
   date: string;
   summary: string;

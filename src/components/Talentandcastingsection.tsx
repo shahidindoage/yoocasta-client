@@ -126,10 +126,10 @@ export default function TalentAndCastingSection({
 
                     <div className="flex items-center justify-between pt-2 border-t border-dashed border-neutral-200/50 group-hover:border-neutral-300/80">
                       <span className={`text-[10px] font-mono font-bold ${isActive ? 'text-pink-100' : 'text-neutral-500 group-hover:text-[#3835A4]'}`}>
-                        {cat.count.toLocaleString()} ACTIVE
+                        {cat.count.toLocaleString()} Active
                       </span>
                       <div className="flex items-center gap-1">
-                        <span className={`text-[8px] uppercase tracking-wider font-mono font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${isActive ? 'text-white' : 'text-neutral-700'}`}>
+                        <span className={`text-[8px] capitalize tracking-wider font-mono font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${isActive ? 'text-white' : 'text-neutral-700'}`}>
                           View
                         </span>
                         <ArrowUpRight className={`h-3.5 w-3.5 transition-transform duration-300 ${isActive ? 'text-white translate-x-0.5 -translate-y-0.5' : 'text-neutral-400 group-hover:text-[#3835A4] group-hover:translate-x-0.5 group-hover:-translate-y-0.5'}`} />
@@ -194,18 +194,18 @@ export default function TalentAndCastingSection({
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/75 via-neutral-950/25 to-transparent transition-opacity group-hover:via-neutral-950/30" />
                       <div className="absolute top-5 left-5 right-5 flex items-center justify-between z-10">
-                        <span className="bg-white/95 backdrop-blur-md text-neutral-900 text-[9px] font-mono font-black tracking-[0.15em] uppercase px-3.5 py-1.5 rounded-xl shadow-md border border-neutral-200/50">
+                        <span className="bg-white/95 backdrop-blur-md text-neutral-900 text-[9px] font-mono font-black tracking-[0.15em] capitalize px-3.5 py-1.5 rounded-xl shadow-md border border-neutral-200/50">
                           {casting.category}
                         </span>
                         <span className="bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white text-[9px] font-mono font-black tracking-[0.15em] px-3.5 py-1.5 rounded-xl border border-white/10 shadow-lg">
-                          {casting.paymentType.toUpperCase()}
+                          {casting.paymentType}
                         </span>
                       </div>
                       
                       {!isExpired && (
-                        <div className="absolute bottom-5 left-5 z-10 flex items-center gap-1.5 text-[9px] font-mono text-neutral-200 bg-neutral-950/80 backdrop-blur-md py-2 px-3.5 rounded-xl border border-white/10 shadow-sm font-bold">
+                        <div className="capitalize absolute bottom-5 left-5 z-10 flex items-center gap-1.5 text-[9px] font-mono text-neutral-200 bg-neutral-950/80 backdrop-blur-md py-2 px-3.5 rounded-xl border border-white/10 shadow-sm font-bold">
                           <Clock className="h-3.5 w-3.5 text-[#C6007E] animate-pulse" />
-                          <span>EXPIRES IN {daysLeft} DAYS</span>
+                          <span>Expires in {daysLeft} Days</span>
                         </div>
                       )}
                     </div>
@@ -214,7 +214,7 @@ export default function TalentAndCastingSection({
                       <div className="space-y-3">
                         <div className="flex items-center gap-1.5 text-[9px] text-neutral-400 tracking-wider uppercase font-black">
                           <Landmark className="h-3 w-3 text-neutral-400" />
-                          <span>{casting.client}</span>
+                          <span className='capitalize'>{casting.client}</span>
                           <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                         </div>
 
@@ -251,7 +251,7 @@ export default function TalentAndCastingSection({
                         <div>
                           {isExpired ? (
                             <span className="inline-flex items-center text-[9px] font-mono font-black bg-red-50 text-red-600 border border-red-200/60 px-2.5 py-1 rounded-lg tracking-wider">
-                              EXPIRED
+                              Expired
                             </span>
                           ) : (
                             <div className="w-1" />
@@ -259,7 +259,7 @@ export default function TalentAndCastingSection({
                         </div>
 
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-mono font-black uppercase text-neutral-500 group-hover:text-[#3835A4] transition-colors duration-300">
+                          <span className="text-[10px] font-mono font-black capitalize text-neutral-500 group-hover:text-[#3835A4] transition-colors duration-300">
                             Apply
                           </span>
                           <div className="p-1.5 rounded-xl bg-neutral-50 border border-neutral-200/60 group-hover:bg-gradient-to-br group-hover:from-[#C6007E] group-hover:to-[#3835A4] group-hover:text-white group-hover:border-transparent transition-all duration-300">

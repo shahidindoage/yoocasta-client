@@ -92,7 +92,7 @@ export default function CreativeCTA({
           className="font-display text-5xl sm:text-7xl font-black text-white tracking-tight leading-none mb-6"
         >
           Shape the GCC Runway. <br />
-          <span className="text-neutral-950 font-serif italic font-medium">Connect Instantly.</span>
+          <span className="text-neutral-950 font-display italic font-medium">Connect Instantly.</span>
         </motion.h2>
 
         {/* Supporting Description */}
@@ -110,17 +110,17 @@ export default function CreativeCTA({
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-lg mx-auto">
           <button
             onClick={onCreateProfileClick}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4.5 bg-neutral-950 hover:bg-white hover:text-neutral-950 text-white rounded-2xl font-black text-xs uppercase tracking-wider transition-all duration-300 shadow-xl cursor-pointer group"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4.5 bg-neutral-950 hover:bg-white hover:text-neutral-950 text-white rounded-2xl font-black text-xs  tracking-wider transition-all duration-300 shadow-xl cursor-pointer group"
           >
-            <span>JOIN AS TALENT</span>
+            <span>Join as Talent</span>
             <ArrowUpRight className="h-4.5 w-4.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </button>
 
           <button
             onClick={onPostCastingClick}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4.5 bg-white text-neutral-950 hover:bg-neutral-950 hover:text-white rounded-2xl font-black text-xs uppercase tracking-wider transition-all duration-300 shadow-md cursor-pointer group"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4.5 bg-white text-neutral-950 hover:bg-neutral-950 hover:text-white rounded-2xl font-black text-xs  tracking-wider transition-all duration-300 shadow-md cursor-pointer group"
           >
-            <span>JOIN AS RECRUITER</span>
+            <span>Join as Recruiter</span>
             <ArrowUpRight className="h-4.5 w-4.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 animate-pulse" />
           </button>
         </div>

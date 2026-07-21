@@ -100,23 +100,23 @@ export default function VideoSection() {
   };
 
   return (
-    <div className="w-full bg-neutral-950 text-white py-12 border-b border-neutral-800 relative overflow-hidden">
-      {/* Editorial Luxury Lighting Flares */}
-      <div className="absolute right-[-10%] top-0 h-[500px] w-[500px] rounded-full bg-[#3835A4]/[0.15] filter blur-[150px] pointer-events-none" />
-      <div className="absolute left-[-10%] bottom-0 h-[500px] w-[500px] rounded-full bg-[#C6007E]/[0.12] filter blur-[150px] pointer-events-none" />
+    <div className="w-full bg-[#fef1f5] text-stone-900 py-12 border-b border-[#f5d0e3] relative overflow-hidden">
+      {/* Soft Pink Lighting Flares */}
+      <div className="absolute right-[-10%] top-0 h-[500px] w-[500px] rounded-full bg-[#C6007E]/10 blur-[150px] pointer-events-none" />
+      <div className="absolute left-[-10%] bottom-0 h-[500px] w-[500px] rounded-full bg-[#3835A4]/8 blur-[150px] pointer-events-none" />
 
-      {/* Grid Pattern Background */}
-      <div className="absolute inset-0 bg-[radial-gradient(rgba(56,53,164,0.08)_1px,transparent_1px)] [background-size:32px_32px] opacity-60 pointer-events-none" />
+      {/* Dot Pattern Background */}
+      <div className="absolute inset-0 bg-[radial-gradient(#C6007E_0.5px,transparent_0.5px)] [background-size:24px_24px] opacity-20 pointer-events-none" />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Headings */}
-        <div className="mb-16 pb-8 border-b border-neutral-800/80">
+        <div className="mb-16 pb-8 border-b border-[#f5d0e3]">
           <div className="space-y-4 max-w-2xl">
-            <h2 className="font-display text-3xl font-black text-white sm:text-5xl tracking-tight leading-none">
+            <h2 className="font-display text-3xl font-black text-stone-900 sm:text-5xl tracking-tight leading-none">
               High-Energy <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#C6007E] to-[#3835A4]">Casting Reels</span>
             </h2>
-            <p className="text-sm text-neutral-400 leading-relaxed font-medium">
+            <p className="text-sm text-stone-500 leading-relaxed font-medium">
               Witness our premier talents in motion. Immersive video audition files, lookbooks, and high fashion digital runway walks vetted by elite international casting curators.
             </p>
           </div>
@@ -127,10 +127,10 @@ export default function VideoSection() {
           
           {/* Main Trendy Video Player (Takes 7 Cols on Large Screens) */}
           <div className="lg:col-span-8 flex flex-col justify-between">
-            <div className="relative aspect-video rounded-[2.5rem] overflow-hidden bg-black/40 border border-neutral-800 shadow-2xl group flex flex-col justify-end">
+            <div className="relative aspect-video rounded-[2.5rem] overflow-hidden bg-white border border-[#f5d0e3] shadow-xl group flex flex-col justify-end">
               
               {/* Hair-thin visual premium lens flare frame */}
-              <div className="absolute inset-4 border border-white/5 rounded-[2rem] pointer-events-none z-20" />
+              <div className="absolute inset-4 border border-[#C6007E]/10 rounded-[2rem] pointer-events-none z-20" />
               
               {/* The Actual Autoplay Video Component */}
               <video
@@ -145,17 +145,18 @@ export default function VideoSection() {
                 className="absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-700"
               />
 
-              {/* Black Gradient Vignette for text legibility */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/40 z-10 pointer-events-none" />
+
+              {/* Soft Pink Gradient Vignette for text legibility */}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#C6007E]/25 via-[#C6007E]/3 to-transparent z-10 pointer-events-none" />
 
               {/* Status Ribbon & Badge */}
               <div className="absolute top-6 left-6 z-20 flex items-center gap-2">
-                <div className="flex items-center gap-1.5 bg-[#C6007E]/95 text-white text-[9px] uppercase font-mono font-black tracking-widest px-3 py-1.5 rounded-xl shadow-lg">
+                <div className="flex items-center gap-1.5 bg-[#C6007E] text-white text-[9px] capitalize font-mono font-black tracking-widest px-3 py-1.5 rounded-xl shadow-lg">
                   <Film className="h-3 w-3 animate-spin-slow" />
-                  <span>AUTOPLAY ACTIVE</span>
+                  <span>Playing</span>
                 </div>
-                <div className="bg-neutral-900/80 backdrop-blur-md text-neutral-300 text-[9px] font-mono font-black tracking-widest px-3 py-1.5 rounded-xl border border-white/10">
-                  {activeClip.location.toUpperCase()}
+                <div className="bg-white/80 backdrop-blur-md text-stone-600 text-[9px] font-mono font-black tracking-widest px-3 py-1.5 rounded-xl border border-[#f5d0e3]">
+                  {activeClip.location}
                 </div>
               </div>
 
@@ -164,17 +165,17 @@ export default function VideoSection() {
                 {/* Volume Toggle */}
                 <button
                   onClick={toggleMute}
-                  className="p-3 rounded-full bg-neutral-950/80 backdrop-blur-md hover:bg-neutral-900 border border-white/10 text-white transition-all scale-95 hover:scale-100 cursor-pointer hover:border-white/20"
+                  className="p-3 rounded-full bg-white/80 backdrop-blur-md hover:bg-white border border-[#f5d0e3] transition-all scale-95 hover:scale-100 cursor-pointer"
                   title={isMuted ? 'Unmute' : 'Mute'}
                 >
-                  {isMuted ? <VolumeX className="h-4.5 w-4.5 text-neutral-400" /> : <Volume2 className="h-4.5 w-4.5 text-[#C6007E]" />}
+                  {isMuted ? <VolumeX className="h-4.5 w-4.5 text-stone-400" /> : <Volume2 className="h-4.5 w-4.5 text-[#C6007E]" />}
                 </button>
                 {/* Pause/Play Toggle */}
                 <button
                   onClick={togglePlay}
-                  className="p-3 rounded-full bg-neutral-950/80 backdrop-blur-md hover:bg-neutral-900 border border-white/10 text-white transition-all scale-95 hover:scale-100 cursor-pointer hover:border-white/20"
+                  className="p-3 rounded-full bg-white/80 backdrop-blur-md hover:bg-white border border-[#f5d0e3] transition-all scale-95 hover:scale-100 cursor-pointer"
                 >
-                  {isPlaying ? <Pause className="h-4.5 w-4.5 text-neutral-400" /> : <Play className="h-4.5 w-4.5 text-[#C6007E]" />}
+                  {isPlaying ? <Pause className="h-4.5 w-4.5 text-stone-400" /> : <Play className="h-4.5 w-4.5 text-[#C6007E]" />}
                 </button>
               </div>
 
@@ -184,7 +185,7 @@ export default function VideoSection() {
                   {activeClip.tags.map((tag, idx) => (
                     <span 
                       key={idx} 
-                      className="text-[9px] font-mono font-black uppercase tracking-widest px-2.5 py-1 bg-white/10 border border-white/15 rounded-lg text-neutral-200"
+                      className="text-[9px] font-mono font-black capitalize tracking-widest px-2.5 py-1 bg-white/80 border border-[#f5d0e3] rounded-lg text-stone-600"
                     >
                       #{tag}
                     </span>
@@ -193,7 +194,7 @@ export default function VideoSection() {
 
                 <div className="space-y-2">
                   <span className="text-xs font-mono font-bold tracking-wider text-[#C6007E] block">
-                    {activeClip.category.toUpperCase()}
+                    {activeClip.category}
                   </span>
                   <h3 className="font-display text-2xl sm:text-3xl font-black text-white tracking-tight leading-none">
                     {activeClip.title}
@@ -201,20 +202,20 @@ export default function VideoSection() {
                   
                   <div className="pt-4 flex items-center gap-3">
                     <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-[#C6007E] to-[#3835A4] p-[1.5px]">
-                      <div className="h-full w-full rounded-full bg-neutral-900 flex items-center justify-center text-white text-[9px] font-black">
+                      <div className="h-full w-full rounded-full bg-white flex items-center justify-center text-[#C6007E] text-[9px] font-black">
                         {activeClip.talentName.charAt(0)}
                       </div>
                     </div>
                     <div>
                       <p className="text-xs font-black text-white">{activeClip.talentName}</p>
-                      <p className="text-[9px] font-mono text-neutral-400 font-bold">{activeClip.views} • GCC Audition File</p>
+                      <p className="text-[9px] font-mono text-white/70 font-bold">{activeClip.views} • GCC Audition File</p>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Animated Seek line */}
-              <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-neutral-900/60 overflow-hidden">
+              <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-white/30 overflow-hidden">
                 <motion.div 
                   className="h-full bg-gradient-to-r from-[#C6007E] to-[#3835A4]"
                   initial={{ width: "0%" }}
@@ -229,11 +230,11 @@ export default function VideoSection() {
           {/* Sidebar Playlist - Right Panel (Takes 4 Cols on Large Screens) */}
           <div className="lg:col-span-4 flex flex-col justify-start space-y-4">
             <div className="flex items-center justify-between">
-              <h4 className="text-[11px] font-mono font-black uppercase tracking-[0.2em] text-neutral-400 flex items-center gap-2">
+              <h4 className="text-[11px] font-mono font-black capitalize tracking-[0.2em] text-[#C6007E] flex items-center gap-2">
                 <Disc className="h-4 w-4 animate-spin-slow text-[#C6007E]" />
-                SELECT AUDITION REEL
+                Select Reel
               </h4>
-              <span className="text-[9px] font-mono text-neutral-500 font-bold">{VIDEO_CLIPS.length} REELS LOADED</span>
+              <span className="text-[9px] font-mono text-stone-400 font-bold">{VIDEO_CLIPS.length} Reels</span>
             </div>
 
             <div className="space-y-3.5">
@@ -250,8 +251,8 @@ export default function VideoSection() {
                     whileTap={{ scale: 0.98 }}
                     className={`w-full text-left p-4 rounded-3xl border transition-all duration-300 flex items-center gap-4 relative overflow-hidden group cursor-pointer ${
                       isActive 
-                        ? 'bg-neutral-900/90 border-[#3835A4] shadow-lg shadow-[#3835A4]/10' 
-                        : 'bg-neutral-900/30 border-neutral-800/80 hover:bg-neutral-900/60 hover:border-neutral-700'
+                        ? 'bg-white border-[#C6007E] shadow-lg shadow-[#C6007E]/10' 
+                        : 'bg-white/60 border-[#f5d0e3] hover:bg-white hover:border-[#C6007E]/40'
                     }`}
                   >
                     {/* Interactive glow effect */}
@@ -260,7 +261,7 @@ export default function VideoSection() {
                     )}
 
                     {/* Poster Thumbnail */}
-                    <div className="h-14 w-14 rounded-2xl overflow-hidden shrink-0 relative bg-neutral-800 border border-white/5">
+                    <div className="h-14 w-14 rounded-2xl overflow-hidden shrink-0 relative bg-stone-100 border border-[#f5d0e3]">
                       <img 
                         src={clip.posterUrl} 
                         alt={clip.talentName} 
@@ -268,31 +269,31 @@ export default function VideoSection() {
                         referrerPolicy="no-referrer"
                       />
                       {isActive ? (
-                        <div className="absolute inset-0 bg-neutral-950/60 flex items-center justify-center">
+                        <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
                           <span className="flex gap-1 items-end">
                             <span className="w-1 h-3 bg-[#C6007E] animate-pulse" />
                             <span className="w-1 h-4 bg-[#3835A4] animate-pulse [animation-delay:0.15s]" />
-                            <span className="w-1 h-2 bg-white animate-pulse [animation-delay:0.3s]" />
+                            <span className="w-1 h-2 bg-[#C6007E] animate-pulse [animation-delay:0.3s]" />
                           </span>
                         </div>
                       ) : (
-                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Play className="h-4 w-4 text-white fill-current" />
+                        <div className="absolute inset-0 bg-[#C6007E]/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Play className="h-4 w-4 text-[#C6007E] fill-current" />
                         </div>
                       )}
                     </div>
 
                     {/* Info Metadata */}
                     <div className="space-y-0.5 min-w-0">
-                      <span className={`text-[9px] font-mono uppercase font-black tracking-wider ${
-                        isActive ? 'text-[#C6007E]' : 'text-neutral-500 group-hover:text-neutral-300'
+                      <span className={`text-[9px] font-mono capitalize font-black tracking-wider ${
+                        isActive ? 'text-[#C6007E]' : 'text-stone-400 group-hover:text-[#C6007E]'
                       }`}>
                         {clip.category}
                       </span>
-                      <h5 className="font-display text-xs font-black text-white truncate">
+                      <h5 className="font-display text-xs font-black text-stone-900 truncate">
                         {clip.title}
                       </h5>
-                      <p className="text-[10px] text-neutral-400 font-bold">
+                      <p className="text-[10px] text-stone-500 font-bold">
                         {clip.talentName} • <span className="font-mono text-[9px]">{clip.location}</span>
                       </p>
                     </div>

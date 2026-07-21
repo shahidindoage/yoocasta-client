@@ -63,7 +63,7 @@ export default function MilestonesSection() {
       <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.005)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.005)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
 
       {/* Epic background year graphic */}
-      <div className="absolute -right-16 bottom-0 select-none pointer-events-none text-[22vw] font-black text-neutral-900/[0.02] tracking-[0.05em] uppercase font-mono leading-none z-0">
+      <div className="absolute -right-16 bottom-0 select-none pointer-events-none text-[22vw] font-black text-neutral-900/[0.02] tracking-[0.05em] capitalize font-mono leading-none z-0">
         {selectedYear}
       </div>
 
@@ -135,11 +135,11 @@ export default function MilestonesSection() {
                 {data.talentsLabel}
               </p>
               
-              <div className="mt-8 pt-6 border-t border-neutral-100 flex items-center justify-between text-[10px] font-mono text-neutral-400">
+              <div className="mt-8 pt-6 border-t border-neutral-100 flex items-center justify-between text-[10px] font-mono text-neutral-600">
                 <span>Verified GCC Portfolios</span>
                 <span className="text-emerald-700 font-bold flex items-center gap-1.5 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200/60">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <span>SECURED</span>
+                  <span>Secured</span>
                 </span>
               </div>
             </div>
@@ -162,9 +162,9 @@ export default function MilestonesSection() {
                 {data.creatorsLabel}
               </p>
               
-              <div className="mt-8 pt-6 border-t border-neutral-100 flex items-center justify-between text-[10px] font-mono text-neutral-400">
+              <div className="mt-8 pt-6 border-t border-neutral-100 flex items-center justify-between text-[10px] font-mono text-neutral-600">
                 <span>Corporate Accounts</span>
-                <span className="text-[#3835A4] font-bold uppercase tracking-widest text-[9px] bg-[#3835A4]/10 border border-[#3835A4]/20 px-2.5 py-1 rounded-lg">ACTIVE REGION</span>
+                <span className="text-[#3835A4] font-bold capitalize tracking-widest text-[9px] bg-[#3835A4]/10 border border-[#3835A4]/20 px-2.5 py-1 rounded-lg">Active Region</span>
               </div>
             </div>
 
@@ -186,9 +186,9 @@ export default function MilestonesSection() {
                 {data.projectsLabel}
               </p>
               
-              <div className="mt-8 pt-6 border-t border-neutral-100 flex items-center justify-between text-[10px] font-mono text-neutral-400">
+              <div className="mt-8 pt-6 border-t border-neutral-100 flex items-center justify-between text-[10px] font-mono text-neutral-600">
                 <span>Completed Campaigns</span>
-                <span className="text-[#C6007E] font-black uppercase tracking-widest text-[9px] bg-[#C6007E]/10 border border-[#C6007E]/20 px-2.5 py-1 rounded-lg">100% ESCROWED</span>
+                <span className="text-[#C6007E] font-black capitalize tracking-widest text-[9px] bg-[#C6007E]/10 border border-[#C6007E]/20 px-2.5 py-1 rounded-lg">100% Escrowed</span>
               </div>
             </div>
 
@@ -210,7 +210,7 @@ export default function MilestonesSection() {
               AED 84,000,000+
             </span>
             <span className="text-neutral-300 hidden sm:inline">•</span>
-            <span className="text-[10px] text-[#C6007E] font-black uppercase tracking-[0.15em] font-mono">Commission-Free Ecosystem</span>
+            <span className="text-[10px] text-[#C6007E] font-black capitalize tracking-[0.15em] font-mono">Commission-Free Ecosystem</span>
           </motion.div>
         </div>
 

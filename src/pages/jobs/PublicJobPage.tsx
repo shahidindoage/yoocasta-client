@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { getPublicJobById } from '../../api/job.api';
+import { getMyApplications } from '../../api/application.api';
+import { getMyProfile } from '../../api/profile.api';
 import { useAuthStore } from '../../store/authStore';
 import ApplicationPopup from '../../components/ApplicationPopup';
 
@@ -31,6 +33,8 @@ const PublicJobPage = () => {
   const [error, setError] = useState('');
   const [applyRole, setApplyRole] = useState<any>(null);
   const [appliedRoleIds, setAppliedRoleIds] = useState<string[]>([]);
+  const [limitReached, setLimitReached] = useState(false);
+  const [limitChecked, setLimitChecked] = useState(false);
   const hasFetched = useRef(false);
 
   useEffect(() => {
@@ -43,6 +47,25 @@ const PublicJobPage = () => {
       .catch(() => setError('Job not found or has been removed'))
       .finally(() => setLoading(false));
   }, [jobId]);
+
+  useEffect(() => {
+    if (!user || user.role !== 'TALENT') return;
+    Promise.all([getMyApplications(), getMyProfile()]).then(([appsRes, profileRes]) => {
+      const apps = appsRes.data.data || [];
+      const roleIds = apps.map((a: any) => a.roleId);
+      setAppliedRoleIds(roleIds);
+      const plan = profileRes.data.data?.subscription?.plan;
+      const maxJobsPerMonth = plan?.maxJobsPerMonth ?? 1;
+      if (maxJobsPerMonth < 999) {
+        const now = new Date();
+        const thisMonthCount = apps.filter((a: any) => {
+          const d = new Date(a.createdAt);
+          return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+        }).length;
+        if (thisMonthCount >= maxJobsPerMonth) setLimitReached(true);
+      }
+    }).catch(console.error).finally(() => setLimitChecked(true));
+  }, [user]);
 
   if (loading) {
     return (
@@ -244,18 +267,32 @@ const PublicJobPage = () => {
                           if (isExpired) return;
                           if (appliedRoleIds.includes(role.id)) return;
                           if (!user) { alert('Please login to apply'); return; }
+                          if (user.role === 'RECRUITER') return;
+                          if (limitReached) return;
                           setApplyRole(role);
                         }}
-                        disabled={isExpired || appliedRoleIds.includes(role.id)}
+                        disabled={isExpired || appliedRoleIds.includes(role.id) || user?.role === 'RECRUITER' || limitReached}
                         className={`px-6 py-3 rounded-xl font-black uppercase tracking-widest text-xs whitespace-nowrap transition-all ${
                           isExpired
                             ? 'bg-stone-200 text-stone-400 cursor-not-allowed'
                             : appliedRoleIds.includes(role.id)
                             ? 'bg-green-100 text-green-700'
+                            : user?.role === 'RECRUITER'
+                            ? 'bg-amber-100 text-amber-700 cursor-not-allowed'
+                            : limitReached
+                            ? 'bg-stone-200 text-stone-400 cursor-not-allowed'
                             : 'bg-[#C6007E] text-white hover:bg-[#a10065] active:scale-95'
                         }`}
                       >
-                        {isExpired ? 'Applications Closed' : appliedRoleIds.includes(role.id) ? '✓ Applied' : 'Apply Now'}
+                        {isExpired
+                          ? 'Applications Closed'
+                          : appliedRoleIds.includes(role.id)
+                          ? '✓ Applied'
+                          : user?.role === 'RECRUITER'
+                          ? 'Register as Talent'
+                          : limitReached
+                          ? 'Monthly Limit Reached'
+                          : 'Apply Now'}
                       </button>
                     </div>
 

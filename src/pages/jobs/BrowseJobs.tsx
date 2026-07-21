@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import { getJobOptions, getPublicJobs } from '../../api/job.api';
 import { getMyApplications } from '../../api/application.api';
+import { getMyProfile } from '../../api/profile.api';
 import { useAuthStore } from '../../store/authStore';
 import ApplicationPopup from '../../components/ApplicationPopup';
 import { ChevronDown, ChevronUp } from 'lucide-react';
@@ -146,6 +147,7 @@ const BrowseJobs = () => {
   const [applyRole, setApplyRole] = useState<any>(null);
   const [appliedRoleIds, setAppliedRoleIds] = useState<Set<string>>(new Set());
   const [loadingApplied, setLoadingApplied] = useState(false);
+  const [limitMessage, setLimitMessage] = useState<string | null>(null);
   const draftRef = useRef(draftFilters);
   draftRef.current = draftFilters;
 
@@ -457,20 +459,46 @@ const BrowseJobs = () => {
 
                           {!isExpired && (
                             <div
-                              onClick={(e) => {
+                              onClick={async (e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
                                 if (!user) { alert('Please login to apply'); return; }
+                                if (user.role === 'RECRUITER') {
+                                  setQuickJob(job);
+                                  setLimitMessage('This feature is for talent only. Please register as a talent to apply for jobs.');
+                                  return;
+                                }
                                 setQuickJob(job);
                                 setLoadingApplied(true);
-                                getMyApplications().then(res => {
-                                  const apps = res.data.data || [];
+                                try {
+                                  const [appsRes, profileRes] = await Promise.all([
+                                    getMyApplications(),
+                                    getMyProfile()
+                                  ]);
+                                  const plan = profileRes.data.data?.subscription?.plan;
+                                  const maxJobsPerMonth = plan?.maxJobsPerMonth ?? 1;
+                                  if (maxJobsPerMonth < 999) {
+                                    const now = new Date();
+                                    const thisMonthCount = (appsRes.data.data || []).filter((a: any) => {
+                                      const d = new Date(a.createdAt);
+                                      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+                                    }).length;
+                                    if (thisMonthCount >= maxJobsPerMonth) {
+                                      setLimitMessage(`You've reached your application limit (${maxJobsPerMonth}/month). Upgrade to Premium for unlimited applications.`);
+                                      return;
+                                    }
+                                  }
+                                  const apps = appsRes.data.data || [];
                                   const roleIds = apps
                                     .filter((a: any) => a.role?.job?.id === job.id)
                                     .map((a: any) => a.roleId);
                                   setAppliedRoleIds(new Set(roleIds));
-                                }).catch(() => setAppliedRoleIds(new Set()))
-                                .finally(() => setLoadingApplied(false));
+                                } catch (err) {
+                                  console.error(err);
+                                  setAppliedRoleIds(new Set());
+                                } finally {
+                                  setLoadingApplied(false);
+                                }
                               }}
                               className="flex items-center gap-2 cursor-pointer"
                             >
@@ -520,57 +548,70 @@ const BrowseJobs = () => {
 
       {/* Quick Apply Popup */}
       {quickJob && !applyRole && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={(e) => { if (e.target === e.currentTarget) setQuickJob(null); }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={(e) => { if (e.target === e.currentTarget) { setQuickJob(null); setLimitMessage(null); } }}>
           <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="sticky top-0 bg-white z-10 border-b border-stone-100 px-6 py-4 flex items-center justify-between rounded-t-3xl">
               <div>
                 <h2 className="text-lg font-black tracking-tight text-[#3835A4]">{quickJob.title || 'Untitled'}</h2>
                 <p className="text-xs text-stone-500 font-medium mt-0.5">{quickJob.company?.companyName || ''}</p>
               </div>
-              <button onClick={() => setQuickJob(null)} className="text-stone-400 hover:text-stone-600 text-xl leading-none">&times;</button>
+              <button onClick={() => { setQuickJob(null); setLimitMessage(null); }} className="text-stone-400 hover:text-stone-600 text-xl leading-none">&times;</button>
             </div>
             <div className="px-6 py-5 space-y-5">
-              {quickJob.description && (
-                <div>
-                  <p className="text-[10px] font-extrabold tracking-widest text-stone-400 uppercase mb-2">Description</p>
-                  <p className="text-sm text-stone-700 leading-relaxed">{stripHtml(quickJob.description).slice(0, 300)}</p>
+              {loadingApplied && !limitMessage ? (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="w-10 h-10 border-4 border-[#C6007E] border-t-transparent rounded-full animate-spin" />
+                  <p className="text-xs text-stone-400 font-medium mt-4">Loading application info...</p>
                 </div>
-              )}
-              <div>
-                <p className="text-[10px] font-extrabold tracking-widest text-stone-400 uppercase mb-3">
-                  Roles ({quickJob.roles?.length || 0})
-                </p>
-                <div className="space-y-2">
-                  {(quickJob.roles || []).map((role: any) => (
-                    <div key={role.id} className="flex items-center justify-between bg-stone-50 rounded-xl px-4 py-3 border border-stone-100">
-                      <div>
-                        <p className="text-sm font-bold text-[#3835A4]">{role.title || 'Untitled Role'}</p>
-                        <p className="text-[10px] text-stone-500">
-                          {role.gender && `${role.gender} · `}{role.ageMin && `${role.ageMin}${role.ageMax ? `-${role.ageMax}` : '+'} yrs`}
-                          {role.noOfCast && ` · ${role.noOfCast} talent${role.noOfCast > 1 ? 's' : ''}`}
-                        </p>
-                      </div>
-                      {loadingApplied ? (
-                        <span className="bg-stone-200 text-stone-500 px-4 py-2 rounded-lg font-black uppercase tracking-widest text-[10px] whitespace-nowrap ml-3 flex items-center gap-1.5">
-                          <svg className="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-                          Loading
-                        </span>
-                      ) : appliedRoleIds.has(role.id) ? (
-                        <span className="bg-green-100 text-green-700 px-4 py-2 rounded-lg font-black uppercase tracking-widest text-[10px] whitespace-nowrap ml-3">
-                          Applied
-                        </span>
-                      ) : (
-                        <button
-                          onClick={() => setApplyRole(role)}
-                          className="bg-[#C6007E] text-white px-4 py-2 rounded-lg font-black uppercase tracking-widest text-[10px] hover:bg-[#a10065] transition-all whitespace-nowrap ml-3"
-                        >
-                          Apply
-                        </button>
-                      )}
+              ) : limitMessage ? (
+                <div className="flex flex-col items-center text-center py-8 px-4">
+                  <div className="w-16 h-16 rounded-full bg-[#C6007E]/10 flex items-center justify-center mb-4">
+                    <svg className="w-8 h-8 text-[#C6007E]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m0 0v2m0-2h2m-2 0H10m9.364-7.364A9 9 0 1112 3a9 9 0 017.364 4.636z" /></svg>
+                  </div>
+                  <h3 className="text-lg font-black text-[#C6007E] mb-2">{limitMessage.includes('application limit') ? 'Application Limit Reached' : 'Notice'}</h3>
+                  <p className="text-sm text-stone-600 leading-relaxed max-w-sm">{limitMessage}</p>
+                  {limitMessage.includes('application limit') && <p className="text-xs text-stone-400 mt-4">Upgrade to Premium for unlimited applications.</p>}
+                </div>
+              ) : (
+                <>
+                  {quickJob.description && (
+                    <div>
+                      <p className="text-[10px] font-extrabold tracking-widest text-stone-400 uppercase mb-2">Description</p>
+                      <p className="text-sm text-stone-700 leading-relaxed">{stripHtml(quickJob.description).slice(0, 300)}</p>
                     </div>
-                  ))}
-                </div>
-              </div>
+                  )}
+                  <div>
+                    <p className="text-[10px] font-extrabold tracking-widest text-stone-400 uppercase mb-3">
+                      Roles ({quickJob.roles?.length || 0})
+                    </p>
+                    <div className="space-y-2">
+                      {(quickJob.roles || []).map((role: any) => (
+                        <div key={role.id} className="flex items-center justify-between bg-stone-50 rounded-xl px-4 py-3 border border-stone-100">
+                          <div>
+                            <p className="text-sm font-bold text-[#3835A4]">{role.title || 'Untitled Role'}</p>
+                            <p className="text-[10px] text-stone-500">
+                              {role.gender && `${role.gender} · `}{role.ageMin && `${role.ageMin}${role.ageMax ? `-${role.ageMax}` : '+'} yrs`}
+                              {role.noOfCast && ` · ${role.noOfCast} talent${role.noOfCast > 1 ? 's' : ''}`}
+                            </p>
+                          </div>
+                          {appliedRoleIds.has(role.id) ? (
+                            <span className="bg-green-100 text-green-700 px-4 py-2 rounded-lg font-black uppercase tracking-widest text-[10px] whitespace-nowrap ml-3">
+                              Applied
+                            </span>
+                          ) : (
+                            <button
+                              onClick={() => setApplyRole(role)}
+                              className="bg-[#C6007E] text-white px-4 py-2 rounded-lg font-black uppercase tracking-widest text-[10px] hover:bg-[#a10065] transition-all whitespace-nowrap ml-3"
+                            >
+                              Apply
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>

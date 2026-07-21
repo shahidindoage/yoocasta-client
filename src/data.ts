@@ -59,7 +59,7 @@ export const INITIAL_TALENTS: Talent[] = [
   },
   {
     id: 't2',
-    name: 'Faisal Al-Khouri',
+    name: 'Faisal',
     gender: 'Male',
     categories: ['Actors & Extras', 'Models'],
     location: 'Dubai, UAE',
@@ -88,7 +88,7 @@ export const INITIAL_TALENTS: Talent[] = [
   },
   {
     id: 't3',
-    name: 'Elena Rostova',
+    name: 'Elena',
     gender: 'Female',
     categories: ['Models', 'Dancers'],
     location: 'Dubai, UAE',
@@ -117,7 +117,7 @@ export const INITIAL_TALENTS: Talent[] = [
   },
   {
     id: 't4',
-    name: 'Kenji Sato',
+    name: 'Kenji',
     gender: 'Male',
     categories: ['Models', 'Actors & Extras', 'Voice Over Artists'],
     location: 'Riyadh, Saudi Arabia',
@@ -144,7 +144,7 @@ export const INITIAL_TALENTS: Talent[] = [
   },
   {
     id: 't5',
-    name: 'Yasmin Al-Sayed',
+    name: 'Yasmin',
     gender: 'Female',
     categories: ['Actors & Extras', 'Singers', 'Voice Over Artists'],
     location: 'Abu Dhabi, UAE',
@@ -171,7 +171,7 @@ export const INITIAL_TALENTS: Talent[] = [
   },
   {
     id: 't6',
-    name: 'Zayson Miller',
+    name: 'Zayson',
     gender: 'Male',
     categories: ['Dancers', 'Actors & Extras', 'Promoters & Hosts'],
     location: 'Dubai, UAE',

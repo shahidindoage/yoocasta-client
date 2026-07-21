@@ -26,10 +26,12 @@ import JobApplications from './pages/recruiter/JobApplications';
 import ApplicationDetails from './pages/recruiter/ApplicationDetails';
 import PublicJobPage from './pages/jobs/PublicJobPage';
 import BrowseJobs from './pages/jobs/BrowseJobs';
+import BlogsPage from './pages/BlogsPage';
 import MyApplications from './pages/talent/MyApplications';
 import ShortlistedApplicants from './pages/talent/ShortlistedApplicants';
 import MyJobInvitations from './pages/talent/MyJobInvitations';
 import MatchingJobs from './pages/talent/MatchingJobs';
+import MySubscriptionPlan from './pages/talent/MySubscriptionPlan';
 import CastBags from './pages/recruiter/CastBags';
 import Favourites from './pages/recruiter/Favourites';
 import SentInvitations from './pages/recruiter/SentInvitations';
@@ -61,6 +63,7 @@ function App() {
           <Route path="/talent/:username" element={<PublicTalentProfile />} />
           <Route path="/browse-talents" element={<BrowseTalents />} />
           <Route path="/browse-jobs" element={<BrowseJobs />} />
+          <Route path="/blogs" element={<BlogsPage />} />
           <Route path="/jobs/:jobId" element={<PublicJobPage />} />
           <Route path="/invitation/:jobId" element={<PublicJobInvitation />} />
           <Route path="/cast-bag/:token" element={<PublicCastBag />} />
@@ -74,6 +77,7 @@ function App() {
             <Route path="/dashboard/talent/applications/shortlisted/:roleId" element={<ShortlistedApplicants />} />
             <Route path="/dashboard/talent/my-invitations" element={<MyJobInvitations />} />
             <Route path="/dashboard/talent/matching-jobs" element={<MatchingJobs />} />
+            <Route path="/dashboard/talent/subscription" element={<MySubscriptionPlan />} />
           </Route>
 
           <Route element={<ProtectedRoute allowedRoles={['RECRUITER']} />}>

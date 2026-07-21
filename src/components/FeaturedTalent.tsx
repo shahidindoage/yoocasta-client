@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Talent } from '../types';
-import { Star, MapPin, Eye, Ruler, ChevronDown, RefreshCw, Layers, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Star, MapPin, Eye, ChevronDown, RefreshCw, Layers, ArrowLeft, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface FeaturedTalentProps {
@@ -50,7 +50,7 @@ export default function FeaturedTalent({
   return (
     <div 
       id="talents-anchor" 
-      className="bg-neutral-50/50 py-8 border-b border-[#f2f2f2] relative overflow-hidden"
+      className="bg-white py-8 border-b border-[#f2f2f2] relative overflow-hidden"
     >
       {/* Ambient lights */}
       <div className="absolute left-0 top-1/4 h-96 w-96 rounded-full bg-[#3835A4]/[0.035] filter blur-[120px] pointer-events-none" />
@@ -83,7 +83,7 @@ export default function FeaturedTalent({
           <button
             key={genderOption}
             onClick={() => onGenderChange(genderOption)}
-            className={`relative px-4 py-3 text-xs font-black tracking-wider uppercase transition-all duration-300 z-10 cursor-pointer rounded-xl border min-w-[80px] text-center ${
+            className={`relative px-4 py-3 text-xs font-black tracking-wider capitalize transition-all duration-300 z-10 cursor-pointer rounded-xl border min-w-[80px] text-center ${
               isSelected
                 ? 'text-white border-transparent bg-gradient-to-r from-[#C6007E] to-[#3835A4] shadow-sm'
                 : 'text-neutral-700 bg-white border-neutral-200 hover:border-neutral-300 hover:text-neutral-900 shadow-xs'
@@ -120,7 +120,7 @@ export default function FeaturedTalent({
               className="absolute left-0 mt-2 w-56 bg-white border border-neutral-200 rounded-2xl shadow-xl p-2 z-50 overflow-hidden"
             >
               <div className="px-3 py-1.5 border-b border-neutral-100 mb-1">
-                <span className="text-[9px] uppercase font-mono font-bold tracking-widest text-neutral-400">Filter Location</span>
+                <span className="text-[9px] capitalize font-mono font-bold tracking-widest text-neutral-400">Filter Location</span>
               </div>
               {locationOptions.map((opt) => (
                 <button
@@ -250,16 +250,12 @@ export default function FeaturedTalent({
 
                       <div className="absolute top-6 left-6 right-6 flex items-center justify-between z-30">
                         {talent.isPremium ? (
-                          <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white text-[9px] uppercase font-mono font-black tracking-[0.2em] px-3.5 py-1.5 rounded-xl shadow-lg">
+                          <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white text-[9px]  font-mono font-black tracking-[0.2em] px-3.5 py-1.5 rounded-xl shadow-lg">
                             <Star className="h-3 w-3 fill-current text-white" />
-                            <span>PREMIUM</span>
+                            <span>Premium</span>
                           </div>
                         ) : <div />}
                         
-                        <div className="bg-neutral-950/80 backdrop-blur-md text-white/90 text-[10px] font-mono tracking-wider px-3.5 py-1.5 rounded-xl border border-white/10 flex items-center gap-1">
-                          <Ruler className="h-3 w-3 text-neutral-400" />
-                          <span>{talent.stats.height} CM</span>
-                        </div>
                       </div>
 
                       <div className="absolute inset-x-0 bottom-0 p-7 z-30 flex flex-col justify-end">
@@ -267,12 +263,12 @@ export default function FeaturedTalent({
                           <div className="space-y-2">
                             <div className="flex flex-wrap gap-1.5">
                               {sortedCategories.slice(0, 2).map((cat, idx) => (
-                                <span key={idx} className="text-[9px] uppercase font-mono tracking-widest font-black text-[#FFF] px-2 py-0.5 bg-[#3835A4] rounded-md group-hover:bg-[#C6007E]">
+                                <span key={idx} className="text-[9px] capitalize font-mono tracking-widest font-black text-[#FFF] px-2 py-0.5 bg-[#3835A4] rounded-md group-hover:bg-[#C6007E]">
                                   {cat}
                                 </span>
                               ))}
                             </div>
-                            <h3 className="font-display text-2xl sm:text-3xl font-black text-white group-hover:text-[#C6007E] transition-colors leading-none">
+                            <h3 className="font-display text-2xl sm:text-3xl font-black text-white leading-none">
                               {talent.name}
                             </h3>
                             <div className="flex items-center gap-1.5 text-xs text-[#FFF] font-bold">
@@ -287,17 +283,21 @@ export default function FeaturedTalent({
                         </div>
 
                         <div className="h-0 opacity-0 overflow-hidden group-hover:h-16 group-hover:opacity-100 group-hover:mt-6 transition-all duration-500 ease-out border-t border-white/10 pt-4">
-                          <div className="grid grid-cols-3 gap-4 text-center">
+                          <div className="grid grid-cols-4 gap-4 text-center">
                             <div>
-                              <p className="text-[8px] text-[#FFF] uppercase font-mono">Shoe Size</p>
+                              <p className="text-[8px] text-[#FFF] capitalize font-mono">Height</p>
+                              <p className="text-xs font-black text-[#FFF] font-mono">{talent.stats.height} CM</p>
+                            </div>
+                            <div>
+                              <p className="text-[8px] text-[#FFF] capitalize font-mono">Shoe Size</p>
                               <p className="text-xs font-black text-[#FFF] font-mono">{talent.stats.shoeSize || 'N/A'} EU</p>
                             </div>
                             <div>
-                              <p className="text-[8px] text-[#FFF] uppercase font-mono">Hair Color</p>
+                              <p className="text-[8px] text-[#FFF] capitalize font-mono">Hair Color</p>
                               <p className="text-xs font-black text-[#FFF] font-mono">{talent.stats.hairColor}</p>
                             </div>
                             <div>
-                              <p className="text-[8px] text-[#FFF] uppercase font-mono">Waistline</p>
+                              <p className="text-[8px] text-[#FFF] capetalize font-mono">Waistline</p>
                               <p className="text-xs font-black text-white font-mono">{talent.stats.waist || 'N/A'} CM</p>
                             </div>
                           </div>

@@ -85,7 +85,7 @@ export default function BlogsSection() {
                     loading="lazy"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/60 via-transparent to-transparent" />
-                  <span className="absolute top-5 left-5 bg-white/95 backdrop-blur-sm text-neutral-900 text-[9px] font-mono font-black tracking-widest uppercase py-1.5 px-3.5 rounded-xl border border-neutral-250/20 shadow-md">
+                  <span className="absolute top-5 left-5 bg-white/95 backdrop-blur-sm text-neutral-900 text-[9px] font-mono font-black tracking-widest capitalize py-1.5 px-3.5 rounded-xl border border-neutral-250/20 shadow-md">
                     {blog.category}
                   </span>
                 </div>
@@ -109,7 +109,7 @@ export default function BlogsSection() {
                   </div>
 
                   <div className="mt-8 pt-5 border-t border-neutral-100 flex items-center justify-between text-xs text-neutral-500 font-bold group-hover:text-neutral-900 transition-colors duration-300">
-                    <span className="text-[9px] uppercase tracking-[0.25em] font-mono font-black">Read Journal Article</span>
+                    <span className="text-[9px] tracking-[0.25em] font-mono font-black">Read Journal Article</span>
                     <div className="p-1.5 rounded-xl bg-neutral-50 border border-neutral-200/60 group-hover:bg-gradient-to-br group-hover:from-[#C6007E] group-hover:to-[#3835A4] group-hover:text-white group-hover:border-transparent transition-all duration-300">
                       <ArrowUpRight className="h-3.5 w-3.5" />
                     </div>

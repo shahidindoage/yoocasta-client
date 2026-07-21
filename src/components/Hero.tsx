@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, SlidersHorizontal, Users, ArrowRight } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { CATEGORIES, LOCATIONS } from '../data';
 
 interface HeroProps {
@@ -28,140 +28,124 @@ export default function Hero({ onSearch }: HeroProps) {
   };
 
   return (
-    <div className="relative min-h-[58vh] lg:min-h-[64vh] w-full overflow-hidden flex flex-col justify-center items-center bg-neutral-950 text-white px-4 sm:px-6 lg:px-8 py-12 lg:py-14">
+    <div className="relative min-h-[58vh] lg:min-h-[64vh] w-full overflow-hidden flex flex-col justify-center items-center text-stone-900 px-4 sm:px-6 lg:px-8 py-12 lg:py-14">
       
-      {/* CSS Injection for smooth running two-color text gradient animation */}
+      {/* CSS Injection for smooth wave text animation */}
     <style>{`
-  @keyframes brandGradientText {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+  @keyframes shimmer {
+    0% { background-position: -200% 0; filter: drop-shadow(0 0 3px rgba(255,237,36,0.2)); }
+    40% { background-position: 0% 0; filter: drop-shadow(0 0 25px rgba(255,255,255,1)) drop-shadow(0 0 50px rgba(255,237,36,0.6)) drop-shadow(0 0 80px rgba(198,0,126,0.3)); }
+    60% { background-position: 0% 0; filter: drop-shadow(0 0 25px rgba(255,255,255,1)) drop-shadow(0 0 50px rgba(255,237,36,0.6)) drop-shadow(0 0 80px rgba(198,0,126,0.3)); }
+    100% { background-position: 200% 0; filter: drop-shadow(0 0 3px rgba(255,237,36,0.2)); }
   }
-  .animate-brand-gradient {
+  .shimmer-char {
+    display: inline-block;
+    color: transparent;
+    background: linear-gradient(120deg, #FFED24 0%, #FFED24 30%, #ffffff 50%, #FFED24 70%, #FFED24 100%);
     background-size: 200% auto;
-    animation: brandGradientText 6s ease infinite;
-    background-image: linear-gradient(to right, #FF00A0, #3375faa8, #FF00A0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: shimmer 2.2s ease-in-out infinite;
   }
 `}</style>
 
-      {/* Full Screen Background Video Autoplay */}
+      {/* Full Screen Background Video with very subtle pink overlay */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <video
           autoPlay
           loop
           muted
           playsInline
-          className="w-full h-full object-cover opacity-60"
+          className="w-full h-full object-cover opacity-70"
           src="https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/casting_video/casting_video_10107.mp4" 
         />
-        {/* Cinematic dark gradient overlay for text readability */}
-        {/* <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/70 to-neutral-950/50" /> */}
+        <div className="absolute inset-0 bg-black/30" />
       </div>
 
       {/* Main Content (Centered) */}
       <div className="relative z-10 w-full max-w-5xl mx-auto flex flex-col items-center text-center space-y-7">
         
-        {/* Typography Masterpiece Title */}
-        <div className="space-y-3 max-w-4xl">
-          <h1 className="font-display text-4xl sm:text-5xl lg:text-[50px] font-black tracking-tight text-white leading-[1.08]">
-          
-            <span className="text-transparent bg-clip-text animate-brand-gradient">
-            DISCOVER THE MOST ELITE, HIGH-FASHION FACES ACROSS ARABIA.
-            </span>{' '}
-        
-          </h1>
-          <p className="max-w-2xl mx-auto text-sm text-neutral-300 font-medium leading-relaxed">
-            Middle East‘s leading digital casting platform for luxury runway models, cinematic lead actors, event hosts, and premium production crews. No middleman agency fees.
+        {/* Typography */}
+        <div className="space-y-4 max-w-4xl">
+          <p className="font-display text-sm sm:text-base font-bold text-white tracking-wide" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
+            Apply to unlimited jobs at
           </p>
+          <h1 className="font-display text-3xl sm:text-5xl lg:text-[56px] font-black tracking-[0.08em] leading-none" style={{ filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.4))' }}>
+            <span className="inline-block">
+              {"AED 20 ONLY".split("").map((char, i) => (
+                <span key={i} className="shimmer-char" style={{ animationDelay: `${i * 0.12}s` }}>
+                  {char === " " ? "\u00A0" : char}
+                </span>
+              ))}
+            </span>
+          </h1>
+          <p className="font-display text-sm sm:text-base font-bold text-white tracking-wide" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
+            Register or Login to become Premium!
+          </p>
+          <div className="pt-4 space-y-1">
+            <p className="font-display text-3xl sm:text-4xl font-black text-[#FFED24] tracking-wider capitalize" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.4)' }}>
+              Connecting Talents & Opportunities
+            </p>
+            <p className="text-[10px] text-white/80 font-medium tracking-[0.2em]" style={{ textShadow: '0 1px 6px rgba(0,0,0,0.5)' }}>
+              Your own online casting agency
+            </p>
+          </div>
         </div>
 
-        {/* Dynamic Search Terminal */}
-        <div className=" max-w-4xl w-full bg-neutral-900/80 backdrop-blur-xl rounded-2xl border border-white/10 p-5 shadow-2xl shadow-black/50 text-left">
-          <h2 className="text-xs uppercase font-mono tracking-widest text-neutral-400 font-bold mb-3.5 flex items-center gap-2">
-            <SlidersHorizontal className="h-3.5 w-3.5 text-amber-400" />
-            TACTILE ATTRIBUTES SEARCH
-          </h2>
-          
-          <form onSubmit={handleSearchSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              
-              {/* Category Selection */}
-              <div className="flex flex-col gap-1 bg-neutral-950 p-3 rounded-xl border border-white/5 focus-within:border-white/20 transition-colors">
-                <label className="text-[9px] uppercase tracking-widest font-mono font-black text-neutral-500">Specialization</label>
+        {/* Search Bar */}
+        <div className="max-w-4xl w-full bg-white/80 backdrop-blur-xl rounded-2xl border border-[#f5d0e3] p-3 shadow-lg shadow-[#C6007E]/5">
+          <form onSubmit={handleSearchSubmit}>
+            <div className="flex items-center gap-2">
+              <div className="flex-1 bg-[#fef1f5] rounded-xl border border-[#f5d0e3] focus-within:border-[#C6007E] transition-colors px-3 py-2">
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full bg-transparent text-xs text-white font-black focus:outline-none cursor-pointer border-none p-0 mt-0.5"
+                  className="w-full bg-transparent text-xs text-stone-900 font-black focus:outline-none cursor-pointer"
                 >
-                  <option value="all" className="bg-neutral-900">Any Specialization</option>
+                  <option value="all" className="bg-white">Any Specialization</option>
                   {CATEGORIES.filter(c => c.id !== 'all').map((cat) => (
-                    <option key={cat.id} value={cat.name} className="bg-neutral-900">{cat.name}</option>
+                    <option key={cat.id} value={cat.name} className="bg-white">{cat.name}</option>
                   ))}
                 </select>
               </div>
-
-              {/* Location Selection */}
-              <div className="flex flex-col gap-1 bg-neutral-950 p-3 rounded-xl border border-white/5 focus-within:border-white/20 transition-colors">
-                <label className="text-[9px] uppercase tracking-widest font-mono font-black text-neutral-500">Location Hub</label>
+              <div className="flex-1 bg-[#fef1f5] rounded-xl border border-[#f5d0e3] focus-within:border-[#C6007E] transition-colors px-3 py-2">
                 <select
                   value={selectedLocation}
                   onChange={(e) => setSelectedLocation(e.target.value)}
-                  className="w-full bg-transparent text-xs text-white font-black focus:outline-none cursor-pointer border-none p-0 mt-0.5"
+                  className="w-full bg-transparent text-xs text-stone-900 font-black focus:outline-none cursor-pointer"
                 >
                   {LOCATIONS.map((loc) => (
-                    <option key={loc} value={loc} className="bg-neutral-900">{loc}</option>
+                    <option key={loc} value={loc} className="bg-white">{loc}</option>
                   ))}
                 </select>
               </div>
-
-              {/* Gender Selection */}
-              <div className="flex flex-col gap-1 bg-neutral-950 p-3 rounded-xl border border-white/5 focus-within:border-white/20 transition-colors">
-                <label className="text-[9px] uppercase tracking-widest font-mono font-black text-neutral-500">Gender Identity</label>
+              <div className="flex-1 bg-[#fef1f5] rounded-xl border border-[#f5d0e3] focus-within:border-[#C6007E] transition-colors px-3 py-2">
                 <select
                   value={selectedGender}
                   onChange={(e) => setSelectedGender(e.target.value)}
-                  className="w-full bg-transparent text-xs text-white font-black focus:outline-none cursor-pointer border-none p-0 mt-0.5"
+                  className="w-full bg-transparent text-xs text-stone-900 font-black focus:outline-none cursor-pointer"
                 >
-                  <option value="All" className="bg-neutral-900">All Genders</option>
-                  <option value="Female" className="bg-neutral-900">Female</option>
-                  <option value="Male" className="bg-neutral-900">Male</option>
-                  <option value="Non-binary" className="bg-neutral-900">Non-binary</option>
+                  <option value="All" className="bg-white">All Genders</option>
+                  <option value="Female" className="bg-white">Female</option>
+                  <option value="Male" className="bg-white">Male</option>
+                  <option value="Non-binary" className="bg-white">Non-binary</option>
                 </select>
               </div>
-
-              {/* Keywords Input */}
-              <div className="flex flex-col gap-1 bg-neutral-950 p-3 rounded-xl border border-white/5 focus-within:border-white/20 transition-colors">
-                <label className="text-[9px] uppercase tracking-widest font-mono font-black text-neutral-500">Custom Keywords</label>
-                <div className="flex items-center gap-2 mt-0.5">
-                  <Search className="h-3.5 w-3.5 text-neutral-500 shrink-0" />
-                  <input 
-                    type="text"
-                    placeholder="e.g. Height 180, Blonde..."
-                    value={keyword}
-                    onChange={(e) => setKeyword(e.target.value)}
-                    className="w-full bg-transparent text-xs text-white font-bold focus:outline-none placeholder-neutral-600 p-0"
-                  />
-                </div>
+              <div className="flex-[2] bg-[#fef1f5] rounded-xl border border-[#f5d0e3] focus-within:border-[#C6007E] transition-colors px-3 py-2 flex items-center gap-2">
+                <Search className="h-4 w-4 text-[#C6007E] shrink-0" />
+                <input
+                  type="text"
+                  placeholder="Search talents..."
+                  value={keyword}
+                  onChange={(e) => setKeyword(e.target.value)}
+                  className="w-full bg-transparent text-xs text-stone-900 font-bold focus:outline-none placeholder-stone-400"
+                />
               </div>
-            </div>
-
-            {/* Submit Row */}
-            <div className="pt-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-white/5 mt-1">
-              <div className="flex items-center gap-3 text-[10px] text-neutral-400 font-mono">
-                <span className="flex items-center gap-1.5 font-bold">
-                  <Users className="h-3.5 w-3.5 text-neutral-500" />
-                  AED 20 Entry
-                </span>
-                <span>•</span>
-                <span className="font-bold">Zero Agent Commissions</span>
-              </div>
-
               <button
                 type="submit"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-amber-400 hover:bg-amber-500 text-neutral-950 transition-all duration-300 px-6 py-3 text-xs font-black shadow-lg shadow-amber-400/10 cursor-pointer uppercase tracking-wider group"
+                className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#C6007E] to-[#3835A4] hover:opacity-90 text-white transition-all duration-300 px-5 py-2.5 shadow-lg shadow-[#C6007E]/20"
               >
-                <span>Instant Audition Search</span>
-                <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
+                <Search className="h-4 w-4" />
               </button>
             </div>
           </form>

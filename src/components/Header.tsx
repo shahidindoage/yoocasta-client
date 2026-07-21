@@ -87,7 +87,7 @@ export default function Header({
           <a href="/browse-jobs" className="hover:text-[#3835a4] transition-colors">
             Casting Calls
           </a>
-          <a href="/" className="hover:text-[#3835a4] transition-colors">Our Work</a>
+          <a href="/blogs" className="hover:text-[#3835a4] transition-colors">Our Work</a>
           <a href="/" className="hover:text-[#3835a4] transition-colors">Success Stories</a>
           <a href="/" className="hover:text-[#3835a4] transition-colors">FAQ</a>
         </nav>
@@ -204,7 +204,7 @@ export default function Header({
             Casting Calls
           </a>
           <a 
-            href="#" 
+            href="/blogs" 
             onClick={toggleMenu}
             className="border-b border-white/10 pb-4 hover:text-pink-200 transition-colors"
           >
