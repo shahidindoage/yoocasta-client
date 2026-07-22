@@ -65,7 +65,7 @@ export default function Header({
         
         {/* Brand Logo - Aligned LEFT on both Desktop and Mobile */}
         <div className="flex items-center z-50">
-          <a href="/" className="flex items-center group">
+          <Link to="/" className="flex items-center group">
             <img 
               src={isMenuOpen ? "/logo.png" : "https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/logo-black.png"} 
               alt="Yoocasta Logo" 
@@ -75,21 +75,21 @@ export default function Header({
                 (e.target as HTMLElement).style.display = 'none';
               }}
             />
-          </a>
+          </Link>
         </div>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-neutral-600">
-          <a href="/browse-talents" className="hover:text-[#3835a4] transition-colors">
+          <Link to="/browse-talents" className="hover:text-[#3835a4] transition-colors">
             Talent Pool
             <span className="ml-1.5 inline-block h-2 w-2 rounded-full bg-[#C6007E] animate-pulse"></span>
-          </a>
-          <a href="/browse-jobs" className="hover:text-[#3835a4] transition-colors">
+          </Link>
+          <Link to="/browse-jobs" className="hover:text-[#3835a4] transition-colors">
             Casting Calls
-          </a>
-          <a href="/blogs" className="hover:text-[#3835a4] transition-colors">Our Work</a>
-          <a href="/" className="hover:text-[#3835a4] transition-colors">Success Stories</a>
-          <a href="/" className="hover:text-[#3835a4] transition-colors">FAQ</a>
+          </Link>
+          <Link to="/blogs" className="hover:text-[#3835a4] transition-colors">Our Work</Link>
+          {/* <a href="/" className="hover:text-[#3835a4] transition-colors">Success Stories</a> */}
+          <Link to="/faq" className="hover:text-[#3835a4] transition-colors">FAQ</Link>
         </nav>
 
         {/* Desktop Action Buttons Interface */}
@@ -188,42 +188,42 @@ export default function Header({
       >
         {/* Navigation Links */}
         <nav className="flex flex-col gap-5 text-lg font-black uppercase font-mono tracking-[0.15em] text-white">
-          <a 
-            href="#" 
+          <Link
+            to="/browse-talents" 
             onClick={toggleMenu}
             className="flex items-center justify-between border-b border-white/10 pb-4 hover:text-pink-200 transition-colors"
           >
             <span>Talent Pool</span>
             <span className="h-2.5 w-2.5 rounded-full bg-[#C6007E] animate-pulse"></span>
-          </a>
-          <a 
-            href="#" 
+          </Link>
+          <Link 
+            to="/browse-jobs" 
             onClick={toggleMenu}
             className="border-b border-white/10 pb-4 hover:text-pink-200 transition-colors"
           >
             Casting Calls
-          </a>
-          <a 
-            href="/blogs" 
+          </Link>
+          <Link 
+            to="/blogs" 
             onClick={toggleMenu}
             className="border-b border-white/10 pb-4 hover:text-pink-200 transition-colors"
           >
             Our Work
-          </a>
-          <a 
+          </Link>
+          {/* <a 
             href="#" 
             onClick={toggleMenu}
             className="border-b border-white/10 pb-4 hover:text-pink-200 transition-colors"
           >
             Success Stories
-          </a>
-          <a 
-            href="#" 
+          </a> */}
+          <Link 
+            to="/faq" 
             onClick={toggleMenu}
             className="border-b border-white/10 pb-4 hover:text-pink-200 transition-colors"
           >
             FAQ
-          </a>
+          </Link>
         </nav>
 
         {/* Action Buttons Footer */}

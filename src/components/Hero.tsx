@@ -59,7 +59,7 @@ export default function Hero({ onSearch }: HeroProps) {
           className="w-full h-full object-cover opacity-70"
           src="https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/casting_video/casting_video_10107.mp4" 
         />
-        <div className="absolute inset-0 bg-black/30" />
+        <div className="absolute inset-0 bg-black/30" /> 
       </div>
 
       {/* Main Content (Centered) */}

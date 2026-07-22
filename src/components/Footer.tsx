@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Phone, Mail, MapPin, Compass } from 'lucide-react';
 
 export default function Footer() {
@@ -71,17 +72,14 @@ export default function Footer() {
           {/* Col 3 Navigation quick links */}
           <div className="space-y-5">
             <h4 className="font-display text-xs font-bold text-white uppercase tracking-[0.25em] font-mono">
-              ROSTER CATEGORIES
+              Quick Links
             </h4>
-            <ul className="grid grid-cols-2 gap-x-4 gap-y-2.5 text-xs text-neutral-400 font-medium">
-              <li><a href="#directors-board" className="hover:text-amber-400 transition-colors flex items-center gap-1">Actors & Extras</a></li>
-              <li><a href="#directors-board" className="hover:text-amber-400 transition-colors flex items-center gap-1">Runway Models</a></li>
-              <li><a href="#directors-board" className="hover:text-amber-400 transition-colors flex items-center gap-1">Dancers</a></li>
-              <li><a href="#directors-board" className="hover:text-amber-400 transition-colors flex items-center gap-1">Vocalists</a></li>
-              <li><a href="#directors-board" className="hover:text-amber-400 transition-colors flex items-center gap-1">Photographers</a></li>
-              <li><a href="#directors-board" className="hover:text-amber-400 transition-colors flex items-center gap-1">MC & Voiceover</a></li>
-              <li><a href="#directors-board" className="hover:text-amber-400 transition-colors flex items-center gap-1">Crew & Makeup</a></li>
-              <li><a href="#directors-board" className="hover:text-amber-400 transition-colors flex items-center gap-1">Expos Hostess</a></li>
+            <ul className="flex flex-col gap-2 text-xs text-neutral-400 font-medium">
+               <li><Link to="/about" className="hover:text-amber-400 transition-colors flex items-center gap-1">About Us</Link></li>
+             <li><Link to="/subscription-plans" className="hover:text-amber-400 transition-colors flex items-center gap-1">Subscription Plans</Link></li>
+                           <li><Link to="/blogs" className="hover:text-amber-400 transition-colors flex items-center gap-1">Our Work</Link></li>
+                 <li><Link to="/contact" className="hover:text-amber-400 transition-colors flex items-center gap-1">Contact Us</Link></li>
+                  <li><Link to="/faq" className="hover:text-amber-400 transition-colors flex items-center gap-1">FAQs</Link></li>
             </ul>
           </div>
 
@@ -101,12 +99,18 @@ export default function Footer() {
           <p className="font-mono text-[10px] tracking-wide">
             © 2026 Yoocasta FZE LLC. All rights reserved. Made for the Middle East Talent & Casting Elite.
           </p>
+          {/* <div className="flex items-center gap-4">
+            <Link to="/about" className="hover:text-amber-400 transition-colors">About</Link>
+            <Link to="/faq" className="hover:text-amber-400 transition-colors">FAQ</Link>
+            <Link to="/contact" className="hover:text-amber-400 transition-colors">Contact</Link>
+            <Link to="/terms" className="hover:text-amber-400 transition-colors">Terms of Service</Link>
+          </div> */}
           <div className="flex flex-wrap gap-4 text-[11px] font-mono">
-            <a href="#" className="hover:text-amber-400 transition-colors">Terms of Service</a>
+            <Link to="/terms" className="hover:text-amber-400 transition-colors">Terms of Service</Link>
             <span>•</span>
-            <a href="#" className="hover:text-amber-400 transition-colors">Privacy Policy</a>
-            <span>•</span>
-            <a href="#" className="hover:text-amber-400 transition-colors">GCC Auditions Act</a>
+            <Link to="/privacy" className="hover:text-amber-400 transition-colors">Privacy Policy</Link>
+            {/* <span>•</span> */}
+            {/* <a href="#" className="hover:text-amber-400 transition-colors">GCC Auditions Act</a> */}
           </div>
         </div>
 

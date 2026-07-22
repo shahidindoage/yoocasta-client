@@ -104,10 +104,10 @@ const MySubscriptionPlan = () => {
       <div className="bg-white border border-[#3835A4]/10 rounded-2xl p-6 sm:p-8 space-y-6">
         <h4 className="text-xs font-black tracking-widest text-[#3835A4]/50 uppercase">Usage Limits</h4>
         <div className="space-y-5">
-          <UsageBar label="Images" current={currentImages} max={limits.maxPhotos} unit="images" isPremium={isPremium} />
-          <UsageBar label="Acting Videos" current={currentVideos} max={limits.maxVideos} unit="videos" isPremium={isPremium} />
-          <UsageBar label="Audio Files" current={currentAudios} max={limits.maxAudios} unit="files" isPremium={isPremium} />
-          <UsageBar label="Monthly Job Applications" current={appsThisMonth} max={limits.maxJobsPerMonth} unit="applications" isPremium={isPremium} />
+          <UsageBar label="Images" current={currentImages} max={limits.maxPhotos} unit="images" />
+          <UsageBar label="Acting Videos" current={currentVideos} max={limits.maxVideos} unit="videos" />
+          <UsageBar label="Audio Files" current={currentAudios} max={limits.maxAudios} unit="files" />
+          <UsageBar label="Monthly Job Applications" current={appsThisMonth} max={limits.maxJobsPerMonth} unit="applications" />
         </div>
       </div>
 
@@ -135,10 +135,11 @@ const MySubscriptionPlan = () => {
   );
 };
 
-const UsageBar = ({ label, current, max, unit, isPremium }: { label: string; current: number; max: number; unit: string; isPremium: boolean }) => {
-  const displayMax = isPremium ? '∞' : max;
-  const pct = isPremium ? 100 : Math.min((current / max) * 100, 100);
-  const isOver = !isPremium && current >= max;
+const UsageBar = ({ label, current, max, unit }: { label: string; current: number; max: number; unit: string }) => {
+  const unlimited = max === 999;
+  const displayMax = unlimited ? '∞' : max;
+  const pct = unlimited ? 0 : Math.min((current / max) * 100, 100);
+  const isOver = !unlimited && current >= max;
 
   return (
     <div>

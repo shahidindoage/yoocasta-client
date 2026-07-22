@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, ArrowUpRight, X, BookOpen } from 'lucide-react';
+import { Calendar, ArrowUpRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 interface BlogPost {
@@ -27,23 +28,30 @@ const CATEGORIES: Record<number, string> = {
 };
 
 export default function BlogsPage() {
+  const navigate = useNavigate();
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-  const [selectedArticle, setSelectedArticle] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  useEffect(() => {
+    setPage(1);
+  }, [selectedCategory]);
 
   useEffect(() => {
     fetchBlogs();
-  }, [selectedCategory]);
+  }, [selectedCategory, page]);
 
   const fetchBlogs = async () => {
     setLoading(true);
     try {
-      const params: any = { limit: 50 };
+      const params: any = { page, limit: 9 };
       if (selectedCategory) params.categoryId = selectedCategory;
       const res = await axios.get(API, { params });
       if (res.data?.success && res.data?.data?.blogs) {
         setBlogs(res.data.data.blogs);
+        setTotalPages(res.data.data.pagination?.totalPages || 1);
       }
     } catch {
       setBlogs([]);
@@ -138,7 +146,7 @@ export default function BlogsPage() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.35, delay: index * 0.05 }}
-                  onClick={() => setSelectedArticle(blog)}
+                  onClick={() => navigate(`/blogs/${blog.id}`)}
                   className="bg-white flex flex-col rounded-[2rem] overflow-hidden shadow-sm hover:shadow-xl cursor-pointer group h-full border border-neutral-200/80 hover:border-[#3835A4]/30 transition-all duration-500 relative"
                 >
                   <div className="absolute inset-2.5 border border-white/0 rounded-[1.5rem] pointer-events-none z-20 group-hover:border-neutral-900/10 transition-all duration-500" />
@@ -180,69 +188,39 @@ export default function BlogsPage() {
             </AnimatePresence>
           </motion.div>
         )}
-      </div>
 
-      <AnimatePresence>
-        {selectedArticle && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-950/85 backdrop-blur-md">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setSelectedArticle(null)}
-              className="absolute inset-0"
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 25 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 25 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-              className="relative w-full max-w-2xl rounded-3xl border border-neutral-200 bg-white shadow-2xl overflow-hidden flex flex-col max-h-[85vh] z-10"
+        {!loading && blogs.length > 0 && totalPages > 1 && (
+          <div className="flex items-center justify-center gap-3 mt-14">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="px-4 py-2 rounded-xl text-xs font-black tracking-wider transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed bg-neutral-100 text-neutral-600 hover:bg-neutral-200"
             >
-              <div className="px-6 py-4 bg-neutral-50 border-b border-neutral-100 flex items-center justify-between">
-                <span className="p-1 px-3.5 rounded-xl bg-[#C6007E]/10 border border-[#C6007E]/20 text-[#C6007E] text-[9px] font-mono font-black capitalize tracking-widest">{selectedArticle.category}</span>
-                <button
-                  onClick={() => setSelectedArticle(null)}
-                  className="p-2 rounded-xl hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-colors cursor-pointer border border-transparent hover:border-neutral-250/20"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-
-              <div className="p-6 md:p-8 overflow-y-auto space-y-6 bg-white">
-                <div className="aspect-video w-full rounded-2xl overflow-hidden bg-neutral-100 border border-neutral-200 relative">
-                  <img src={getImageUrl(selectedArticle.image)} alt="" className="h-full w-full object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/40 via-transparent to-transparent" />
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex items-center gap-4 text-[10px] font-mono tracking-wider font-bold text-neutral-400">
-                    <span className="flex items-center gap-1"><Calendar className="h-3.5 w-3.5" /> Published: {formatDate(selectedArticle.date)}</span>
-                  </div>
-                  <h1 className="font-display text-2xl md:text-3xl font-black text-neutral-900 leading-tight">{selectedArticle.title}</h1>
-                </div>
-
-                <div className="p-5 bg-[#3835A4]/5 border-l-2 border-[#3835A4] text-xs italic text-neutral-800 leading-relaxed rounded-r-xl font-medium">
-                  {selectedArticle.description}
-                </div>
-
-                <div className="pt-8 border-t border-neutral-100 text-center flex flex-col items-center gap-3">
-                  <div className="h-10 w-10 rounded-xl bg-[#3835A4]/10 flex items-center justify-center text-[#3835A4]">
-                    <BookOpen className="h-5 w-5" />
-                  </div>
-                  <p className="text-xs text-neutral-500 font-mono max-w-sm mx-auto">Want to secure absolute career exposure? Upgrade to premium modeling membership to land direct agency opportunities.</p>
-                  <button
-                    onClick={() => setSelectedArticle(null)}
-                    className="mt-2 bg-gradient-to-r from-[#C6007E] to-[#3835A4] hover:opacity-95 text-white text-xs font-bold py-2.5 px-6 rounded-xl transition-all cursor-pointer shadow-md"
-                  >
-                    Close Article
-                  </button>
-                </div>
-              </div>
-            </motion.div>
+              Previous
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+              <button
+                key={p}
+                onClick={() => setPage(p)}
+                className={`w-9 h-9 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                  p === page
+                    ? 'bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white shadow-md'
+                    : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200'
+                }`}
+              >
+                {p}
+              </button>
+            ))}
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="px-4 py-2 rounded-xl text-xs font-black tracking-wider transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed bg-neutral-100 text-neutral-600 hover:bg-neutral-200"
+            >
+              Next
+            </button>
           </div>
         )}
-      </AnimatePresence>
+      </div>
     </div>
   );
 }

@@ -343,22 +343,22 @@ const setProfessionalText = (key: string, val: string) => {
   <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0 }}>
     <video
       autoPlay loop muted playsInline
-      style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.6 }}
+      className="w-full h-full object-cover opacity-70"
     >
       <source src="https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/casting_video/casting_video_10107.mp4" type="video/mp4" />
     </video>
   </div>
 
-  <div style={{ position: 'absolute', inset: 0, background: 'rgba(254, 241, 245, 0.4)', backdropFilter: 'blur(1px)', WebkitBackdropFilter: 'blur(8px)', zIndex: 1 }} />
+  <div className="absolute inset-0 bg-black/30" /> 
 
   {/* ⬇️ NEW WRAPPER — everything below must go INSIDE this div */}
   <div style={{ position: 'relative', zIndex: 2 }}>
 
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-      <h2 style={{ margin: 0, fontSize: '22px', fontWeight: 900, letterSpacing: '-0.02em' }}>
+      <h2 style={{ margin: 0, fontSize: '22px', fontWeight: 900, letterSpacing: '-0.02em',color:"#ffed24" }}>
         Talents Pool
       </h2>
-      <button onClick={resetFilters} style={{ fontSize: '12px', color: '#C6007E', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>
+      <button onClick={resetFilters} style={{ fontSize: '12px', color: '#cdcdcdff', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>
         Reset All
       </button>
     </div>

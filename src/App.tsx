@@ -27,11 +27,18 @@ import ApplicationDetails from './pages/recruiter/ApplicationDetails';
 import PublicJobPage from './pages/jobs/PublicJobPage';
 import BrowseJobs from './pages/jobs/BrowseJobs';
 import BlogsPage from './pages/BlogsPage';
+import BlogDetailsPage from './pages/BlogDetailsPage';
 import MyApplications from './pages/talent/MyApplications';
 import ShortlistedApplicants from './pages/talent/ShortlistedApplicants';
 import MyJobInvitations from './pages/talent/MyJobInvitations';
 import MatchingJobs from './pages/talent/MatchingJobs';
 import MySubscriptionPlan from './pages/talent/MySubscriptionPlan';
+import SubscriptionPlans from './pages/SubscriptionPlans';
+import AboutUs from './pages/AboutUs';
+import TermsOfService from './pages/TermsOfService';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import ContactUs from './pages/ContactUs';
+import FAQ from './pages/FAQ';
 import CastBags from './pages/recruiter/CastBags';
 import Favourites from './pages/recruiter/Favourites';
 import SentInvitations from './pages/recruiter/SentInvitations';
@@ -64,6 +71,13 @@ function App() {
           <Route path="/browse-talents" element={<BrowseTalents />} />
           <Route path="/browse-jobs" element={<BrowseJobs />} />
           <Route path="/blogs" element={<BlogsPage />} />
+          <Route path="/blogs/:blogId" element={<BlogDetailsPage />} />
+          <Route path="/subscription-plans" element={<SubscriptionPlans />} />
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/contact" element={<ContactUs />} />
+          <Route path="/faq" element={<FAQ />} />
           <Route path="/jobs/:jobId" element={<PublicJobPage />} />
           <Route path="/invitation/:jobId" element={<PublicJobInvitation />} />
           <Route path="/cast-bag/:token" element={<PublicCastBag />} />
