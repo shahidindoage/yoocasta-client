@@ -19,7 +19,7 @@ interface Category {
   name: string;
 }
 
-const API = 'http://localhost:3000/api/v1/blogs';
+const API = import.meta.env.VITE_API_URL + '/blogs';
 
 const CATEGORIES: Record<number, string> = {
   1: 'Actors & Extras',

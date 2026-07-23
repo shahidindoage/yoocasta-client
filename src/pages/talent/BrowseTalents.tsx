@@ -802,7 +802,7 @@ const setProfessionalText = (key: string, val: string) => {
                         const token = localStorage.getItem('accessToken');
                         const headers: Record<string, string> = { 'Content-Type': 'application/json' };
                         if (token) headers['Authorization'] = `Bearer ${token}`;
-                        const res = await fetch('http://localhost:3000/api/v1/recruiter/z-card', {
+                        const res = await fetch(`${import.meta.env.VITE_API_URL}/recruiter/z-card`, {
                           method: 'POST',
                           headers,
                           body: JSON.stringify({ talentIds: [talent.id] }),
