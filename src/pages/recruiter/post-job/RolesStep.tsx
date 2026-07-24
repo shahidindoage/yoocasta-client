@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import HtmlEditor from '../../../components/HtmlEditor';
 
 const INITIAL_ROLE = {
   title: '',
@@ -248,7 +249,7 @@ export default function RolesStep({ roles, setRoles, jobPaymentInfo, options, on
             {/* Description */}
             <div className="space-y-1.5 md:col-span-2">
               <label className="block text-[10px] font-extrabold tracking-widest text-[#3835A4]/50 uppercase">Description *</label>
-              <textarea name="description" value={form.description} onChange={handleChange} rows={3} className="w-full bg-[#3835A4]/5 border border-[#3835A4]/10 rounded-xl p-4 text-sm outline-none focus:border-[#3835A4] resize-none" />
+              <HtmlEditor value={form.description} onChange={(html) => handleChange({ target: { name: 'description', value: html } } as any)} />
             </div>
 
             {/* Role Usage */}

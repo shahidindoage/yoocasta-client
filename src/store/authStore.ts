@@ -3,14 +3,15 @@ import { create } from 'zustand';
 interface User {
   id: string;
   email: string;
-  username: string;
+  username?: string;
   role: string;
-  firstName: string | null;
-  lastName: string | null;
-  isEmailVerified: boolean;
-  isVerified: boolean;
-  profileCompleted: boolean;
-  image: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  isEmailVerified?: boolean;
+  isVerified?: boolean;
+  profileCompleted?: boolean;
+  image?: string | null;
+  name?: string | null;
 }
 
 interface AuthState {

@@ -17,7 +17,11 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const original = error.config;
+    const isAdminRoute = original?.url?.startsWith('/admin');
+
     if (error.response?.status === 401 && !original._retry) {
+      if (original.url === '/admin/login') return Promise.reject(error);
+
       original._retry = true;
       try {
         const refreshToken = localStorage.getItem('refreshToken');
@@ -29,7 +33,7 @@ api.interceptors.response.use(
         return api(original);
       } catch {
         localStorage.clear();
-        window.location.href = '/login';
+        window.location.href = isAdminRoute ? '/admin/login' : '/login';
       }
     }
     return Promise.reject(error);

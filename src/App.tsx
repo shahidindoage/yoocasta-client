@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from './store/authStore';
 import ProtectedRoute from './auth/ProtectedRoute';
 
@@ -44,6 +44,9 @@ import Favourites from './pages/recruiter/Favourites';
 import SentInvitations from './pages/recruiter/SentInvitations';
 import PublicJobInvitation from './pages/jobs/PublicJobInvitation';
 import PublicCastBag from './pages/PublicCastBag';
+import AdminLogin from './pages/admin/AdminLogin';
+import AdminLayout from './pages/admin/AdminLayout';
+import ManageTalents from './pages/admin/ManageTalents';
 
 // Placeholder dashboard pages (we'll build these next)
 
@@ -51,10 +54,12 @@ const Unauthorized = () => <div><h1>Unauthorized</h1></div>;
 
 function App() {
   const { isAuthenticated, user } = useAuthStore();
+  const { pathname } = useLocation();
+  const isAdminRoute = pathname.startsWith('/admin');
 
   return (
     <div id="app-root" className="flex min-h-screen flex-col bg-white text-neutral-900 selection:bg-amber-400 selection:text-neutral-950">
-      <Header />
+      {!isAdminRoute && <Header />}
       <main className="flex-grow">
         <Routes>
           {/* Public routes */}
@@ -81,6 +86,14 @@ function App() {
           <Route path="/jobs/:jobId" element={<PublicJobPage />} />
           <Route path="/invitation/:jobId" element={<PublicJobInvitation />} />
           <Route path="/cast-bag/:token" element={<PublicCastBag />} />
+
+          {/* Admin routes */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route element={<ProtectedRoute allowedRoles={['ADMIN']} redirectTo="/admin/login" />}>
+            <Route element={<AdminLayout />}>
+              <Route path="/admin/talents" element={<ManageTalents />} />
+            </Route>
+          </Route>
 
           {/* Protected routes */}
           <Route element={<ProtectedRoute allowedRoles={['TALENT']} />}>
@@ -109,7 +122,7 @@ function App() {
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </main>
-      <Footer />
+      {!isAdminRoute && <Footer />}
     </div>
   );
 }

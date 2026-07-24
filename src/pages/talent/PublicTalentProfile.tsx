@@ -138,6 +138,10 @@ const PublicTalentProfile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('Photos');
+  const [showAllHistory, setShowAllHistory] = useState(false);
+  const [showAllCourses, setShowAllCourses] = useState(false);
+  const [showAllPortfolio, setShowAllPortfolio] = useState(false);
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
 
   const hasFetched = useRef(false);
 
@@ -187,7 +191,7 @@ const PublicTalentProfile = () => {
           <div className="w-16 h-16 border-4 border-[#3835A4] border-t-[#C6007E] rounded-full animate-spin" />
           <div className="absolute inset-0 flex items-center justify-center text-[10px] font-black font-mono text-[#3835A4]">GO</div>
         </div>
-        <span className="mt-4 text-[9px] font-black tracking-[0.3em] text-[#3835A4]/60 uppercase font-mono animate-pulse">
+        <span className="mt-4 text-[9px] font-black  text-[#3835A4]/60  font-mono animate-pulse">
           Rendering Creative Ecosystem...
         </span>
       </div>
@@ -199,10 +203,10 @@ const PublicTalentProfile = () => {
       <div className="min-h-screen flex items-center justify-center bg-[#fdfbf7] p-4">
         <div className="bg-white border-4 border-[#3835A4] p-8 rotate-1 max-w-md text-center space-y-4 shadow-[8px_8px_0px_0px_#C6007E]">
           <span className="text-4xl block animate-bounce">⚡</span>
-          <p className="text-sm font-black text-[#3835A4] tracking-wider uppercase font-mono bg-red-100 px-2 py-1 inline-block">
+          <p className="text-sm font-black text-[#3835A4] tracking-wider  font-mono bg-red-100 px-2 py-1 inline-block">
             {error}
           </p>
-          <Link to="/browse-talents" className="block text-[10px] font-black tracking-widest uppercase bg-[#3835A4] text-white px-6 py-3 transition-transform active:scale-95 hover:-translate-y-0.5">
+          <Link to="/browse-talents" className="block text-[10px] font-black   bg-[#3835A4] text-white px-6 py-3 transition-transform active:scale-95 hover:-translate-y-0.5">
             ← Return to Hub
           </Link>
         </div>
@@ -251,8 +255,8 @@ const PublicTalentProfile = () => {
                 
                 {/* Float Badge */}
                 {profile.isVerified && (
-                  <div className="absolute bottom-6 right-6 bg-[#C6007E] text-white font-mono text-[10px] font-black tracking-widest px-3 py-1.5 rounded-full border-2 border-[#3835A4] shadow-md transform rotate-3">
-                    VERIFIED NODE ✓
+                  <div className="absolute bottom-6 right-6 bg-[#C6007E] text-white font-mono text-[10px] font-black  px-3 py-1.5 rounded-full border-2 border-[#3835A4] shadow-md transform rotate-3">
+                    Verified ✓
                   </div>
                 )}
               </div>
@@ -263,13 +267,13 @@ const PublicTalentProfile = () => {
           <div className="lg:col-span-7 space-y-8 text-center lg:text-left">
             <div className="space-y-4">
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3">
-                <span className="font-sans text-[10px] font-black tracking-[0.25em] text-[#C6007E] uppercase bg-[#C6007E]/5 px-3 py-1 rounded-md border border-[#C6007E]/20">
+                <span className="font-sans text-[10px] font-black  text-[#C6007E]  bg-[#C6007E]/5 px-3 py-1 rounded-md border border-[#C6007E]/20">
                   {planName} Tier
                 </span>
                 <span className="font-sans text-[10px] font-bold text-stone-400">//@{profile.username}</span>
               </div>
               
-              <h1 className="text-4xl sm:text-6xl font-black tracking-tight uppercase leading-[0.95] font-display text-stone-900">
+              <h1 className="text-4xl sm:text-6xl font-black tracking-tight  leading-[0.95] font-display text-stone-900">
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#3835A4] via-[#C6007E] to-amber-500">
                   {profile.firstName}
                 </span>
@@ -279,15 +283,15 @@ const PublicTalentProfile = () => {
             {/* QUICK STATS AS A KINETIC GRID */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               <div className="bg-white border-2 border-[#3835A4] p-4 rounded-2xl shadow-[4px_4px_0px_0px_#3835A4] flex flex-col justify-between h-24 text-left transform -rotate-1">
-                <span className="text-[8px] font-black tracking-widest text-stone-400 uppercase font-sans">Profile ID</span>
+                <span className="text-[8px] font-black  text-stone-400  font-sans">Profile ID</span>
                 <span className="text-sm font-black font-display text-[#3835A4]">{formatTalentId(profile.id)}</span>
               </div>
               <div className="bg-[#C6007E]/10 border-2 border-[#3835A4] p-4 rounded-2xl shadow-[4px_4px_0px_0px_#3835A4] flex flex-col justify-between h-24 text-left transform rotate-1">
-                <span className="text-[8px] font-black tracking-widest text-[#C6007E] uppercase font-sans">Profile Views</span>
+                <span className="text-[8px] font-black  text-[#C6007E]  font-sans">Profile Views</span>
                 <span className="text-xl font-black font-display text-[#3835A4]">👁 {tp?.views ?? 0}</span>
               </div>
               <div className="col-span-2 sm:col-span-1 bg-white border-2 border-[#3835A4] p-4 rounded-2xl shadow-[4px_4px_0px_0px_#3835A4] flex flex-col justify-between h-24 text-left transform -rotate-1">
-                <span className="text-[8px] font-black tracking-widest text-stone-400 uppercase font-sans">Location</span>
+                <span className="text-[8px] font-black  text-stone-400  font-sans">Location</span>
                 <span className="text-xs font-display text-stone-900 truncate block">
                   {tp?.city?.name ? `${tp.city.name}, ${tp.city.country?.name || ''}` : 'Global Hub'}
                 </span>
@@ -296,11 +300,11 @@ const PublicTalentProfile = () => {
 
             {/* CATEGORIES DISPLAYED AS HIGH-CONTRAST CHIPS */}
             <div className="space-y-2 text-left">
-              <span className="block text-[9px] font-black tracking-[0.2em] text-stone-400 uppercase font-sans">Categories</span>
+              <span className="block text-[9px] font-black  text-stone-400  font-sans">Categories</span>
               <div className="flex flex-wrap gap-2">
                 {tp?.categories?.map((c: any) => (
-                  <span key={c.category.id} className="px-4 py-2 bg-[#3835A4] text-white rounded-xl text-[10px] font-display tracking-widest uppercase border border-[#3835A4] hover:bg-transparent hover:text-[#3835A4] transition-all duration-300">
-                    ✦ {c.category.name}
+                  <span key={c.category.id} className="px-4 py-2 bg-[#3835A4] text-white rounded-xl text-[10px] font-display   border border-[#3835A4] hover:bg-transparent hover:text-[#3835A4] transition-all duration-300">
+                     {c.category.name}
                   </span>
                 )) || <span className="text-xs italic font-display text-stone-400">Uncategorized Vector</span>}
               </div>
@@ -309,7 +313,7 @@ const PublicTalentProfile = () => {
             {/* NARRATIVE STATEMENT BLOCK */}
             {tp?.bioDescription && (
               <div className="text-left relative border-l-4 border-[#C6007E] pl-6 space-y-2">
-                <span className="text-[9px] font-black tracking-[0.2em] text-stone-400 uppercase font-sans block">About</span>
+                <span className="text-[9px] font-black  text-stone-400  font-sans block">About</span>
                 <p className="text-sm text-stone-600 font-display leading-relaxed whitespace-pre-line max-w-2xl">
                   {tp.bioDescription}
                 </p>
@@ -324,20 +328,20 @@ const PublicTalentProfile = () => {
           {/* IDENTITY MATRIX GRID */}
         <div className="lg:col-span-7 bg-white border-2 border-[#3835A4] rounded-[32px] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#3835A4] flex flex-col justify-between space-y-6">
   <div className="flex items-center justify-between border-b-2 border-[#3835A4] pb-4">
-    <h3 className="text-xs font-black tracking-[0.25em] text-[#3835A4] uppercase font-sans">Identity Blueprint</h3>
+    <h3 className="text-xs font-black  text-[#3835A4]  font-sans">              Identity</h3>
   </div>
 
   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
     {[
-      { label: 'Calculated Age', val: calculateAge(tp?.dob) },
-      { label: 'Gender Matrix', val: tp?.gender },
-      { label: 'Ethnicity Index', val: tp?.ethnicity?.name },
-      { label: 'Sovereign Nationality', val: profile.nationality?.name },
-      { label: 'Linguistic Tracks', val: tp?.languages?.map((l: any) => l.language.name).join(', ') },
-      { label: 'Dialect Grid', val: tp?.dialects?.map((d: any) => d.dialect.name).join(', ') }
+      { label: 'Age', val: calculateAge(tp?.dob) },
+      { label: 'Gender', val: tp?.gender },
+      { label: 'Ethnicity', val: tp?.ethnicity?.name },
+      { label: 'Nationality', val: profile.nationality?.name },
+      { label: 'Languages', val: tp?.languages?.map((l: any) => l.language.name).join(', ') },
+      { label: 'Dialects', val: tp?.dialects?.map((d: any) => d.dialect.name).join(', ') }
     ].map((item, idx) => (
       <div key={idx} className="border-b border-stone-200 pb-2">
-        <span className="block text-[8px] font-black uppercase text-stone-400 font-sans tracking-wider">{item.label}</span>
+        <span className="block text-[8px] font-black  text-stone-400 font-sans tracking-wider">{item.label}</span>
         <span className="text-xs font-display text-stone-900 mt-0.5 block">{item.val || '—'}</span>
       </div>
     ))}
@@ -346,13 +350,13 @@ const PublicTalentProfile = () => {
   {/* TECHNICAL EXECUTION DESCRIPTION FOOTER */}
   {tp?.skillDescription ? (
     <div className="bg-amber-50 border-2 border-dashed border-amber-400/80 p-4 rounded-2xl mt-4">
-      <span className="block text-[8px] font-black uppercase text-amber-600 font-sans tracking-wider mb-1">Capabilities & Special Skills</span>
+      <span className="block text-[8px] font-black  text-amber-600 font-sans tracking-wider mb-1">Skills</span>
       <p className="text-xs font-display text-amber-900 leading-relaxed">{tp.skillDescription}</p>
     </div>
   ) : (
     <div className="bg-stone-50 border-2 border-dashed border-stone-200 p-4 rounded-2xl mt-4 text-center">
-      <span className="block text-[8px] font-black uppercase text-stone-400 font-sans tracking-wider mb-1">Capabilities & Special Skills</span>
-      <p className="text-xs font-display text-stone-400">No special skills added yet.</p>
+      <span className="block text-[8px] font-black  text-stone-400 font-sans tracking-wider mb-1">Skills</span>
+      <p className="text-xs font-display text-stone-400">No skills added yet.</p>
     </div>
   )}
 </div>
@@ -360,23 +364,23 @@ const PublicTalentProfile = () => {
           {/* PHYSICAL ARCHITECTURE FRAMEWORK */}
           <div className="lg:col-span-5 bg-[#3835A4] text-stone-100 rounded-[32px] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#C6007E] flex flex-col justify-between space-y-6">
             <div className="flex items-center justify-between border-b border-[#3835A4]/30 pb-4">
-              <h3 className="text-xs font-black tracking-[0.25em] text-[#FFF] uppercase font-sans">Physcial Metrics</h3>
+              <h3 className="text-xs font-black  text-[#FFF]  font-sans">Physical</h3>
               {/* <span className="text-white/40 font-mono text-[10px]">SPEC_02</span> */}
             </div>
 
             <div className="grid grid-cols-2 gap-x-6 gap-y-4">
               {[
-                { label: 'Stature (Height)', val: tp?.height ? `${tp.height} cm` : null },
-                { label: 'Mass (Weight)', val: tp?.weight ? `${tp.weight} kg` : null },
-                { label: 'Chest Spectrum', val: tp?.chest ? `${tp.chest} cm` : null },
-                { label: 'Waist Spectrum', val: tp?.waist ? `${tp.waist} cm` : null },
-                { label: 'Ocular Palette', val: tp?.eyeColor },
-                { label: 'Shoe Metric', val: tp?.shoeSize },
-                { label: 'Hair Attribute', val: tp?.hairColor ? `${tp.hairColor} (${tp.hairLength || 'Short'})` : null },
-                { label: 'Skeletal Build', val: tp?.bodyStructure }
+      { label: 'Height', val: tp?.height ? `${tp.height} cm` : null },
+      { label: 'Weight', val: tp?.weight ? `${tp.weight} kg` : null },
+      { label: 'Chest', val: tp?.chest ? `${tp.chest} cm` : null },
+      { label: 'Waist', val: tp?.waist ? `${tp.waist} cm` : null },
+      { label: 'Eye Color', val: tp?.eyeColor },
+      { label: 'Shoe Size', val: tp?.shoeSize },
+      { label: 'Hair', val: tp?.hairColor ? `${tp.hairColor} (${tp.hairLength || 'Short'})` : null },
+      { label: 'Body Type', val: tp?.bodyStructure }
               ].map((item, idx) => (
                 <div key={idx} className="border-b border-white/10 pb-2">
-                  <span className="block text-[8px] font-black uppercase text-white/40 font-sans tracking-wider">{item.label}</span>
+                  <span className="block text-[8px] font-black  text-white/40 font-sans tracking-wider">{item.label}</span>
                   <span className="text-xs font-display text-white mt-0.5 block">{item.val || '—'}</span>
                 </div>
               ))}
@@ -384,7 +388,7 @@ const PublicTalentProfile = () => {
 
             {tp?.tattoo && (
               <div className="pt-2 text-left">
-                <span className="block text-[8px] font-black uppercase text-white/40 font-sans tracking-wider">Dermal Alterations</span>
+                <span className="block text-[8px] font-black  text-white/40 font-sans tracking-wider">Tattoos</span>
                 <p className="text-xs text-[#C6007E] font-display mt-0.5 bg-white px-2 py-0.5 rounded inline-block">{tp.tattoo}</p>
               </div>
             )}
@@ -396,8 +400,8 @@ const PublicTalentProfile = () => {
           
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between border-b-2 border-[#3835A4] pb-6 gap-6">
             <div className="space-y-1">
-              <h3 className="text-lg font-black tracking-tight uppercase font-sans text-stone-900">Curated Media Showcase</h3>
-              <p className="text-[10px] font-display text-stone-400">SELECT STATE CAPTURED ASSETS</p>
+              <h3 className="text-lg font-black tracking-tight  font-sans text-stone-900">Portfolio</h3>
+              <p className="text-[10px] font-display text-stone-400">Photos / Videos / Casting / Audio</p>
             </div>
             
             {/* Neo-Brutalist Segment Controller */}
@@ -406,7 +410,7 @@ const PublicTalentProfile = () => {
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`flex-1 md:flex-none px-6 py-2.5 text-[10px] font-bold tracking-widest uppercase rounded-xl transition-all font-display ${
+                  className={`flex-1 md:flex-none px-6 py-2.5 text-[10px] font-bold   rounded-xl transition-all font-display ${
                     activeTab === tab
                       ? 'bg-[#3835A4] text-white shadow-md'
                       : 'text-stone-400 hover:text-[#3835A4]'
@@ -419,24 +423,33 @@ const PublicTalentProfile = () => {
           </div>
           
           {/* Dynamic Asset Stream Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-            {filterPortfolio(activeTab).length === 0 ? (
-              <div className="py-16 col-span-full text-center bg-stone-50 rounded-3xl border-2 border-dashed border-stone-200">
-                <span className="text-2xl block mb-2">🪐</span>
-                <p className="text-xs font-sans text-stone-400 uppercase tracking-wider">
-                  No vectors integrated into current registry layer [{activeTab}].
-                </p>
-              </div>
-            ) : (
-              filterPortfolio(activeTab).map((item: any) => (
-                <div key={item.id} className="group relative aspect-[3/4] bg-stone-50 border-2 border-[#3835A4] rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          {(() => {
+            const items = filterPortfolio(activeTab);
+            const visible = showAllPortfolio ? items : items.slice(0, 4);
+            if (items.length === 0) {
+              return (
+                <div className="py-16 col-span-full text-center bg-stone-50 rounded-3xl border-2 border-dashed border-stone-200">
+                  <span className="text-2xl block mb-2">🪐</span>
+                  <p className="text-xs font-sans text-stone-400 tracking-wider">
+                    No media found in [{activeTab}].
+                  </p>
+                </div>
+              );
+            }
+            return (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                  {visible.map((item: any) => (
+                    <div key={item.id} className="group relative aspect-[3/4] bg-stone-50 border-2 border-[#3835A4] rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                   
                   {item.type === 'IMAGE' && (
-                    <img 
-                      src={item.url} 
-                      alt="" 
-                      className="w-full h-full object-cover opacity-95 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out" 
-                    />
+                    <button onClick={() => setLightboxImage(item.url)} className="w-full h-full block text-left">
+                      <img
+                        src={item.url}
+                        alt=""
+                        className="w-full h-full object-cover opacity-95 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out"
+                      />
+                    </button>
                   )}
                   
                   {(item.type === 'ACTING_VIDEO' || item.type === 'VIDEO') && (
@@ -448,27 +461,46 @@ const PublicTalentProfile = () => {
                   )}
                   
                   {item.type === 'VIDEO_LINK' && (
-                    <div className="w-full h-full flex flex-col justify-between p-6 bg-[#3835A4] text-white font-mono">
-                      <span className="text-3xl">💎</span>
-                      <div className="space-y-3">
-                        <p className="text-[10px] font-bold tracking-tight line-clamp-3 text-white/70 uppercase leading-snug">{item.caption || 'External Link Vector'}</p>
-                        <a 
-                          href={item.videoLink} 
-                          target="_blank" 
-                          rel="noreferrer" 
-                          className="inline-block text-[9px] font-black tracking-widest bg-[#C6007E] text-white px-3 py-2 rounded-lg border border-[#3835A4] uppercase shadow-[2px_2px_0px_0px_#3835A4]"
-                        >
-                          Execute Stream ↗
-                        </a>
-                      </div>
+                    <div className="w-full h-full relative bg-stone-950 rounded-2xl overflow-hidden">
+                      {(() => {
+                        const url = item.videoLink || item.url;
+                        const youtubeMatch = url?.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+                        if (youtubeMatch) {
+                          return (
+                            <iframe
+                              src={`https://www.youtube.com/embed/${youtubeMatch[1]}`}
+                              title={item.caption || 'YouTube video'}
+                              className="w-full h-full"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                            />
+                          );
+                        }
+                        return (
+                          <div className="w-full h-full flex flex-col justify-between p-6 bg-[#3835A4] text-white font-mono">
+                            <span className="text-3xl">💎</span>
+                            <div className="space-y-3">
+                              <p className="text-[10px] font-bold leading-relaxed text-white/70">{item.caption || 'External Link'}</p>
+                              <a
+                                href={url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-block text-[9px] font-black bg-[#C6007E] text-white px-3 py-2 rounded-lg border border-[#3835A4] shadow-[2px_2px_0px_0px_#3835A4]"
+                              >
+                                Open Link →
+                              </a>
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </div>
                   )}
                   
                   {item.type === 'CASTING_VIDEO' && (
                     <div className="w-full h-full relative bg-stone-950">
                       <video src={item.url} controls className="w-full h-full object-cover" />
-                      <span className="absolute top-4 left-4 bg-[#C6007E] text-white text-[8px] font-black tracking-widest uppercase px-2.5 py-1 rounded-md border border-[#3835A4] shadow-md">
-                        Casting Core Node
+                      <span className="absolute top-4 left-4 bg-[#C6007E] text-white text-[8px] font-black   px-2.5 py-1 rounded-md border border-[#3835A4] shadow-md">
+                        Casting Video
                       </span>
                     </div>
                   )}
@@ -477,19 +509,29 @@ const PublicTalentProfile = () => {
                     <div className="w-full h-full flex flex-col justify-between p-5 bg-amber-50 border-2 border-[#3835A4] rounded-xl">
                       <div className="flex justify-between items-start">
                         <span className="text-3xl">🔊</span>
-                        <span className="text-[8px] font-black tracking-widest text-amber-700 bg-amber-200/60 px-2 py-0.5 rounded uppercase font-mono">Acoustic Core</span>
+                        <span className="text-[8px] font-black  text-amber-700 bg-amber-200/60 px-2 py-0.5 rounded  font-mono">Audio</span>
                       </div>
                       <div className="space-y-3 w-full">
-                        <p className="text-[10px] font-black text-stone-800 font-mono truncate">{item.caption || item.title || 'Untitled Track Seg'}</p>
+                        <p className="text-[10px] font-black text-stone-800 font-mono truncate">{item.caption || item.title || 'Untitled Track'}</p>
                         <audio src={item.url} controls className="w-full scale-95 origin-bottom" />
                       </div>
                     </div>
                   )}
 
+                    </div>
+                  ))}
                 </div>
-              ))
-            )}
-          </div>
+                {items.length > 4 && (
+                  <button
+                    onClick={() => setShowAllPortfolio(!showAllPortfolio)}
+                    className="mt-6 w-full text-[10px] font-black bg-[#3835A4] text-white px-6 py-3 rounded-xl border-2 border-[#3835A4] shadow-[4px_4px_0px_0px_#C6007E] transition-transform active:scale-95 hover:-translate-y-0.5"
+                  >
+                    {showAllPortfolio ? 'Show Less ↑' : `Show More (${items.length}) ↓`}
+                  </button>
+                )}
+              </>
+            );
+          })()}
         </div>
 
        {/* ROW 1: HISTORICAL PLACEMENT + ACADEMIC, SIDE BY SIDE */}
@@ -498,15 +540,15 @@ const PublicTalentProfile = () => {
   {/* Historical Placement */}
   <div className="bg-white border-2 border-[#3835A4] rounded-[32px] p-6 sm:p-10 shadow-[8px_8px_0px_0px_#3835A4] space-y-8">
     <div className="flex items-center justify-between border-b-2 border-[#3835A4] pb-4">
-      <h3 className="text-xs font-black tracking-[0.25em] text-[#3835A4] uppercase font-sans">Historical Placement Grid</h3>
+      <h3 className="text-xs font-black  text-[#3835A4]  font-sans">Career History</h3>
     </div>
 
     {tp?.careerHistory && tp.careerHistory.length > 0 ? (
       <div className="grid grid-cols-1 gap-6 relative">
-        {tp.careerHistory.map((ch: any) => (
+        {(showAllHistory ? tp.careerHistory : tp.careerHistory.slice(0, 1)).map((ch: any) => (
           <div key={ch.id} className="bg-[#fdfbf7] border-2 border-[#3835A4] p-6 rounded-2xl relative space-y-2 group transition-transform hover:-translate-y-0.5 hover:bg-white shadow-[4px_4px_0px_0px_#3835A4]">
             <div className="flex justify-between items-start gap-4">
-              <h4 className="text-sm font-black tracking-tight text-stone-900 uppercase font-display">{ch.title}</h4>
+              <h4 className="text-sm font-black tracking-tight text-stone-900  font-display">{ch.title}</h4>
               <span className="text-[8px] font-sans font-black text-[#C6007E] bg-[#C6007E]/5 border border-[#C6007E]/20 px-2 py-0.5 rounded whitespace-nowrap">
                 {ch.startDate ? new Date(ch.startDate).toLocaleDateString(undefined, { year: 'numeric' }) : ''}
                 {ch.endDate ? ` — ${new Date(ch.endDate).toLocaleDateString(undefined, { year: 'numeric' })}` : ' — Pres'}
@@ -517,38 +559,54 @@ const PublicTalentProfile = () => {
             )}
           </div>
         ))}
+        {tp.careerHistory.length > 1 && (
+          <button
+            onClick={() => setShowAllHistory(!showAllHistory)}
+            className="w-full text-[10px] font-black   bg-[#3835A4] text-white px-6 py-3 rounded-xl border-2 border-[#3835A4] shadow-[4px_4px_0px_0px_#C6007E] transition-transform active:scale-95 hover:-translate-y-0.5"
+          >
+            {showAllHistory ? 'Show Less ↑' : `Show More (${tp.careerHistory.length}) ↓`}
+          </button>
+        )}
       </div>
     ) : (
       <div className="py-10 text-center bg-stone-50 rounded-2xl border-2 border-dashed border-stone-200">
         <span className="text-2xl block mb-2">🗂️</span>
-        <p className="text-xs font-sans text-stone-400 uppercase tracking-wider">No career history added yet.</p>
+        <p className="text-xs font-sans text-stone-400  tracking-wider">No career history added yet.</p>
       </div>
     )}
   </div>
 
   {/* Academic Matrix & Training */}
   <div className="bg-white border-2 border-[#3835A4] rounded-[32px] p-6 sm:p-8 space-y-4 shadow-[6px_6px_0px_0px_#3835A4]">
-    <div className="flex items-center gap-2 border-b border-stone-100 pb-3">
-      <span className="text-xl">🎓</span>
-      <h3 className="text-xs font-black tracking-[0.2em] text-stone-400 uppercase font-sans">Academic Matrix & Training</h3>
+    <div className="flex items-center gap-2 border-b border-[#3835A4] pb-3">
+      {/* <span className="text-xl">🎓</span> */}
+      <h3 className="text-xs font-black  text-[#3835A4]  font-sans">Education & Training</h3>
     </div>
 
     {tp?.courses && tp.courses.length > 0 ? (
       <div className="space-y-3">
-        {tp.courses.map((c: any) => (
+        {(showAllCourses ? tp.courses : tp.courses.slice(0, 1)).map((c: any) => (
           <div key={c.id} className="bg-stone-50 border border-stone-200 p-4 rounded-xl flex justify-between items-center gap-4 hover:border-[#3835A4] transition-colors">
             <div className="space-y-0.5">
-              <strong className="block text-xs font-display text-stone-900 uppercase tracking-wide">{c.title}</strong>
+              <strong className="block text-xs font-display text-stone-900  tracking-wide">{c.title}</strong>
               {c.institution && <span className="block text-[10px] font-sans font-bold text-stone-400">{c.institution}</span>}
             </div>
             {c.year && <span className="text-xs font-sans font-black bg-[#3835A4] text-white px-2.5 py-1 rounded-md">{c.year}</span>}
           </div>
         ))}
+        {tp.courses.length > 1 && (
+          <button
+            onClick={() => setShowAllCourses(!showAllCourses)}
+            className="w-full text-[10px] font-black   bg-[#3835A4] text-white px-6 py-3 rounded-xl border-2 border-[#3835A4] shadow-[4px_4px_0px_0px_#C6007E] transition-transform active:scale-95 hover:-translate-y-0.5"
+          >
+            {showAllCourses ? 'Show Less ↑' : `Show More (${tp.courses.length}) ↓`}
+          </button>
+        )}
       </div>
     ) : (
       <div className="py-10 text-center bg-stone-50 rounded-2xl border-2 border-dashed border-stone-200">
         <span className="text-2xl block mb-2">🎓</span>
-        <p className="text-xs font-sans text-stone-400 uppercase tracking-wider">No academic or training details added yet.</p>
+        <p className="text-xs font-sans text-stone-400  tracking-wider">No education or training added yet.</p>
       </div>
     )}
   </div>
@@ -557,10 +615,9 @@ const PublicTalentProfile = () => {
 
 {/* ROW 2: ATTRIBUTES, FULL WIDTH */}
 <div className="bg-white border-2 border-[#3835A4] rounded-[32px] p-6 sm:p-8 space-y-6 shadow-[6px_6px_0px_0px_#C6007E]">
-  <div className="flex items-center gap-2 border-b border-stone-100 pb-3">
-    <span className="text-xl">📋</span>
-    <h3 className="text-xs font-black tracking-[0.2em] text-stone-400 uppercase font-sans">Professional Details
-</h3>
+  <div className="flex items-center gap-2 border-b border-[#3835A4] pb-3">
+    {/* <span className="text-xl">📋</span> */}
+    <h3 className="text-xs font-black  text-[#3835A4]  font-sans">Professional Details</h3>
   </div>
 
   {tp?.attributes && tp.attributes.filter((a: any) => formatAttributeValue(a.key, a.value) !== null).length > 0 ? (
@@ -570,7 +627,7 @@ const PublicTalentProfile = () => {
         <div key={category} className="space-y-4">
           <div className="flex items-center  gap-2">
             <Icon size={16} color="#3835A4" />
-            <h4 className="text-xs font-black tracking-widest text-[#3835A4] uppercase font-sans">{category}</h4>
+            <h4 className="text-xs font-black  text-[#3835A4]  font-sans">{category}</h4>
           </div>
 
           {direct.length > 0 && (
@@ -586,7 +643,7 @@ const PublicTalentProfile = () => {
 
           {Object.entries(subGroups).map(([subGroupLabel, features]) => (
             <div key={subGroupLabel} className="pl-6 space-y-2">
-              <span className="block text-[10px] font-bold text-stone-400 uppercase tracking-wider">{subGroupLabel}</span>
+              <span className="block text-[10px] font-bold text-stone-400  tracking-wider">{subGroupLabel}</span>
               <div className="flex flex-wrap gap-2">
                 {features.map((f, idx) => (
                   <span key={`${f.key}-${idx}`} className="flex items-center gap-1.5 text-xs font-black font-display text-[#3835A4] bg-stone-50 border border-stone-200 rounded-lg px-3 py-1.5">
@@ -603,12 +660,32 @@ const PublicTalentProfile = () => {
   ) : (
     <div className="py-10 text-center bg-stone-50 rounded-2xl border-2 border-dashed border-stone-200">
       <span className="text-2xl block mb-2">📋</span>
-      <p className="text-xs font-sans text-stone-400 uppercase tracking-wider">No professional attributes added yet.</p>
+      <p className="text-xs font-sans text-stone-400  tracking-wider">No professional attributes added yet.</p>
     </div>
   )}
 </div>
 
       </div>
+
+      {lightboxImage && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 cursor-pointer"
+          onClick={() => setLightboxImage(null)}
+        >
+          <button
+            onClick={() => setLightboxImage(null)}
+            className="absolute top-4 right-4 text-white text-3xl leading-none hover:opacity-70 z-10"
+          >
+            &times;
+          </button>
+          <img
+            src={lightboxImage}
+            alt="Full size"
+            className="max-w-full max-h-full object-contain rounded-2xl"
+            onClick={e => e.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
   );
 };

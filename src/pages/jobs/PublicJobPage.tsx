@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { Calendar, MapPin, Eye, Users, Briefcase, Clock } from 'lucide-react';
 import { getPublicJobById } from '../../api/job.api';
 import { getMyApplications } from '../../api/application.api';
 import { getMyProfile } from '../../api/profile.api';
@@ -24,6 +25,23 @@ const parseJsonArray = (val: string | null | undefined | any[]): string[] => {
   }
 };
 
+const CATEGORY_IMAGES: Record<string, string> = {
+  'Actors & Extras': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/actors_image.jpg',
+  'Dancers': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/category.jpg',
+  'Models': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/WhatsApp_Image_2024-10-11_at_3_22_56_PM.jpeg',
+  'Photographers': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/2892613_8705625.jpg',
+  'Makeup & Hairstylists': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/makeup.jpg',
+  'Singers': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/singers.jpg',
+  'Directors': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/Directors.jpg',
+  'Cinematographers / Videographers': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/Videographers.jpg',
+};
+
+const DEFAULT_CATEGORY_IMAGE = 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/pexels-bertellifotografia-2608515.jpg';
+
+const getCategoryImage = (categoryName: string) => {
+  return CATEGORY_IMAGES[categoryName] || DEFAULT_CATEGORY_IMAGE;
+};
+
 const PublicJobPage = () => {
   const { jobId } = useParams<{ jobId: string }>();
   const navigate = useNavigate();
@@ -34,7 +52,7 @@ const PublicJobPage = () => {
   const [applyRole, setApplyRole] = useState<any>(null);
   const [appliedRoleIds, setAppliedRoleIds] = useState<string[]>([]);
   const [limitReached, setLimitReached] = useState(false);
-  const [limitChecked, setLimitChecked] = useState(false);
+  const [selectedRoleIndex, setSelectedRoleIndex] = useState(0);
   const hasFetched = useRef(false);
 
   useEffect(() => {
@@ -44,7 +62,10 @@ const PublicJobPage = () => {
 
     getPublicJobById(jobId)
       .then(res => setJob(res.data.data))
-      .catch(() => setError('Job not found or has been removed'))
+      .catch((err) => {
+        const msg = err?.response?.data?.message || 'Job not found or has been removed';
+        setError(msg);
+      })
       .finally(() => setLoading(false));
   }, [jobId]);
 
@@ -64,7 +85,7 @@ const PublicJobPage = () => {
         }).length;
         if (thisMonthCount >= maxJobsPerMonth) setLimitReached(true);
       }
-    }).catch(console.error).finally(() => setLimitChecked(true));
+    }).catch(console.error);
   }, [user]);
 
   if (loading) {
@@ -72,10 +93,10 @@ const PublicJobPage = () => {
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#fdfbf7]">
         <div className="relative">
           <div className="w-16 h-16 border-4 border-[#3835A4] border-t-[#C6007E] rounded-full animate-spin" />
-          <div className="absolute inset-0 flex items-center justify-center text-[10px] font-black font-mono text-[#3835A4]">JOB</div>
+          <div className="absolute inset-0 flex items-center justify-center text-[10px] font-black font-mono text-[#3835A4]">GO</div>
         </div>
-        <span className="mt-4 text-[9px] font-black tracking-[0.3em] text-[#3835A4]/60 uppercase font-mono animate-pulse">
-          Loading Casting Ledger...
+        <span className="mt-4 text-[9px] font-black tracking-[0.3em] text-[#3835A4]/60 capitalize font-mono animate-pulse">
+          Loading Creative Brief...
         </span>
       </div>
     );
@@ -85,12 +106,12 @@ const PublicJobPage = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#fdfbf7] p-4">
         <div className="bg-white border-4 border-[#3835A4] p-8 rotate-1 max-w-md text-center space-y-4 shadow-[8px_8px_0px_0px_#C6007E]">
-          <span className="text-4xl block animate-bump">⚡</span>
-          <p className="text-sm font-black text-[#3835A4] tracking-wider uppercase font-mono bg-red-100 px-2 py-1 inline-block">
+          <span className="text-4xl block animate-bounce">⚡</span>
+          <p className="text-sm font-black text-[#3835A4] tracking-wider capitalize font-mono bg-red-100 px-2 py-1 inline-block">
             {error}
           </p>
-          <Link to="/" className="block text-[10px] font-black tracking-widest uppercase bg-[#3835A4] text-white px-6 py-3 transition-transform active:scale-95 hover:-translate-y-0.5">
-            ← Return Home
+          <Link to="/" className="block text-[10px] font-black tracking-widest capitalize bg-[#3835A4] text-white px-6 py-3 transition-transform active:scale-95 hover:-translate-y-0.5">
+            ← Return to Hub
           </Link>
         </div>
       </div>
@@ -99,276 +120,303 @@ const PublicJobPage = () => {
 
   if (!job) return null;
 
-  // Recruitor status checks
   if (user?.role === 'RECRUITER') {
     if (job.status === 'PENDING') {
-      return <StatusMessage icon="⏳" title="Awaiting Approval" message="This job posting is currently under review by the system administration team and is pending approval. It will be visible to talents once approved." />;
+      return <StatusMessage icon="⏳" title="Awaiting Approval" message="This job posting is currently under review." />;
     }
     if (job.status === 'REJECTED') {
-      return <StatusMessage icon="🚫" title="Job Not Approved" message="This job posting has not been approved by the administration. Please contact support for further details." />;
+      return <StatusMessage icon="🚫" title="Job Not Approved" message="This job posting has not been approved." />;
     }
   }
 
   const isExpired = job.lastDateToApply && new Date(job.lastDateToApply) < new Date();
-  const castingDates = parseJsonArray(job.castingDates);
-  const shootingDates = parseJsonArray(job.shootingDates);
+  const castingDates = parseJsonArray(job.castingDates).filter(Boolean);
+  const shootingDates = parseJsonArray(job.shootingDates).filter(Boolean);
+  const totalOpenings = job.roles?.reduce((sum: number, r: any) => sum + (r.noOfCast || 0), 0) || 0;
+  const totalApplications = job.roles?.reduce((sum: number, r: any) => sum + (r._count?.applications || 0), 0) || 0;
+  const catName = job.category?.name || '';
+  const createdAt = job.createdAt || job.postedDate;
 
   return (
     <div className="min-h-screen bg-[#fdfbf7] text-stone-900 selection:bg-[#C6007E]/30 selection:text-stone-900 pb-32 relative overflow-hidden font-sans">
-
       <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-tr from-[#3835A4]/10 to-[#C6007E]/10 blur-[120px] pointer-events-none -z-10" />
       <div className="absolute bottom-[10%] right-[-5%] w-[40vw] h-[40vw] rounded-full bg-gradient-to-br from-[#C6007E]/10 to-cyan-200/40 blur-[100px] pointer-events-none -z-10" />
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#3835a405_1px,transparent_1px),linear-gradient(to_bottom,#3835a405_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none -z-10" />
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-8 pt-16 space-y-12 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-16 space-y-16 relative z-10">
+        <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
 
-        {/* Hero: Title + Description */}
-        <div className="space-y-6">
-          <div className="space-y-3">
-            <h1 className="text-4xl sm:text-6xl font-black tracking-tight uppercase leading-[0.95] font-display text-stone-900">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#3835A4] via-[#C6007E] to-amber-500">
-                {job.title || 'Untitled Casting'}
-              </span>
-            </h1>
-            {job.subTitle && (
-              <p className="text-lg font-display text-stone-500 max-w-3xl">{job.subTitle}</p>
-            )}
-          </div>
-          {job.description && (
-            <div className="bg-white border-2 border-[#3835A4] rounded-[24px] p-6 sm:p-8 shadow-[6px_6px_0px_0px_#3835A4]">
-              <div className="text-sm text-stone-700 font-display leading-relaxed [&_h1]:text-xl [&_h1]:font-black [&_h2]:text-lg [&_h2]:font-black [&_h3]:text-base [&_h3]:font-bold [&_strong]:font-black [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:text-[#3835A4] [&_a]:underline [&_p]:mb-2" dangerouslySetInnerHTML={{ __html: job.description }} />
-            </div>
-          )}
-        </div>
+          {/* ─── LEFT COLUMN ─── */}
+          <div className="lg:col-span-7 space-y-8">
 
-        {/* Key Details Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[
-            { label: 'Category', val: job.category?.name },
-            { label: 'Project Type', val: job.projectType?.name },
-            { label: 'Payment', val: job.paymentInfo ? (job.paymentInfo.charAt(0).toUpperCase() + job.paymentInfo.slice(1)) : '—' },
-            { label: 'Usage', val: job.usage || '—' },
-            { label: 'Casting City', val: job.castingCity ? `${job.castingCity.name}${job.castingCity.country ? `, ${job.castingCity.country.name}` : ''}` : '—' },
-            { label: 'Shooting City', val: job.shootingCity ? `${job.shootingCity.name}${job.shootingCity.country ? `, ${job.shootingCity.country.name}` : ''}` : '—' },
-          ].map((item, idx) => (
-            <div key={idx} className="bg-white border-2 border-[#3835A4]/10 rounded-2xl p-5 shadow-sm space-y-1">
-              <span className="text-[9px] font-black tracking-widest text-[#3835A4]/50 uppercase">{item.label}</span>
-              <p className="text-sm font-bold text-[#3835A4]">{item.val || '—'}</p>
+            {/* Hero Image */}
+            <div className="relative group w-full">
+              <div className="absolute inset-0 bg-[#3835A4] rounded-[32px] translate-x-3 translate-y-3 transition-transform group-hover:translate-x-4 group-hover:translate-y-4 duration-300" />
+              <div className="relative bg-white border-2 border-[#3835A4] rounded-[32px] overflow-hidden shadow-sm z-10">
+                <img src={getCategoryImage(catName)} alt={catName} className="w-full h-56 sm:h-72 object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                <span className="absolute bottom-4 left-4 bg-white/95 text-stone-900 text-[10px] font-black tracking-widest capitalize px-4 py-2 rounded-xl border border-[#3835A4] shadow-[2px_2px_0px_0px_#3835A4]">
+                  {catName || 'General'}
+                </span>
+              </div>
             </div>
-          ))}
-          <div className="bg-white border-2 border-[#3835A4]/10 rounded-2xl p-5 shadow-sm space-y-1">
-            <span className="text-[9px] font-black tracking-widest text-[#3835A4]/50 uppercase">Last Date to Apply</span>
-            <p className={`text-sm font-bold ${isExpired ? 'text-red-600' : 'text-[#C6007E]'}`}>
-              {job.lastDateToApply ? formatDate(job.lastDateToApply) : '—'}
-              {isExpired && ' (Expired)'}
-            </p>
-          </div>
-        </div>
 
-        {/* About Company */}
-        {job.company && (
-          <div className="bg-white border-2 border-[#3835A4] rounded-[24px] p-6 sm:p-8 shadow-[6px_6px_0px_0px_#3835A4] space-y-5">
-            <div className="flex items-center gap-3 border-b-2 border-[#3835A4] pb-4">
-              <span className="text-xl">🏢</span>
-              <h2 className="text-sm font-black tracking-[0.25em] text-[#3835A4] uppercase">About Company</h2>
+            {/* Title + Meta */}
+            <div className="space-y-4 text-center lg:text-left">
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3">
+                {/* <span className="font-sans text-[10px] font-black tracking-[0.25em] text-[#C6007E] capitalize bg-[#C6007E]/5 px-3 py-1 rounded-md border border-[#C6007E]/20">
+                  {job.projectType?.name || 'Casting Call'}
+                </span> */}
+              </div>
+              <h1 className="text-4xl sm:text-5xl font-black tracking-tight capitalize leading-[0.95] font-display text-stone-900">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#3835A4] via-[#C6007E] to-amber-500">
+                  {job.title || 'Untitled Casting'}
+                </span>
+              </h1>
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-1.5 text-xs font-bold text-stone-400">
+                <span className="flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-[#C6007E]" />
+                  {job.castingCity ? `${job.castingCity.name}${job.castingCity.country ? `, ${job.castingCity.country.name}` : ''}` : '—'}
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <Briefcase className="w-3.5 h-3.5 text-[#3835A4]" />
+                  {catName || '—'}
+                </span>
+              </div>
             </div>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-6">
-              <div className="flex items-center gap-4">
-                {job.company?.user?.image ? (
-                  <img src={job.company.user.image} alt="" className="w-16 h-16 rounded-2xl object-cover border-2 border-[#3835A4]/20" />
-                ) : (
-                  <div className="w-16 h-16 rounded-2xl bg-[#3835A4] text-white flex items-center justify-center font-black text-2xl">
-                    {job.company?.companyName?.[0] || 'C'}
-                  </div>
-                )}
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-black tracking-tight text-[#3835A4] uppercase">{job.company.companyName}</h3>
-                    {job.company.user?.isVerified && (
-                      <span className="bg-[#C6007E] text-white text-[8px] font-black tracking-widest px-2.5 py-1 rounded-full border border-[#3835A4] shadow-sm">
-                        VERIFIED ✓
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs text-[#3835A4]/50 font-medium">{job.company.user?.email || ''}</p>
+
+            {/* Stats Row */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <StatCard icon={<Users className="w-4 h-4" />} label="Openings" value={String(totalOpenings || '—')} />
+              <StatCard icon={<Users className="w-4 h-4" />} label="Applications" value={String(totalApplications)} />
+              <StatCard icon={<Clock className="w-4 h-4" />} label="Posted" value={createdAt ? formatDate(createdAt) : '—'} />
+              <StatCard icon={<Eye className="w-4 h-4" />} label="Views" value={String(job.views || job._count?.views || 0)} />
+            </div>
+
+            {/* Description Card */}
+            <div className="bg-white border-2 border-[#3835A4] rounded-[32px] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#3835A4] space-y-5">
+              <div className="flex items-center justify-between border-b-2 border-[#3835A4] pb-4">
+                <h3 className="text-xs font-black tracking-[0.25em] text-[#3835A4] capitalize font-sans">Brief Description</h3>
+              </div>
+              {job.subTitle && (
+                <p className="text-sm font-bold text-stone-700">{job.subTitle}</p>
+              )}
+              {job.description && (
+                <div className="text-sm text-stone-600 leading-relaxed font-medium [&_h1]:text-lg [&_h1]:font-black [&_h2]:text-base [&_h2]:font-black [&_h3]:text-sm [&_h3]:font-bold [&_strong]:font-black [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:text-[#3835A4] [&_a]:underline [&_p]:mb-2" dangerouslySetInnerHTML={{ __html: job.description }} />
+              )}
+              {job.usage && (
+                <div className="pt-3 border-t border-stone-200">
+                  <span className="text-[9px] font-black tracking-widest text-stone-400 capitalize block">Usage</span>
+                  <p className="text-sm font-bold text-stone-800 mt-0.5">{job.usage}</p>
                 </div>
-              </div>
-              <div className="sm:ml-auto flex gap-6">
-                {job.company.user?.createdAt && (
-                  <div className="text-center">
-                    <span className="block text-[9px] font-black tracking-widest text-[#3835A4]/40 uppercase">Member Since</span>
-                    <span className="text-xs font-bold text-[#3835A4]">{formatDate(job.company.user.createdAt)}</span>
-                  </div>
-                )}
-                {job.company._count?.jobs != null && (
-                  <div className="text-center">
-                    <span className="block text-[9px] font-black tracking-widest text-[#3835A4]/40 uppercase">Total Jobs</span>
-                    <span className="text-xs font-bold text-[#C6007E]">{job.company._count.jobs}</span>
-                  </div>
-                )}
-              </div>
+              )}
             </div>
-          </div>
-        )}
 
-        {/* Casting & Shooting Dates */}
-        {!job.isLegacy && (castingDates.length > 0 || shootingDates.length > 0) && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {castingDates.length > 0 && (
-              <div className="bg-white border-2 border-[#3835A4] rounded-[24px] p-6 shadow-[6px_6px_0px_0px_#3835A4] space-y-3">
-                <h3 className="text-[10px] font-black tracking-[0.25em] text-[#3835A4] uppercase">Casting Dates</h3>
-                <div className="flex flex-wrap gap-2">
-                  {castingDates.map((d, i) => (
-                    <span key={i} className="bg-[#3835A4]/5 border border-[#3835A4]/10 rounded-lg px-3 py-1.5 text-xs font-bold text-[#3835A4]">
-                      {formatDate(d)}
-                    </span>
+            {/* Casting Roles */}
+            {job.roles && job.roles.length > 0 && (
+              <div className="bg-white border-2 border-[#3835A4] rounded-[32px] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#C6007E] space-y-6">
+                <div className="flex items-center justify-between border-b-2 border-[#3835A4] pb-4">
+                  <h3 className="text-xs font-black tracking-[0.25em] text-[#3835A4] capitalize font-sans">
+                    Casting Roles <span className="text-stone-400 font-medium">({job.roles.length})</span>
+                  </h3>
+                </div>
+
+                {/* Role Tabs Segment Controller */}
+                <div className="flex flex-wrap bg-stone-100 p-1.5 rounded-2xl border-2 border-[#3835A4]">
+                  {job.roles.map((role: any, idx: number) => (
+                    <button
+                      key={role.id}
+                      onClick={() => setSelectedRoleIndex(idx)}
+                      className={`flex-1 md:flex-none px-5 py-2.5 text-[10px] font-bold tracking-widest capitalize rounded-xl transition-all font-display ${
+                        idx === selectedRoleIndex
+                          ? 'bg-[#3835A4] text-white shadow-md'
+                          : 'text-stone-400 hover:text-[#3835A4]'
+                      }`}
+                    >
+                      {role.title || `Role ${idx + 1}`}
+                    </button>
                   ))}
                 </div>
-              </div>
-            )}
-            {shootingDates.length > 0 && (
-              <div className="bg-white border-2 border-[#3835A4] rounded-[24px] p-6 shadow-[6px_6px_0px_0px_#3835A4] space-y-3">
-                <h3 className="text-[10px] font-black tracking-[0.25em] text-[#3835A4] uppercase">Shooting Dates</h3>
-                <div className="flex flex-wrap gap-2">
-                  {shootingDates.map((d, i) => (
-                    <span key={i} className="bg-[#C6007E]/5 border border-[#C6007E]/10 rounded-lg px-3 py-1.5 text-xs font-bold text-[#C6007E]">
-                      {formatDate(d)}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
 
-        {/* Roles Section */}
-        {job.roles && job.roles.length > 0 && (
-          <div className="space-y-6">
-            <div className="flex items-center gap-3 border-b-2 border-[#3835A4] pb-4">
-              <span className="text-xl">🎭</span>
-              <h2 className="text-lg font-black tracking-tight uppercase font-display text-stone-900">Casting Roles ({job.roles.length})</h2>
-            </div>
-
-            <div className="grid grid-cols-1 gap-6">
-              {job.roles.map((role: any) => {
-                const experience = parseJsonArray(role.experience);
-
-                return (
-                  <div key={role.id} className="bg-white border-2 border-[#3835A4] rounded-[24px] p-6 sm:p-8 shadow-[6px_6px_0px_0px_#3835A4] space-y-6">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div>
-                        <h3 className="text-xl font-black tracking-tight text-[#3835A4] uppercase">{role.title || 'Untitled Role'}</h3>
-                        {role.noOfCast && (
-                          <span className="text-xs font-bold text-[#3835A4]/50">Casting {role.noOfCast} talent{role.noOfCast > 1 ? 's' : ''}</span>
-                        )}
+                {/* Selected Role Detail */}
+                {(() => {
+                  const role = job.roles[selectedRoleIndex];
+                  if (!role) return null;
+                  const experience = parseJsonArray(role.experience);
+                  return (
+                    <div key={role.id} className="space-y-5">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                          <h3 className="text-base font-black text-stone-900">{role.title || 'Untitled Role'}</h3>
+                          {role.noOfCast && (
+                            <span className="text-xs font-medium text-stone-500">Casting {role.noOfCast} talent{role.noOfCast > 1 ? 's' : ''}</span>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => {
+                            if (isExpired) return;
+                            if (appliedRoleIds.includes(role.id)) return;
+                            if (!user) { alert('Please login to apply'); return; }
+                            if (user.role === 'RECRUITER') return;
+                            if (limitReached) return;
+                            setApplyRole(role);
+                          }}
+                          disabled={isExpired || appliedRoleIds.includes(role.id) || user?.role === 'RECRUITER' || limitReached}
+                          className={`px-5 py-2.5 rounded-xl text-[10px] font-black tracking-widest capitalize whitespace-nowrap transition-all ${
+                            isExpired
+                              ? 'bg-stone-100 text-stone-400 cursor-not-allowed'
+                              : appliedRoleIds.includes(role.id)
+                              ? 'bg-green-100 text-green-700'
+                              : user?.role === 'RECRUITER'
+                              ? 'bg-amber-100 text-amber-700 cursor-not-allowed'
+                              : limitReached
+                              ? 'bg-stone-100 text-stone-400 cursor-not-allowed'
+                              : 'bg-[#C6007E] text-white hover:bg-[#a10065]'
+                          }`}
+                        >
+                          {isExpired ? 'Closed'
+                            : appliedRoleIds.includes(role.id) ? '✓ Applied'
+                            : user?.role === 'RECRUITER' ? 'Talent Only'
+                            : limitReached ? 'Limit Reached'
+                            : 'Apply Now'}
+                        </button>
                       </div>
-                      <button
-                        onClick={() => {
-                          if (isExpired) return;
-                          if (appliedRoleIds.includes(role.id)) return;
-                          if (!user) { alert('Please login to apply'); return; }
-                          if (user.role === 'RECRUITER') return;
-                          if (limitReached) return;
-                          setApplyRole(role);
-                        }}
-                        disabled={isExpired || appliedRoleIds.includes(role.id) || user?.role === 'RECRUITER' || limitReached}
-                        className={`px-6 py-3 rounded-xl font-black uppercase tracking-widest text-xs whitespace-nowrap transition-all ${
-                          isExpired
-                            ? 'bg-stone-200 text-stone-400 cursor-not-allowed'
-                            : appliedRoleIds.includes(role.id)
-                            ? 'bg-green-100 text-green-700'
-                            : user?.role === 'RECRUITER'
-                            ? 'bg-amber-100 text-amber-700 cursor-not-allowed'
-                            : limitReached
-                            ? 'bg-stone-200 text-stone-400 cursor-not-allowed'
-                            : 'bg-[#C6007E] text-white hover:bg-[#a10065] active:scale-95'
-                        }`}
-                      >
-                        {isExpired
-                          ? 'Applications Closed'
-                          : appliedRoleIds.includes(role.id)
-                          ? '✓ Applied'
-                          : user?.role === 'RECRUITER'
-                          ? 'Register as Talent'
-                          : limitReached
-                          ? 'Monthly Limit Reached'
-                          : 'Apply Now'}
-                      </button>
-                    </div>
 
-                    {role.description && (
-                      <div className="text-sm text-stone-600 font-display leading-relaxed [&_h1]:text-xl [&_h1]:font-black [&_h2]:text-lg [&_h2]:font-black [&_h3]:text-base [&_h3]:font-bold [&_strong]:font-black [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:text-[#3835A4] [&_a]:underline [&_p]:mb-2" dangerouslySetInnerHTML={{ __html: role.description }} />
-                    )}
+                      {role.description && (
+                        <div className="text-sm text-stone-600 leading-relaxed [&_h1]:text-lg [&_h1]:font-black [&_h2]:text-base [&_h2]:font-black [&_h3]:text-sm [&_h3]:font-bold [&_strong]:font-black [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:text-[#3835A4] [&_a]:underline [&_p]:mb-2" dangerouslySetInnerHTML={{ __html: role.description }} />
+                      )}
 
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                      {role.gender && (
-                        <DetailChip label="Gender" value={role.gender} />
-                      )}
-                      {role.ageMin && (
-                        <DetailChip label="Age Range" value={`${role.ageMin}${role.ageMax ? ` - ${role.ageMax}` : '+'} yrs`} />
-                      )}
-                      {role.paymentInfo && (
-                        <DetailChip label="Payment" value={role.paymentInfo.charAt(0).toUpperCase() + role.paymentInfo.slice(1)} />
-                      )}
-                      {role.paymentType && (
-                        <DetailChip label="Pay Type" value={role.paymentType.replace(/_/g, ' ')} />
-                      )}
+                      {(() => {
+                        const ethnicity = role.ethnicityAll ? 'All' : role.ethnicityNames;
+                        const nationality = role.nationalityAll ? 'All' : role.nationalityNames;
+                        const languages = role.languageNames;
+                        const dialects = role.dialectNames;
+                        const hasAny = ethnicity || nationality || experience.length > 0 || languages || dialects;
+                        if (!hasAny) return null;
+                        return (
+                          <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-xs text-stone-600">
+                            {ethnicity && <div><span className="font-bold text-stone-800">Ethnicity:</span> {ethnicity}</div>}
+                            {nationality && <div><span className="font-bold text-stone-800">Nationality:</span> {nationality}</div>}
+                            {experience.length > 0 && <div><span className="font-bold text-stone-800">Experience:</span> {experience.join(', ')}</div>}
+                            {languages && <div><span className="font-bold text-stone-800">Languages:</span> {languages}</div>}
+                            {dialects && <div className="col-span-2"><span className="font-bold text-stone-800">Dialects:</span> {dialects}</div>}
+                          </div>
+                        );
+                      })()}
+
                       {role.usage && (
-                        <DetailChip label="Usage" value={role.usage} />
+                        <div className="text-xs text-stone-600">
+                          <span className="font-bold text-stone-800">Usage:</span> {role.usage}
+                        </div>
                       )}
-                      {role.ethnicityAll ? (
-                        <DetailChip label="Ethnicity" value="All Ethnicities" />
-                      ) : role.ethnicityNames && (
-                        <DetailChip label="Ethnicity" value={role.ethnicityNames} />
-                      )}
-                      {role.nationalityAll ? (
-                        <DetailChip label="Nationality" value="All Nationalities" />
-                      ) : role.nationalityNames && (
-                        <DetailChip label="Nationality" value={role.nationalityNames} />
-                      )}
-                      {role.experienceAll ? (
-                        <DetailChip label="Experience" value="All Levels" />
-                      ) : experience.length > 0 && (
-                        <DetailChip label="Experience" value={experience.join(', ')} />
-                      )}
-                      {role.languageNames && (
-                        <DetailChip label="Languages" value={role.languageNames} />
-                      )}
-                      {role.dialectNames && (
-                        <DetailChip label="Dialects" value={role.dialectNames} />
-                      )}
-                      {role.requiredProfileVideo && (
-                        <DetailChip label="Profile Video" value="Required" accent />
-                      )}
-                      {role.requiredCastingVideo && (
-                        <DetailChip label="Casting Video" value="Required" accent />
-                      )}
-                    </div>
 
-                    {role.payment && (
-                      <div className="bg-amber-50 border-2 border-dashed border-amber-400/80 rounded-2xl p-5 space-y-2">
-                        <span className="text-[9px] font-black tracking-widest text-amber-700 uppercase">Compensation Details</span>
-                        <PaymentDetails payment={role.payment} type={role.paymentType} />
-                      </div>
-                    )}
-
-                    {(role.question1 || role.question2 || role.question3) && (
-                      <div className="bg-stone-50 border-2 border-dashed border-stone-300 rounded-2xl p-5 space-y-3">
-                        <span className="text-[9px] font-black tracking-widest text-stone-500 uppercase">Application Questions</span>
-                        <div className="space-y-2">
-                          {role.question1 && <p className="text-xs font-medium text-stone-700"><span className="font-black text-[#3835A4]">Q1:</span> {role.question1}</p>}
-                          {role.question2 && <p className="text-xs font-medium text-stone-700"><span className="font-black text-[#3835A4]">Q2:</span> {role.question2}</p>}
-                          {role.question3 && <p className="text-xs font-medium text-stone-700"><span className="font-black text-[#3835A4]">Q3:</span> {role.question3}</p>}
+                      {(role.gender || role.ageMin || role.payment) && (
+                      <div className="bg-amber-50 border-2 border-amber-200/80 rounded-2xl p-4 space-y-3">
+                        {/* <span className="text-[9px] font-black tracking-widest text-amber-700 capitalize block">Compensation</span> */}
+                        <div className="flex flex-wrap gap-2">
+                          {role.gender && <RoleChip label="Gender" value={role.gender} />}
+                          {role.ageMin && <RoleChip label="Age" value={`${role.ageMin}${role.ageMax ? `-${role.ageMax}` : '+'}`} />}
+                          {role.payment && <PaymentChips payment={role.payment} type={role.paymentType} />}
                         </div>
                       </div>
+                      )}
+
+                      {(role.question1 || role.question2 || role.question3) && (
+                        <div className="bg-stone-50 border-2 border-stone-200 rounded-2xl p-4 space-y-2">
+                          <span className="text-[9px] font-black tracking-widest text-stone-500 capitalize">Questions</span>
+                          {role.question1 && <p className="text-xs text-stone-700"><span className="font-bold text-[#3835A4]">Q1:</span> {role.question1}</p>}
+                          {role.question2 && <p className="text-xs text-stone-700"><span className="font-bold text-[#3835A4]">Q2:</span> {role.question2}</p>}
+                          {role.question3 && <p className="text-xs text-stone-700"><span className="font-bold text-[#3835A4]">Q3:</span> {role.question3}</p>}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
+              </div>
+            )}
+          </div>
+
+          {/* ─── RIGHT COLUMN ─── */}
+          <div className="lg:col-span-5 space-y-8 lg:sticky lg:top-8">
+
+            {/* Job Overview */}
+            <div className="bg-[#3835A4] text-stone-100 rounded-[32px] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#C6007E] space-y-6">
+              <div className="flex items-center justify-between border-b border-[#3835A4]/30 pb-4">
+                <h3 className="text-xs font-black tracking-[0.25em] text-white capitalize font-sans">Job Overview</h3>
+              </div>
+              <div className="space-y-4">
+                {(() => {
+                  const formatted = castingDates.map(d => formatDate(d)).filter(d => d !== '—');
+                  if (formatted.length === 0) return null;
+                  return <OverviewItem label="Casting Dates" value={formatted.join(', ')} />;
+                })()}
+                {(() => {
+                  const formatted = shootingDates.map(d => formatDate(d)).filter(d => d !== '—');
+                  if (formatted.length === 0) return null;
+                  return <OverviewItem label="Shooting Dates" value={formatted.join(', ')} />;
+                })()}
+                {job.shootingCity?.name && (
+                  <OverviewItem
+                    label="Shooting City"
+                    value={`${job.shootingCity.name}${job.shootingCity.country?.name ? `, ${job.shootingCity.country.name}` : ''}`}
+                  />
+                )}
+                {job.lastDateToApply && (
+                  <OverviewItem
+                    label="Last Date to Apply"
+                    value={formatDate(job.lastDateToApply)}
+                    highlight={isExpired ? 'text-[#F6C9E6]' : 'text-white'}
+                  />
+                )}
+                {/* {job.projectType?.name && (
+                  <OverviewItem label="Project Type" value={job.projectType.name} />
+                )} */}
+                {job.paymentInfo && (
+                  <OverviewItem label="Payment" value={job.paymentInfo} />
+                )}
+              </div>
+            </div>
+
+            {/* About Company */}
+            {job.company && (
+              <div className="bg-white border-2 border-[#3835A4] rounded-[32px] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#3835A4] space-y-5">
+                <div className="flex items-center justify-between border-b-2 border-[#3835A4] pb-4">
+                  <h3 className="text-xs font-black tracking-[0.25em] text-[#3835A4] capitalize font-sans">About Company</h3>
+                </div>
+                <div className="flex items-center gap-4">
+                  {job.company?.user?.image ? (
+                    <img src={job.company.user.image} alt="" className="w-14 h-14 rounded-xl object-cover border-2 border-[#3835A4]" />
+                  ) : (
+                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#3835A4] to-[#C6007E] text-white flex items-center justify-center font-black text-lg border-2 border-[#3835A4]">
+                      {job.company?.companyName?.[0] || 'C'}
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <p className="text-sm font-black text-stone-900 truncate">{job.company.companyName}</p>
+                    {job.company.user?.isVerified && (
+                      <span className="text-[9px] font-black tracking-widest text-green-600 capitalize">✓ Verified</span>
                     )}
                   </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
+                </div>
+                <div className="flex gap-4 text-xs font-medium">
+                  {job.company.user?.createdAt && (
+                    <span className="text-stone-500">Member since {formatDate(job.company.user.createdAt)}</span>
+                  )}
+                  {job.company._count?.jobs != null && (
+                    <span className="font-bold text-[#3835A4]">{job.company._count.jobs} jobs</span>
+                  )}
+                </div>
+                {/* {job.company.user?.email && (
+                  <div className="bg-stone-50 border border-stone-200 rounded-xl px-4 py-2">
+                    <span className="text-[8px] font-black tracking-widest text-stone-400 capitalize block">Contact</span>
+                    <p className="text-xs font-bold text-stone-700">{job.company.user.email}</p>
+                  </div>
+                )} */}
+              </div>
+            )}
 
+          </div>
+        </div>
       </div>
 
       {applyRole && (
@@ -384,99 +432,87 @@ const PublicJobPage = () => {
   );
 };
 
-const DetailChip = ({ label, value, accent }: { label: string; value: string; accent?: boolean }) => (
-  <div className="bg-[#3835A4]/5 border border-[#3835A4]/10 rounded-xl px-4 py-2.5 space-y-0.5">
-    <span className="block text-[8px] font-black tracking-widest text-[#3835A4]/40 uppercase">{label}</span>
-    <span className={`text-xs font-bold ${accent ? 'text-[#C6007E]' : 'text-[#3835A4]'}`}>{value}</span>
+const StatCard = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) => (
+  <div className="bg-white border-2 border-[#3835A4] p-4 rounded-2xl shadow-[4px_4px_0px_0px_#3835A4] flex flex-col justify-between h-24 text-left transform -rotate-1">
+    <div className="flex items-center gap-1.5 text-stone-400">
+      {icon}
+      <span className="text-[8px] font-black tracking-widest capitalize font-sans">{label}</span>
+    </div>
+    <p className="text-lg font-black font-display text-[#3835A4]">{value}</p>
   </div>
 );
 
-const PaymentDetails = ({ payment, type }: { payment: any; type: string }) => {
-  const rows: { label: string; value: number | null | undefined }[] = [];
+const RoleChip = ({ label, value }: { label: string; value: string }) => (
+  <div className="bg-white border border-amber-300 rounded-lg px-3 py-1.5">
+    <span className="text-[8px] font-black tracking-widest text-amber-600 capitalize block">{label}</span>
+    <span className="text-xs font-bold text-amber-900">{value}</span>
+  </div>
+);
 
+const OverviewItem = ({ label, value, highlight }: { label: string; value: string; highlight?: string }) => (
+  <div>
+    <span className="text-[9px] font-black tracking-widest text-white/40 capitalize block">{label}</span>
+    <p className={`text-sm font-bold mt-0.5 ${highlight || 'text-white'}`}>{value}</p>
+  </div>
+);
+
+const PaymentChips = ({ payment, type }: { payment: any; type: string }) => {
+  let rows: { label: string; value: number | null | undefined }[] = [];
   switch (type) {
     case 'per_hour':
-      rows.push(
+      rows = [
         { label: 'Hours / Day', value: payment.hourPerDay },
         { label: 'Budget / Hour', value: payment.hourBudgetPerHour },
         { label: 'No. of Days', value: payment.hourNoOfDays },
-        { label: 'Commission', value: payment.hourCommission },
-        { label: 'Talent Budget', value: payment.hourTalentBudget },
-        { label: 'Profit', value: payment.hourProfit },
-      );
+      ];
       break;
     case 'per_day':
-      rows.push(
+      rows = [
         { label: 'Full Day', value: payment.dayFullDay },
         { label: 'Half Day', value: payment.dayHalfDay },
         { label: 'Budget Full Day', value: payment.dayBudgetFullDay },
         { label: 'Budget Half Day', value: payment.dayBudgetHalfDay },
         { label: 'Total Budget', value: payment.dayTotalBudget },
-        { label: 'Commission', value: payment.dayCommission },
         { label: 'Talent Full Day', value: payment.dayTalentFullDay },
         { label: 'Talent Half Day', value: payment.dayTalentHalfDay },
         { label: 'Talent Total', value: payment.dayTalentTotal },
-        { label: 'Profit', value: payment.dayTotalProfit },
-      );
+      ];
       break;
     case 'per_week':
-      rows.push(
+      rows = [
         { label: 'No. of Weeks', value: payment.weekNoOfWeek },
         { label: 'Days / Week', value: payment.weekDaysPerWeek },
         { label: 'Budget / Week', value: payment.weekBudgetPerWeek },
-        { label: 'Commission', value: payment.weekCommission },
-        { label: 'Talent Budget', value: payment.weekTalentBudget },
-        { label: 'Profit', value: payment.weekProfit },
-      );
+      ];
       break;
     case 'per_month':
-      rows.push(
+      rows = [
         { label: 'No. of Months', value: payment.monthNoOfMonth },
         { label: 'Days / Month', value: payment.monthDayPerMonth },
         { label: 'Budget / Month', value: payment.monthBudgetPerMonth },
-        { label: 'Commission', value: payment.monthCommission },
-        { label: 'Talent Budget', value: payment.monthTalentBudget },
-        { label: 'Profit', value: payment.monthProfit },
-      );
+      ];
       break;
     case 'package':
-      rows.push(
+      rows = [
         { label: 'Budget Full Day', value: payment.packageBudgetFullDay },
         { label: 'Budget Half Day', value: payment.packageBudgetHalfDay },
         { label: 'Total Budget', value: payment.packageTotalBudget },
-        { label: 'Commission', value: payment.packageCommission },
         { label: 'Talent Total', value: payment.packageTotalTalent },
-        { label: 'Profit', value: payment.packageProfit },
-      );
+      ];
       break;
   }
-
-  return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-      {rows.filter(r => r.value != null).map((r, i) => (
-        <div key={i} className="bg-white border border-amber-200 rounded-lg px-3 py-2">
-          <span className="block text-[8px] font-black uppercase text-amber-600 tracking-wider">{r.label}</span>
-          <span className="text-xs font-bold text-amber-900">{r.value}</span>
-        </div>
-      ))}
-    </div>
-  );
+  return rows.map((r, i) => (
+    <RoleChip key={i} label={r.label} value={r.value != null ? String(r.value) : '—'} />
+  ));
 };
 
 const StatusMessage = ({ icon, title, message }: { icon: string; title: string; message: string }) => (
   <div className="min-h-screen flex items-center justify-center bg-[#fdfbf7] p-4">
-    <div className="bg-white border-4 border-[#3835A4] p-8 sm:p-12 max-w-xl text-center space-y-6 shadow-[12px_12px_0px_0px_#C6007E]">
-      <span className="text-6xl block animate-bounce">{icon}</span>
-      <div className="space-y-2">
-        <h2 className="text-2xl font-black tracking-tight uppercase text-[#3835A4]">{title}</h2>
-        <p className="text-sm font-medium text-[#3835A4]/70 max-w-md mx-auto leading-relaxed">{message}</p>
-      </div>
-      <Link
-        to="/dashboard/recruiter/jobs"
-        className="inline-block text-[10px] font-black tracking-widest uppercase bg-[#3835A4] text-white px-8 py-4 rounded-xl transition-transform active:scale-95 hover:-translate-y-0.5"
-      >
-        ← Back to Manage Jobs
-      </Link>
+    <div className="bg-white border-4 border-[#3835A4] p-8 rotate-1 max-w-md text-center space-y-4 shadow-[8px_8px_0px_0px_#C6007E]">
+      <span className="text-5xl block">{icon}</span>
+      <h2 className="text-lg font-black text-stone-900">{title}</h2>
+      <p className="text-sm text-stone-500 font-medium">{message}</p>
+      <Link to="/dashboard/recruiter/jobs" className="inline-block text-[10px] font-black tracking-widest capitalize bg-[#3835A4] text-white px-6 py-3 transition-transform active:scale-95 hover:-translate-y-0.5">← Back to Manage Jobs</Link>
     </div>
   </div>
 );
