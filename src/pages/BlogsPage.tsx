@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, ArrowUpRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api/axios';
 
 interface BlogPost {
   id: number;
@@ -18,8 +18,6 @@ interface Category {
   id: number;
   name: string;
 }
-
-const API = import.meta.env.VITE_API_URL + '/blogs';
 
 const CATEGORIES: Record<number, string> = {
   1: 'Actors & Extras',
@@ -48,7 +46,7 @@ export default function BlogsPage() {
     try {
       const params: any = { page, limit: 9 };
       if (selectedCategory) params.categoryId = selectedCategory;
-      const res = await axios.get(API, { params });
+      const res = await api.get('/blogs', { params });
       if (res.data?.success && res.data?.data?.blogs) {
         setBlogs(res.data.data.blogs);
         setTotalPages(res.data.data.pagination?.totalPages || 1);

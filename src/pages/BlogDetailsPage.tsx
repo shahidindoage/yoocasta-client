@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
-import axios from 'axios';
+import api from '../api/axios';
 
 interface BlogPost {
   id: number;
@@ -12,8 +12,6 @@ interface BlogPost {
   date: string;
   image: string;
 }
-
-const API = 'http://localhost:3000/api/v1/blogs';
 
 const CATEGORIES: Record<number, string> = {
   1: 'Actors & Extras',
@@ -40,8 +38,8 @@ export default function BlogDetailsPage() {
     setLoading(true);
     try {
       const [blogRes, allRes] = await Promise.all([
-        axios.get(`${API}/${id}`),
-        axios.get(API, { params: { limit: 100 } }),
+        api.get(`/blogs/${id}`),
+        api.get('/blogs', { params: { limit: 100 } }),
       ]);
 
       if (blogRes.data?.success && blogRes.data?.data) {

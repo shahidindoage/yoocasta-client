@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Phone, Mail, MapPin } from 'lucide-react';
-import axios from 'axios';
+import api from '../api/axios';
 
 export default function ContactUs() {
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
@@ -17,7 +17,7 @@ export default function ContactUs() {
     setError('');
     setLoading(true);
     try {
-      await axios.post('http://localhost:3000/api/v1/contact', form);
+      await api.post('/contact', form);
       setSubmitted(true);
       setForm({ name: '', email: '', subject: '', message: '' });
     } catch {
