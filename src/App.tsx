@@ -47,6 +47,11 @@ import PublicCastBag from './pages/PublicCastBag';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminLayout from './pages/admin/AdminLayout';
 import ManageTalents from './pages/admin/ManageTalents';
+import ManageCompanies from './pages/admin/ManageCompanies';
+import AdminManageJobs from './pages/admin/ManageJobs';
+import JobPaymentDetails from './pages/admin/JobPaymentDetails';
+import AdminJobEdit from './pages/admin/AdminJobEdit';
+import TalentSubscription from './pages/admin/TalentSubscription';
 
 // Placeholder dashboard pages (we'll build these next)
 
@@ -92,6 +97,11 @@ function App() {
           <Route element={<ProtectedRoute allowedRoles={['ADMIN']} redirectTo="/admin/login" />}>
             <Route element={<AdminLayout />}>
               <Route path="/admin/talents" element={<ManageTalents />} />
+              <Route path="/admin/talents/:id/subscription" element={<TalentSubscription />} />
+              <Route path="/admin/companies" element={<ManageCompanies />} />
+              <Route path="/admin/jobs" element={<AdminManageJobs />} />
+              <Route path="/admin/jobs/:id/payment" element={<JobPaymentDetails />} />
+              <Route path="/admin/jobs/:id/edit" element={<AdminJobEdit />} />
             </Route>
           </Route>
 

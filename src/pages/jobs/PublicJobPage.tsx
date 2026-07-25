@@ -456,9 +456,22 @@ const OverviewItem = ({ label, value, highlight }: { label: string; value: strin
   </div>
 );
 
+const PAYMENT_TYPE_ALIAS: Record<string, string> = {
+  per_hour: 'per_hour',
+  per_hour_pay: 'per_hour',
+  per_day: 'per_day',
+  per_day_pay: 'per_day',
+  per_week: 'per_week',
+  per_month: 'per_month',
+  per_month_pay: 'per_month',
+  package: 'package',
+  package_pay: 'package',
+};
+
 const PaymentChips = ({ payment, type }: { payment: any; type: string }) => {
+  const t = PAYMENT_TYPE_ALIAS[type] || type;
   let rows: { label: string; value: number | null | undefined }[] = [];
-  switch (type) {
+  switch (t) {
     case 'per_hour':
       rows = [
         { label: 'Hours / Day', value: payment.hourPerDay },
@@ -473,9 +486,6 @@ const PaymentChips = ({ payment, type }: { payment: any; type: string }) => {
         { label: 'Budget Full Day', value: payment.dayBudgetFullDay },
         { label: 'Budget Half Day', value: payment.dayBudgetHalfDay },
         { label: 'Total Budget', value: payment.dayTotalBudget },
-        { label: 'Talent Full Day', value: payment.dayTalentFullDay },
-        { label: 'Talent Half Day', value: payment.dayTalentHalfDay },
-        { label: 'Talent Total', value: payment.dayTalentTotal },
       ];
       break;
     case 'per_week':
@@ -501,7 +511,7 @@ const PaymentChips = ({ payment, type }: { payment: any; type: string }) => {
       ];
       break;
   }
-  return rows.map((r, i) => (
+  return rows.filter(r => r.value != null && r.value !== 0).map((r, i) => (
     <RoleChip key={i} label={r.label} value={r.value != null ? String(r.value) : '—'} />
   ));
 };

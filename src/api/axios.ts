@@ -8,7 +8,7 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('accessToken');
+  const token = sessionStorage.getItem('accessToken') || localStorage.getItem('accessToken');
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
@@ -24,14 +24,16 @@ api.interceptors.response.use(
 
       original._retry = true;
       try {
-        const refreshToken = localStorage.getItem('refreshToken');
+        const storage = sessionStorage.getItem('accessToken') ? sessionStorage : localStorage;
+        const refreshToken = storage.getItem('refreshToken');
         const res = await axios.post(`${API_URL}/auth/refresh`, { refreshToken });
         const { accessToken, refreshToken: newRefresh } = res.data.data;
-        localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', newRefresh);
+        storage.setItem('accessToken', accessToken);
+        storage.setItem('refreshToken', newRefresh);
         original.headers.Authorization = `Bearer ${accessToken}`;
         return api(original);
       } catch {
+        sessionStorage.clear();
         localStorage.clear();
         window.location.href = isAdminRoute ? '/admin/login' : '/login';
       }
