@@ -143,7 +143,7 @@ function MultiSelectDropdown({
 }
 
 // ─── Main Component ────────────────────────────────────────────────────
-export default function RolesStep({ roles, setRoles, jobPaymentInfo, options, onBack, onSubmit, submitting }: any) {
+export default function RolesStep({ roles, setRoles, jobPaymentInfo, options, onBack, onSubmit, submitting, submitLabel = 'Finish & Post Job' }: any) {
   const [form, setForm] = useState<typeof INITIAL_ROLE>({ ...INITIAL_ROLE });
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [showForm, setShowForm] = useState(roles.length === 0);
@@ -412,9 +412,9 @@ export default function RolesStep({ roles, setRoles, jobPaymentInfo, options, on
 
                 {form.paymentType === 'per_hour' && (
                   <div className="grid grid-cols-3 gap-4">
-                    <input type="number" name="hoursPerDay" placeholder="No of Hours/Day" onChange={handlePaymentChange} className="border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
-                    <input type="number" name="budgetPerHour" placeholder="Budget/Hour (AED)" onChange={handlePaymentChange} className="border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
-                    <input type="number" name="noOfDays" placeholder="No of Days" onChange={handlePaymentChange} className="border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
+                    <input type="number" name="hoursPerDay" placeholder="No of Hours/Day" value={form.paymentDetails?.hoursPerDay ?? ''} onChange={handlePaymentChange} className="border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
+                    <input type="number" name="budgetPerHour" placeholder="Budget/Hour (AED)" value={form.paymentDetails?.budgetPerHour ?? ''} onChange={handlePaymentChange} className="border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
+                    <input type="number" name="noOfDays" placeholder="No of Days" value={form.paymentDetails?.noOfDays ?? ''} onChange={handlePaymentChange} className="border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
                   </div>
                 )}
 
@@ -424,13 +424,13 @@ export default function RolesStep({ roles, setRoles, jobPaymentInfo, options, on
                     <div className="grid grid-cols-2 gap-4 border-l-2 border-[#3835A4]/20 pl-4">
                       <div className="space-y-2">
                         <label className="text-xs font-bold text-[#3835A4]">No of Days</label>
-                        <input type="number" name="fullDay" placeholder="Full Day" onChange={handlePaymentChange} className="w-full border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
-                        <input type="number" name="halfDay" placeholder="Half Day" onChange={handlePaymentChange} className="w-full border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
+                        <input type="number" name="fullDay" placeholder="Full Day" value={form.paymentDetails?.fullDay ?? ''} onChange={handlePaymentChange} className="w-full border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
+                        <input type="number" name="halfDay" placeholder="Half Day" value={form.paymentDetails?.halfDay ?? ''} onChange={handlePaymentChange} className="w-full border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
                       </div>
                       <div className="space-y-2">
                         <label className="text-xs font-bold text-[#3835A4]">Budget (AED)</label>
-                        <input type="number" name="budgetFullDay" placeholder="Full Day Budget" onChange={handlePaymentChange} className="w-full border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
-                        <input type="number" name="budgetHalfDay" placeholder="Half Day Budget" onChange={handlePaymentChange} className="w-full border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
+                        <input type="number" name="budgetFullDay" placeholder="Full Day Budget" value={form.paymentDetails?.budgetFullDay ?? ''} onChange={handlePaymentChange} className="w-full border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
+                        <input type="number" name="budgetHalfDay" placeholder="Half Day Budget" value={form.paymentDetails?.budgetHalfDay ?? ''} onChange={handlePaymentChange} className="w-full border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
                       </div>
                     </div>
                   </div>
@@ -438,17 +438,17 @@ export default function RolesStep({ roles, setRoles, jobPaymentInfo, options, on
 
                 {form.paymentType === 'per_week' && (
                   <div className="grid grid-cols-3 gap-4">
-                    <input type="number" name="noOfWeek" placeholder="No of Week" onChange={handlePaymentChange} className="border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
-                    <input type="number" name="daysPerWeek" placeholder="No of Day/Week" onChange={handlePaymentChange} className="border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
-                    <input type="number" name="budgetPerWeek" placeholder="Budget/Week (AED)" onChange={handlePaymentChange} className="border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
+                    <input type="number" name="noOfWeek" placeholder="No of Week" value={form.paymentDetails?.noOfWeek ?? ''} onChange={handlePaymentChange} className="border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
+                    <input type="number" name="daysPerWeek" placeholder="No of Day/Week" value={form.paymentDetails?.daysPerWeek ?? ''} onChange={handlePaymentChange} className="border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
+                    <input type="number" name="budgetPerWeek" placeholder="Budget/Week (AED)" value={form.paymentDetails?.budgetPerWeek ?? ''} onChange={handlePaymentChange} className="border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
                   </div>
                 )}
 
                 {form.paymentType === 'per_month' && (
                   <div className="grid grid-cols-3 gap-4">
-                    <input type="number" name="noOfMonth" placeholder="No of Months" onChange={handlePaymentChange} className="border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
-                    <input type="number" name="daysPerMonth" placeholder="No of Days/Month" onChange={handlePaymentChange} className="border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
-                    <input type="number" name="budgetPerMonth" placeholder="Budget/Month (AED)" onChange={handlePaymentChange} className="border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
+                    <input type="number" name="noOfMonth" placeholder="No of Months" value={form.paymentDetails?.noOfMonth ?? ''} onChange={handlePaymentChange} className="border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
+                    <input type="number" name="daysPerMonth" placeholder="No of Days/Month" value={form.paymentDetails?.daysPerMonth ?? ''} onChange={handlePaymentChange} className="border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
+                    <input type="number" name="budgetPerMonth" placeholder="Budget/Month (AED)" value={form.paymentDetails?.budgetPerMonth ?? ''} onChange={handlePaymentChange} className="border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
                   </div>
                 )}
 
@@ -456,12 +456,12 @@ export default function RolesStep({ roles, setRoles, jobPaymentInfo, options, on
                   <div className="grid grid-cols-2 gap-4 border-l-2 border-[#3835A4]/20 pl-4">
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-[#3835A4]">Total no of days</label>
-                      <input type="number" name="fullDay" placeholder="Full Day" onChange={handlePaymentChange} className="w-full border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
-                      <input type="number" name="halfDay" placeholder="Half Day" onChange={handlePaymentChange} className="w-full border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
+                      <input type="number" name="fullDay" placeholder="Full Day" value={form.paymentDetails?.fullDay ?? ''} onChange={handlePaymentChange} className="w-full border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
+                      <input type="number" name="halfDay" placeholder="Half Day" value={form.paymentDetails?.halfDay ?? ''} onChange={handlePaymentChange} className="w-full border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
                     </div>
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-[#3835A4]">Talent Total Budget (AED)</label>
-                      <input type="number" name="totalBudget" placeholder="Total Budget" onChange={handlePaymentChange} className="w-full border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
+                      <input type="number" name="totalBudget" placeholder="Total Budget" value={form.paymentDetails?.totalBudget ?? ''} onChange={handlePaymentChange} className="w-full border-b-2 border-[#3835A4]/20 py-2 text-sm bg-transparent outline-none" />
                     </div>
                   </div>
                 )}
@@ -490,7 +490,7 @@ export default function RolesStep({ roles, setRoles, jobPaymentInfo, options, on
           disabled={submitting || roles.length === 0}
           className="bg-[#C6007E] disabled:bg-[#C6007E]/50 disabled:cursor-not-allowed text-white px-10 py-4 rounded-xl font-black uppercase tracking-widest hover:bg-[#a10065] transition-colors"
         >
-          {submitting ? 'Posting...' : 'Finish & Post Job'}
+          {submitting ? 'Saving...' : submitLabel}
         </button>
       </div>
     </div>

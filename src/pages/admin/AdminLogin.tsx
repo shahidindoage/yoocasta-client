@@ -38,49 +38,67 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#fdfbf7] flex items-center justify-center p-4">
-      <div className="bg-white border-2 border-[#3835A4] rounded-[32px] p-8 sm:p-12 shadow-[8px_8px_0px_0px_#C6007E] max-w-md w-full">
-        <div className="space-y-2 mb-8 text-center">
-          <h1 className="text-2xl font-black text-[#3835A4]">Admin Panel</h1>
-          <p className="text-xs text-stone-400">Sign in to manage the platform</p>
+    <div className="w-full min-h-screen bg-neutral-50 text-neutral-900 flex flex-col justify-center items-center p-4 md:p-8 font-sans selection:bg-fuchsia-600 selection:text-white relative overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none opacity-[0.02]">
+        <div className="absolute left-1/4 top-0 w-px h-full bg-black" />
+        <div className="absolute left-3/4 top-0 w-px h-full bg-black" />
+      </div>
+
+      <div className="w-full max-w-md bg-white border border-neutral-200/80 rounded-2xl p-8 md:p-10 shadow-xl shadow-neutral-100/40 relative z-10 space-y-8">
+        <div>
+          <h2 className="text-xl font-black tracking-[0.25em] uppercase text-neutral-950 text-center">
+            Admin Access
+          </h2>
+          <p className="text-xs text-neutral-400 font-light mt-1 text-center">
+            Authorized personnel only
+          </p>
         </div>
 
         {error && (
-          <div className="p-3 rounded-xl bg-red-50 border border-red-100 text-red-600 text-xs font-bold mb-6">
+          <div className="p-3 rounded-xl bg-red-50/60 border border-red-100 text-red-600 text-xs font-semibold flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-black text-stone-400">EMAIL</label>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-1.5 relative group">
+            <label className="text-[10px] font-extrabold text-neutral-400 group-focus-within:text-neutral-950 tracking-widest uppercase transition-colors duration-200">
+              Email
+            </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@example.com"
+              placeholder="admin@yoocasta.com"
               required
-              className="w-full bg-transparent border-b-2 border-[#3835A4]/20 py-3 text-sm outline-none focus:border-[#3835A4]"
+              className="w-full bg-transparent border-b-2 border-neutral-100 focus:border-neutral-950 py-2.5 text-sm text-neutral-900 placeholder-neutral-200 outline-none transition-all duration-200 font-medium"
             />
           </div>
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-black text-stone-400">PASSWORD</label>
+
+          <div className="space-y-1.5 relative group">
+            <label className="text-[10px] font-extrabold text-neutral-400 group-focus-within:text-neutral-950 tracking-widest uppercase transition-colors duration-200">
+              Password
+            </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               required
-              className="w-full bg-transparent border-b-2 border-[#3835A4]/20 py-3 text-sm outline-none focus:border-[#3835A4]"
+              className="w-full bg-transparent border-b-2 border-neutral-100 focus:border-neutral-950 py-2.5 text-sm text-neutral-900 placeholder-neutral-200 outline-none transition-all duration-200 font-medium"
             />
           </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-[#3835A4] text-white text-xs font-black rounded-xl border-2 border-[#3835A4] shadow-[4px_4px_0px_0px_#C6007E] transition-transform active:scale-95 hover:-translate-y-0.5 disabled:opacity-50"
-          >
-            {loading ? 'Signing in...' : 'Sign In'}
-          </button>
+
+          <div className="pt-2">
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-neutral-950 hover:bg-neutral-900 disabled:bg-neutral-100 text-white disabled:text-neutral-400 font-bold text-xs tracking-widest uppercase px-8 py-4 rounded-xl transition-all duration-200 active:scale-[0.99] disabled:pointer-events-none"
+            >
+              {loading ? 'Signing in...' : 'Authenticate'}
+            </button>
+          </div>
         </form>
       </div>
     </div>

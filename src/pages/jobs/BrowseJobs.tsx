@@ -96,10 +96,23 @@ const daysUntil = (dateStr: string) => {
 const truncate = (str: string, len: number) =>
   str && str.length > len ? str.slice(0, len) + '...' : str;
 
+const PAYMENT_TYPE_ALIAS: Record<string, string> = {
+  per_hour: 'per_hour',
+  per_hour_pay: 'per_hour',
+  per_day: 'per_day',
+  per_day_pay: 'per_day',
+  per_week: 'per_week',
+  per_month: 'per_month',
+  per_month_pay: 'per_month',
+  package: 'package',
+  package_pay: 'package',
+};
+
 const formatBudget = (role: any): string | null => {
   if (!role?.payment) return null;
   const p = role.payment;
-  switch (role.paymentType) {
+  const t = PAYMENT_TYPE_ALIAS[role.paymentType] || role.paymentType;
+  switch (t) {
     case 'per_hour': return p.hourBudgetPerHour ? `${p.hourBudgetPerHour} AED / HOUR` : null;
     case 'per_day': {
       if (p.dayBudgetFullDay && p.dayBudgetHalfDay) return `${p.dayBudgetFullDay} AED / DAY (Full) • ${p.dayBudgetHalfDay} AED / HALF DAY`;
