@@ -47,10 +47,10 @@ const AdminLogin = () => {
       <div className="w-full max-w-md bg-white border border-neutral-200/80 rounded-2xl p-8 md:p-10 shadow-xl shadow-neutral-100/40 relative z-10 space-y-8">
         <div>
           <h2 className="text-xl font-black tracking-[0.25em] uppercase text-neutral-950 text-center">
-            Admin Access
+            Admin Login
           </h2>
           <p className="text-xs text-neutral-400 font-light mt-1 text-center">
-            Authorized personnel only
+            Sign in to manage the platform
           </p>
         </div>
 
@@ -96,7 +96,7 @@ const AdminLogin = () => {
               disabled={loading}
               className="w-full bg-neutral-950 hover:bg-neutral-900 disabled:bg-neutral-100 text-white disabled:text-neutral-400 font-bold text-xs tracking-widest uppercase px-8 py-4 rounded-xl transition-all duration-200 active:scale-[0.99] disabled:pointer-events-none"
             >
-              {loading ? 'Signing in...' : 'Authenticate'}
+              {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </div>
         </form>

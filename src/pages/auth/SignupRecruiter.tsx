@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate, Link } from 'react-router-dom';
 import { registerRecruiter } from '../../api/auth.api';
 import { useAuthStore } from '../../store/authStore';
+import { countryCodes } from '../../constants/countryCodes';
 
 const schema = z.object({
   companyName: z.string().min(1, 'Company name is required'),
@@ -12,9 +13,9 @@ const schema = z.object({
   email: z.string().email('Valid email required'),
   password: z.string()
     .min(8, 'Password must be at least 8 characters')
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Must contain uppercase, lowercase and number'),
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Must contain a capital letter, lowercase and number'),
   confirmPassword: z.string(),
-  phone: z.string().optional(),
+  phone: z.string().min(7, 'Phone number is too short').max(15, 'Phone number is too long').regex(/^[\d\s\-().+]+$/, 'Phone number contains invalid characters'),
 }).refine(data => data.password === data.confirmPassword, {
   message: 'Passwords do not match',
   path: ['confirmPassword'],
@@ -27,6 +28,20 @@ const SignupRecruiter = () => {
   const { setAuth } = useAuthStore();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [phoneCode, setPhoneCode] = useState('+1');
+  const [selectedCountry, setSelectedCountry] = useState(countryCodes.find((c) => c.code === '+1') || countryCodes[0]);
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -37,6 +52,7 @@ const SignupRecruiter = () => {
       setLoading(true);
       setError('');
       const { confirmPassword, ...payload } = data;
+      if (payload.phone) payload.phone = `${phoneCode} ${payload.phone}`;
       const res = await registerRecruiter(payload);
       const { user, accessToken, refreshToken } = res.data.data;
       setAuth(user, accessToken, refreshToken);
@@ -63,11 +79,11 @@ const SignupRecruiter = () => {
           
           {/* Section Title */}
           <div>
-            <h2 className="text-sm font-black tracking-[0.25em] uppercase text-neutral-950">
-              Recruiter Initialization
+            <h2 className="text-sm font-black tracking-[0.25em] text-neutral-950">
+              Create Account
             </h2>
             <p className="text-xs text-neutral-400 font-light mt-1">
-              Please populate all modules with valid corporate credentials.
+              Fill in your details to get started
             </p>
           </div>
 
@@ -85,7 +101,7 @@ const SignupRecruiter = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Company Name Input */}
               <div className="space-y-1.5 relative group">
-                <label className="text-[10px] font-extrabold text-neutral-400 group-focus-within:text-neutral-950 tracking-widest uppercase transition-colors duration-200">
+                <label className="text-[10px] font-extrabold text-neutral-400 group-focus-within:text-neutral-950 tracking-widest transition-colors duration-200">
                   Company Name
                 </label>
                 <input
@@ -101,7 +117,7 @@ const SignupRecruiter = () => {
 
               {/* Contact Person Input */}
               <div className="space-y-1.5 relative group">
-                <label className="text-[10px] font-extrabold text-neutral-400 group-focus-within:text-neutral-950 tracking-widest uppercase transition-colors duration-200">
+                <label className="text-[10px] font-extrabold text-neutral-400 group-focus-within:text-neutral-950 tracking-widest transition-colors duration-200">
                   Contact Person
                 </label>
                 <input
@@ -118,8 +134,8 @@ const SignupRecruiter = () => {
 
             {/* Email Input Column */}
             <div className="space-y-1.5 relative group">
-              <label className="text-[10px] font-extrabold text-neutral-400 group-focus-within:text-neutral-950 tracking-widest uppercase transition-colors duration-200">
-                Corporate Email / Identity Node
+              <label className="text-[10px] font-extrabold text-neutral-400 group-focus-within:text-neutral-950 tracking-widest transition-colors duration-200">
+                Email
               </label>
               <input
                 type="email"
@@ -136,7 +152,7 @@ const SignupRecruiter = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Password Input */}
               <div className="space-y-1.5 relative group">
-                <label className="text-[10px] font-extrabold text-neutral-400 group-focus-within:text-neutral-950 tracking-widest uppercase transition-colors duration-200">
+                <label className="text-[10px] font-extrabold text-neutral-400 group-focus-within:text-neutral-950 tracking-widest transition-colors duration-200">
                   Password
                 </label>
                 <input
@@ -152,7 +168,7 @@ const SignupRecruiter = () => {
 
               {/* Confirm Password Input */}
               <div className="space-y-1.5 relative group">
-                <label className="text-[10px] font-extrabold text-neutral-400 group-focus-within:text-neutral-950 tracking-widest uppercase transition-colors duration-200">
+                <label className="text-[10px] font-extrabold text-neutral-400 group-focus-within:text-neutral-950 tracking-widest transition-colors duration-200">
                   Confirm Password
                 </label>
                 <input
@@ -167,17 +183,50 @@ const SignupRecruiter = () => {
               </div>
             </div>
 
-            {/* Optional Contact Field */}
+            {/* Phone with Country Code */}
             <div className="space-y-1.5 relative group">
-              <label className="text-[10px] font-extrabold text-neutral-400 group-focus-within:text-neutral-950 tracking-widest uppercase transition-colors duration-200">
-                Phone Number <span className="text-neutral-300 lowercase font-normal italic">(optional)</span>
+              <label className="text-[10px] font-extrabold text-neutral-400 group-focus-within:text-neutral-950 tracking-widest transition-colors duration-200">
+                Phone Number
               </label>
-              <input
-                type="text"
-                {...register('phone')}
-                placeholder="+1 (555) 000-0000"
-                className="w-full bg-transparent border-b-2 border-neutral-100 focus:border-neutral-950 py-2.5 text-sm text-neutral-900 placeholder-neutral-200 outline-none transition-all duration-200 font-medium"
-              />
+              <div className="flex gap-2">
+                <div className="relative w-36">
+                  <button
+                    type="button"
+                    onClick={() => setOpen(!open)}
+                    className="flex items-center gap-1.5 w-full bg-transparent border-b-2 border-neutral-100 focus:border-neutral-950 py-2.5 text-sm text-neutral-900 outline-none transition-all duration-200 font-medium"
+                  >
+                    {selectedCountry && (
+                      <span>{selectedCountry.flag} {selectedCountry.code}</span>
+                    )}
+                    <span className="ml-auto text-neutral-300 text-xs">▾</span>
+                  </button>
+                  {open && (
+                    <div ref={dropdownRef} className="absolute top-full left-0 mt-1 z-50 bg-white border border-neutral-200 rounded-xl shadow-lg max-h-48 overflow-y-auto w-64">
+                      {countryCodes.map((c) => (
+                        <button
+                          key={c.code + c.name}
+                          type="button"
+                          onClick={() => { setPhoneCode(c.code); setSelectedCountry(c); setOpen(false); }}
+                          className={`flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-neutral-50 transition-colors ${c.code === phoneCode ? 'bg-neutral-50 font-bold' : ''}`}
+                        >
+                          <span>{c.flag}</span>
+                          <span>{c.code}</span>
+                          <span className="text-neutral-500">{c.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <input
+                  type="text"
+                  {...register('phone')}
+                  placeholder="555-000-0000"
+                  className={`flex-1 bg-transparent border-b-2 ${errors.phone ? 'border-red-400 focus:border-red-500' : 'border-neutral-100 focus:border-neutral-950'} py-2.5 text-sm text-neutral-900 placeholder-neutral-200 outline-none transition-all duration-200 font-medium`}
+                />
+              </div>
+              {errors.phone && (
+                <p className="text-xs text-red-500 font-medium pt-1">{errors.phone.message}</p>
+              )}
             </div>
 
             {/* Action Row Submit Structure */}
@@ -186,7 +235,7 @@ const SignupRecruiter = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="bg-neutral-950 hover:bg-neutral-900 disabled:bg-neutral-100 text-white disabled:text-neutral-400 font-bold text-xs tracking-widest uppercase px-8 py-4 rounded-xl transition-all duration-200 active:scale-[0.99] disabled:pointer-events-none group inline-flex items-center gap-3"
+                className="bg-neutral-950 hover:bg-neutral-900 disabled:bg-neutral-100 text-white disabled:text-neutral-400 font-bold text-xs tracking-widest px-8 py-4 rounded-xl transition-all duration-200 active:scale-[0.99] disabled:pointer-events-none group inline-flex items-center gap-3"
               >
                 {loading ? (
                   <>
@@ -194,11 +243,11 @@ const SignupRecruiter = () => {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
-                    Initializing Matrix...
+                    Creating account...
                   </>
                 ) : (
                   <>
-                    Complete Registration 
+                    Create Account
                     <span className="text-purple-500 transition-transform group-hover:translate-x-1 duration-150">→</span>
                   </>
                 )}
@@ -233,20 +282,20 @@ const SignupRecruiter = () => {
           {/* Creative Badge Integration */}
           <div className="inline-flex items-center gap-2 mb-6 bg-white border border-neutral-200 px-3 py-1 rounded-full shadow-sm">
             <span className="w-1.5 h-1.5 rounded-full bg-purple-600 animate-pulse" />
-            <span className="text-[9px] font-black tracking-[0.2em] uppercase text-neutral-800">
+            <span className="text-[9px] font-black tracking-[0.2em] text-neutral-800">
               Recruiter Hub
             </span>
           </div>
           
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter uppercase leading-[0.85] text-neutral-950">
-            ACQUIRE <br />
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter leading-[0.85] text-neutral-950">
+            Join as <br />
             <span className="bg-gradient-to-r from-purple-600 via-indigo-600 to-fuchsia-600 bg-clip-text text-transparent">
-              THE ELITE
+              A Recruiter
             </span>
           </h1>
           
           <p className="text-xs text-neutral-400 font-light mt-4 leading-relaxed">
-            Gain executive access to the global engine of high-tier professionals. Deploy your corporate node to source and command world-class capability.
+            Create your company profile and find top talent worldwide.
           </p>
         </div>
       </div>

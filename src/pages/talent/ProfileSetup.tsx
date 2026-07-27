@@ -39,7 +39,7 @@ const ProfileSetup = () => {
         setExistingProfile(profileRes.data.data);
       })
       .catch((err) => {
-        setError('Failed to populate administrative profile datasets.');
+        setError('Failed to load profile data.');
       });
   }, []);
 
@@ -52,10 +52,10 @@ const ProfileSetup = () => {
     try {
       setLoading(true); setError('');
       await updateBasicInfo(data);
-      showSuccess('Identity parameters saved successfully.');
+      showSuccess('Saved successfully.');
       if (isFirstTime) setActiveTab(2);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to preserve dataset');
+      setError(err.response?.data?.message || 'Failed to save');
     } finally { setLoading(false); }
   };
 
@@ -63,10 +63,10 @@ const ProfileSetup = () => {
     try {
       setLoading(true); setError('');
       await updatePhysicalAttributes(data);
-      showSuccess('Physical composition parameters saved.');
+      showSuccess('Saved successfully.');
       if (isFirstTime) setActiveTab(3);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to preserve dataset');
+      setError(err.response?.data?.message || 'Failed to save');
     } finally { setLoading(false); }
   };
 
@@ -74,10 +74,10 @@ const ProfileSetup = () => {
     try {
       setLoading(true); setError('');
       await updateCategoriesSkills(data);
-      showSuccess('Skill matrix and categories saved.');
+      showSuccess('Saved successfully.');
       if (isFirstTime) setActiveTab(4);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to preserve dataset');
+      setError(err.response?.data?.message || 'Failed to save');
     } finally { setLoading(false); }
   };
 
@@ -85,10 +85,10 @@ const ProfileSetup = () => {
     try {
       setLoading(true); setError('');
       await updateBioDescription(data);
-      showSuccess('Biographical documentation saved.');
+      showSuccess('Saved successfully.');
       if (isFirstTime) setActiveTab(5);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to preserve dataset');
+      setError(err.response?.data?.message || 'Failed to save');
     } finally { setLoading(false); }
   };
 
@@ -97,12 +97,12 @@ const ProfileSetup = () => {
       setLoading(true); setError('');
       await uploadProfilePhoto(file);
       updateUser({ profileCompleted: true });
-      showSuccess('Portrait artifact saved.');
+      showSuccess('Photo saved successfully.');
       const profileRes = await getMyProfile();
       setExistingProfile(profileRes.data.data);
       if (isFirstTime) navigate('/dashboard/talent');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to commit portrait asset');
+      setError(err.response?.data?.message || 'Failed to upload photo');
     } finally { setLoading(false); }
   };
 
@@ -114,21 +114,21 @@ const ProfileSetup = () => {
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
           </svg>
-          <span className="text-xs font-black tracking-[0.2em] uppercase text-[#3835A4]/50">Loading Datasets...</span>
+          <span className="text-xs font-black tracking-[0.2em] text-[#3835A4]/50">Loading...</span>
         </div>
       </div>
     );
   }
 
   const TABS = [
-    { id: 1, label: 'Identity / Basics' },
-    { id: 2, label: 'Physical Specs' },
-    { id: 3, label: 'Skill Matrix' },
-    { id: 4, label: 'Bio Context' },
-    { id: 5, label: 'Portrait Asset' },
+    { id: 1, label: 'Basic Info' },
+    { id: 2, label: 'Physical' },
+    { id: 3, label: 'Skills' },
+    { id: 4, label: 'Bio' },
+    { id: 5, label: 'Photo' },
     ...(!isFirstTime ? [
-      { id: 6, label: '📸 Media Portfolio' },
-      { id: 7, label: '💼 Career & Courses' },
+      { id: 6, label: 'Media Portfolio' },
+      { id: 7, label: 'Career & Courses' },
     ] : []),
   ];
 
@@ -146,18 +146,15 @@ const ProfileSetup = () => {
         {/* Header Block Frame */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 border-b border-[#3835A4]/10 pb-6">
           <div>
-            <span className="text-[9px] font-black tracking-[0.25em] text-[#C6007E] uppercase block mb-1">
-              {isFirstTime ? 'Onboarding Setup' : 'Console Configuration'}
-            </span>
-            <h1 className="text-3xl md:text-4xl font-black tracking-tight uppercase text-[#3835A4]">
-              {isFirstTime ? 'Build Your Presence' : 'Modify Core Profile'}
+            <h1 className="text-3xl md:text-4xl font-black tracking-tight text-[#3835A4]">
+              {isFirstTime ? 'Complete Your Profile' : 'Edit Profile'}
             </h1>
           </div>
 
           {!isFirstTime && (
             <button 
               onClick={() => navigate('/dashboard/talent/profile')}
-              className="group inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#3835A4]/50 hover:text-[#3835A4] transition-colors duration-200 self-start sm:self-auto"
+              className="group inline-flex items-center gap-2 text-xs font-bold tracking-widest text-[#3835A4]/50 hover:text-[#3835A4] transition-colors duration-200 self-start sm:self-auto"
             >
               <span className="transition-transform group-hover:-translate-x-1 duration-150">←</span> 
               Exit Setup
@@ -196,7 +193,7 @@ const ProfileSetup = () => {
                 disabled={isFirstTime && tab.id !== activeTab}
                 onClick={() => !isFirstTime && setActiveTab(tab.id)}
                 className={`
-                  px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider shrink-0 transition-all duration-200 border
+                  px-4 py-2.5 rounded-xl text-[10px] font-black tracking-wider shrink-0 transition-all duration-200 border
                   ${isActive 
                     ? 'bg-[#3835A4] border-[#3835A4] text-white shadow-md shadow-[#3835A4]/20' 
                     : isCompleted

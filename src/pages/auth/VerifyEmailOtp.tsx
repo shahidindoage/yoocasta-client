@@ -53,11 +53,11 @@ const VerifyEmailOtp = () => {
         
         {/* Section Title */}
         <div>
-          <h2 className="text-xl font-black tracking-[0.25em] uppercase text-neutral-950 text-center">
-            Identity Verification
+          <h2 className="text-xl font-black tracking-[0.25em] text-neutral-950 text-center">
+            Verify Email
           </h2>
           <p className="text-xs text-neutral-400 font-light mt-1 text-center">
-            We sent a 6-digit verification code to <strong className="text-neutral-900 font-semibold">{user?.email || 'your email node'}</strong>
+            Enter the 6-digit code sent to <strong className="text-neutral-900 font-semibold">{user?.email || 'your email'}</strong>
           </p>
         </div>
 
@@ -72,7 +72,7 @@ const VerifyEmailOtp = () => {
         {resent && (
           <div className="p-3 rounded-xl bg-emerald-50/60 border border-emerald-100 text-emerald-600 text-xs font-semibold flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0 animate-pulse" />
-            Verification code redeployed successfully.
+            Code sent successfully!
           </div>
         )}
 
@@ -80,8 +80,8 @@ const VerifyEmailOtp = () => {
           
           {/* OTP Input Module */}
           <div className="space-y-1.5 relative group">
-            <label className="text-[10px] font-extrabold text-neutral-400 group-focus-within:text-neutral-950 tracking-widest uppercase transition-colors duration-200">
-              Secure OTP Code
+            <label className="text-[10px] font-extrabold text-neutral-400 group-focus-within:text-neutral-950 tracking-widest transition-colors duration-200">
+              Verification Code
             </label>
             <input
               type="text"
@@ -99,7 +99,7 @@ const VerifyEmailOtp = () => {
             <button
               type="submit"
               disabled={loading || otp.length !== 6}
-              className="bg-neutral-950 hover:bg-neutral-900 disabled:bg-neutral-100 text-white disabled:text-neutral-400 font-bold text-xs tracking-widest uppercase px-8 py-4 rounded-xl transition-all duration-200 active:scale-[0.99] disabled:pointer-events-none group inline-flex items-center gap-3 w-full sm:w-auto justify-center"
+              className="bg-neutral-950 hover:bg-neutral-900 disabled:bg-neutral-100 text-white disabled:text-neutral-400 font-bold text-xs tracking-widest px-8 py-4 rounded-xl transition-all duration-200 active:scale-[0.99] disabled:pointer-events-none group inline-flex items-center gap-3 w-full sm:w-auto justify-center"
             >
               {loading ? (
                 <>
@@ -107,11 +107,11 @@ const VerifyEmailOtp = () => {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  Authorizing...
+                  Verifying...
                 </>
               ) : (
                 <>
-                  Verify Code 
+                  Verify
                   <span className="text-fuchsia-500 transition-transform group-hover:translate-x-1 duration-150">→</span>
                 </>
               )}

@@ -86,17 +86,14 @@ const Step3Categories = ({ options, onSubmit, onBack, loading, existingProfile, 
 
   return (
     <div className="space-y-12">
-      
-      {/* Structural Segment: Category Selection Grid */}
+
       <div className="space-y-6">
-        <h3 className="text-xs font-black tracking-widest text-[#3835A4]/40 uppercase border-b border-[#3835A4]/10 pb-2">
-          01 / Discipline Allocation
+        <h3 className="text-xs font-black tracking-widest text-[#3835A4]/40 border-b border-[#3835A4]/10 pb-2">
+          01 / Categories
         </h3>
-        
+
         <div className="space-y-2">
-          <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40 uppercase block">
-            Select Specializations
-          </label>
+          <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40 block">Select Categories</label>
           <div className="flex flex-wrap gap-2.5">
             {options.categories.map((cat: any) => {
               const isSelected = selectedCategories.includes(cat.id);
@@ -106,7 +103,7 @@ const Step3Categories = ({ options, onSubmit, onBack, loading, existingProfile, 
                   key={cat.id}
                   onClick={() => toggleCategory(cat.id)}
                   className={`
-                    px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 uppercase tracking-wider border
+                    px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 tracking-wider border
                     ${isSelected 
                       ? 'bg-[#3835A4] border-[#3835A4] text-white shadow-md shadow-[#3835A4]/20' 
                       : 'bg-white border-[#3835A4]/10 text-[#3835A4]/50 hover:border-[#3835A4] hover:text-[#3835A4]'
@@ -121,11 +118,10 @@ const Step3Categories = ({ options, onSubmit, onBack, loading, existingProfile, 
         </div>
       </div>
 
-      {/* Structural Segment: Dynamic Attribute Sub-Forms */}
       {selectedCategories.some(id => CATEGORY_ATTRIBUTES[options.categories.find((c: any) => c.id === id)?.name]?.length > 0) && (
         <div className="space-y-6">
-          <h3 className="text-xs font-black tracking-widest text-[#3835A4]/40 uppercase border-b border-[#3835A4]/10 pb-2">
-            02 / Specialization Parameters
+          <h3 className="text-xs font-black tracking-widest text-[#3835A4]/40 border-b border-[#3835A4]/10 pb-2">
+            02 / Details
           </h3>
 
           <div className="space-y-8">
@@ -135,31 +131,28 @@ const Step3Categories = ({ options, onSubmit, onBack, loading, existingProfile, 
               if (fields.length === 0) return null;
 
               return (
-                <div 
-                  key={categoryId} 
-                  className="bg-[#3835A4]/5 border border-[#3835A4]/10 rounded-2xl p-6 space-y-6 relative overflow-hidden"
-                >
+                <div key={categoryId} className="bg-[#3835A4]/5 border border-[#3835A4]/10 rounded-2xl p-6 space-y-6">
                   <div className="flex items-center gap-3">
                     <span className="w-1 h-3 bg-[#C6007E] rounded-full" />
-                    <h4 className="text-xs font-black uppercase tracking-wider text-[#3835A4]">
-                      {category?.name} Specifications
+                    <h4 className="text-xs font-black tracking-wider text-[#3835A4]">
+                      {category?.name}
                     </h4>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {fields.map(field => (
                       <div key={field.key} className="space-y-1.5 group">
-                        <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40 group-focus-within:text-[#3835A4] uppercase transition-colors duration-200">
+                        <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40 group-focus-within:text-[#3835A4] transition-colors duration-200">
                           {field.label}
                         </label>
-                        
+
                         {field.type === 'select' ? (
                           <select
                             value={attributes[categoryId]?.[field.key] || ''}
                             onChange={(e) => handleAttributeChange(categoryId, field.key, e.target.value)}
                             className="w-full bg-transparent border-b-2 border-[#3835A4]/10 focus:border-[#3835A4] py-2 text-sm font-medium text-[#3835A4] outline-none transition-all duration-200 cursor-pointer appearance-none"
                           >
-                            <option value="">Select Option</option>
+                            <option value="">Select...</option>
                             {field.options?.map(opt => (
                               <option key={opt} value={opt.toLowerCase()}>{opt}</option>
                             ))}
@@ -183,14 +176,11 @@ const Step3Categories = ({ options, onSubmit, onBack, loading, existingProfile, 
         </div>
       )}
 
-      {/* Persistent Control Hub Structure */}
       <div className="pt-6 border-t border-[#3835A4]/10 flex items-center justify-between gap-4">
-        <button 
-          type="button" 
-          onClick={onBack}
-          className="group inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#3835A4]/40 hover:text-[#3835A4] transition-colors duration-200 py-3"
+        <button type="button" onClick={onBack}
+          className="group inline-flex items-center gap-2 text-[10px] font-black tracking-widest text-[#3835A4]/40 hover:text-[#3835A4] transition-colors duration-200 py-3"
         >
-          <span className="transition-transform group-hover:-translate-x-1 duration-150">←</span> 
+          <span className="transition-transform group-hover:-translate-x-1 duration-150">←</span>
           Back
         </button>
 
@@ -198,9 +188,9 @@ const Step3Categories = ({ options, onSubmit, onBack, loading, existingProfile, 
           type="button"
           onClick={handleFormSubmit}
           disabled={loading || selectedCategories.length === 0}
-          className="bg-[#3835A4] hover:bg-[#2a2780] disabled:bg-[#3835A4]/20 text-white disabled:text-white/40 font-black text-[10px] tracking-widest uppercase px-10 py-4 rounded-xl transition-all duration-200 active:scale-[0.99] disabled:pointer-events-none inline-flex items-center gap-3 shadow-lg shadow-[#3835A4]/20"
+          className="bg-[#3835A4] hover:bg-[#2a2780] disabled:bg-[#3835A4]/20 text-white disabled:text-white/40 font-black text-[10px] tracking-widest px-10 py-4 rounded-xl transition-all duration-200 active:scale-[0.99] disabled:pointer-events-none inline-flex items-center gap-3 shadow-lg shadow-[#3835A4]/20"
         >
-          {loading ? 'Preserving Fields...' : isFirstTime ? 'Save & Progress →' : 'Commit Changes'}
+          {loading ? 'Saving...' : isFirstTime ? 'Save & Next →' : 'Save'}
         </button>
       </div>
 

@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useAuthStore } from '../../../store/authStore';
 import { FormOptions } from '../ProfileSetup';
@@ -9,6 +10,42 @@ interface Props {
   existingProfile: any;
   isFirstTime: boolean;
 }
+
+const MultiSelect = ({ label, options, selected, onToggle }: { label: string; options: { id: string; name: string }[]; selected: string[]; onToggle: (id: string) => void }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  return (
+    <div className="relative" ref={ref}>
+      <button type="button" onClick={() => setOpen(!open)}
+        className="flex items-center gap-2 w-full bg-transparent border-b-2 border-[#3835A4]/10 focus:border-[#3835A4] py-2.5 text-sm text-[#3835A4] outline-none transition-all duration-200"
+      >
+        <span className="flex-1 text-left truncate">
+          {selected.length === 0 ? label : `${selected.length} selected`}
+        </span>
+        <span className="text-[#3835A4]/30 text-xs">▾</span>
+      </button>
+      {open && (
+        <div className="absolute top-full left-0 mt-1 z-50 bg-white border border-[#3835A4]/10 rounded-xl shadow-lg max-h-48 overflow-y-auto w-full">
+          {options.map((opt) => (
+            <label key={opt.id} className="flex items-center gap-2 px-3 py-2 text-xs text-[#3835A4] hover:bg-[#3835A4]/5 cursor-pointer transition-colors">
+              <input type="checkbox" checked={selected.includes(opt.id)} onChange={() => onToggle(opt.id)} className="accent-[#3835A4]" />
+              {opt.name}
+            </label>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const Step1BasicInfo = ({ options, onSubmit, loading, existingProfile, isFirstTime }: Props) => {
   const { user } = useAuthStore();
@@ -53,59 +90,70 @@ const Step1BasicInfo = ({ options, onSubmit, loading, existingProfile, isFirstTi
     setValue(fieldName, updated);
   };
 
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({ '01': true });
+
+  const toggleSection = (id: string) => {
+    setOpenSections(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const AccordionSection = ({ id, label, children }: { id: string; label: string; children: React.ReactNode }) => {
+    const isOpen = openSections[id];
+    return (
+      <div className="border border-[#3835A4]/10 rounded-xl">
+        <button type="button" onClick={() => toggleSection(id)}
+          className="flex items-center justify-between w-full px-4 py-3 bg-[#3835A4]/5 hover:bg-[#3835A4]/10 transition-colors text-left"
+        >
+          <span className="text-xs font-black tracking-widest text-[#3835A4]/40">{label}</span>
+          <span className={`text-[#3835A4]/30 text-sm transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>▾</span>
+        </button>
+        {isOpen && <div className="p-4 space-y-6">{children}</div>}
+      </div>
+    );
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-12">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       
-      {/* Structural Segment: Core Account Data */}
-      <div className="space-y-6">
-        <h3 className="text-xs font-black tracking-widest text-[#3835A4]/40 uppercase border-b border-[#3835A4]/10 pb-2">
-          01 / Identity Parameters
-        </h3>
-        
+      <AccordionSection id="01" label="01 / Basic Info">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="space-y-1.5 opacity-60">
-            <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40 uppercase">First Name</label>
+            <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40">First Name</label>
             <input value={user?.firstName || ''} disabled className="w-full bg-[#3835A4]/5 border-b-2 border-[#3835A4]/10 py-2.5 text-sm font-medium text-[#3835A4]/50 cursor-not-allowed outline-none" />
           </div>
 
           <div className="space-y-1.5 group">
-            <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40 group-focus-within:text-[#3835A4] uppercase transition-colors duration-200">Middle Name</label>
+            <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40 group-focus-within:text-[#3835A4] transition-colors duration-200">Middle Name</label>
             <input type="text" {...register('middleName')} placeholder="Optional" className="w-full bg-transparent border-b-2 border-[#3835A4]/10 focus:border-[#3835A4] py-2.5 text-sm font-medium text-[#3835A4] placeholder-[#3835A4]/20 outline-none transition-all duration-200" />
           </div>
 
           <div className="space-y-1.5 opacity-60">
-            <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40 uppercase">Last Name</label>
+            <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40">Last Name</label>
             <input value={user?.lastName || ''} disabled className="w-full bg-[#3835A4]/5 border-b-2 border-[#3835A4]/10 py-2.5 text-sm font-medium text-[#3835A4]/50 cursor-not-allowed outline-none" />
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="space-y-1.5 opacity-60">
-            <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40 uppercase">Primary Email Node</label>
+            <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40">Email</label>
             <input value={user?.email || ''} disabled className="w-full bg-[#3835A4]/5 border-b-2 border-[#3835A4]/10 py-2.5 text-sm font-medium text-[#3835A4]/50 cursor-not-allowed outline-none" />
           </div>
 
           <div className="space-y-1.5 opacity-60">
-            <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40 uppercase">Phone Link</label>
+            <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40">Phone</label>
             <input value={user?.phone || 'Not Configured'} disabled className="w-full bg-[#3835A4]/5 border-b-2 border-[#3835A4]/10 py-2.5 text-sm font-medium text-[#3835A4]/50 cursor-not-allowed outline-none" />
           </div>
 
           <div className="space-y-1.5 group">
-            <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40 group-focus-within:text-[#3835A4] uppercase transition-colors duration-200">WhatsApp Destination</label>
+            <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40 group-focus-within:text-[#3835A4] transition-colors duration-200">WhatsApp</label>
             <input type="text" {...register('whatsappNo')} placeholder="+971 00 000 0000" className="w-full bg-transparent border-b-2 border-[#3835A4]/10 focus:border-[#3835A4] py-2.5 text-sm font-medium text-[#3835A4] placeholder-[#3835A4]/20 outline-none transition-all duration-200" />
           </div>
         </div>
-      </div>
+      </AccordionSection>
 
-      {/* Structural Segment: Profile Metrics */}
-      <div className="space-y-6">
-        <h3 className="text-xs font-black tracking-widest text-[#3835A4]/40 uppercase border-b border-[#3835A4]/10 pb-2">
-          02 / Physical Metrics & Lineage
-        </h3>
-
+      <AccordionSection id="02" label="02 / Physical">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="space-y-1.5 group">
-            <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40 group-focus-within:text-[#3835A4] uppercase transition-colors duration-200">Date of Birth</label>
+            <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40 group-focus-within:text-[#3835A4] transition-colors duration-200">Date of Birth</label>
             <input
               type="date"
               {...register('dob')}
@@ -118,14 +166,14 @@ const Step1BasicInfo = ({ options, onSubmit, loading, existingProfile, isFirstTi
           </div>
 
           <div className="space-y-1.5 opacity-60">
-            <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40 uppercase">Calculated Age</label>
+            <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40">Age</label>
             <input value={dob ? calculateAge(dob) : '—'} disabled className="w-full bg-[#3835A4]/5 border-b-2 border-[#3835A4]/10 py-2.5 text-sm font-bold text-[#3835A4] cursor-not-allowed outline-none" />
           </div>
 
           <div className="space-y-1.5 group">
-            <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40 group-focus-within:text-[#3835A4] uppercase transition-colors duration-200">Gender Expression</label>
-            <select {...register('gender', { required: 'Gender specification required' })} className="w-full bg-transparent border-b-2 border-[#3835A4]/10 focus:border-[#3835A4] py-2.5 text-sm font-medium text-[#3835A4] outline-none transition-all duration-200 cursor-pointer appearance-none">
-              <option value="">Select Option</option>
+            <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40 group-focus-within:text-[#3835A4] transition-colors duration-200">Gender</label>
+            <select {...register('gender', { required: 'Gender is required' })} className="w-full bg-transparent border-b-2 border-[#3835A4]/10 focus:border-[#3835A4] py-2.5 text-sm font-medium text-[#3835A4] outline-none transition-all duration-200 cursor-pointer appearance-none">
+              <option value="">Select...</option>
               <option value="male">Male</option>
               <option value="female">Female</option>
               <option value="other">Other</option>
@@ -134,87 +182,59 @@ const Step1BasicInfo = ({ options, onSubmit, loading, existingProfile, isFirstTi
           </div>
 
           <div className="space-y-1.5 group">
-            <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40 group-focus-within:text-[#3835A4] uppercase transition-colors duration-200">Ethnicity Matrix</label>
+            <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40 group-focus-within:text-[#3835A4] transition-colors duration-200">Ethnicity</label>
             <select {...register('ethnicityId')} className="w-full bg-transparent border-b-2 border-[#3835A4]/10 focus:border-[#3835A4] py-2.5 text-sm font-medium text-[#3835A4] outline-none transition-all duration-200 cursor-pointer appearance-none">
-              <option value="">Select Ethnicity</option>
+              <option value="">Select...</option>
               {options.ethnicities.map((e: any) => (
                 <option key={e.id} value={e.id}>{e.name}</option>
               ))}
             </select>
           </div>
         </div>
-      </div>
+      </AccordionSection>
 
-      {/* Structural Segment: Linguistic Competencies */}
-      <div className="space-y-6">
-        <h3 className="text-xs font-black tracking-widest text-[#3835A4]/40 uppercase border-b border-[#3835A4]/10 pb-2">
-          03 / Linguistic Grid
-        </h3>
-
+      <AccordionSection id="03" label="03 / Languages">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-3">
-            <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40 uppercase block">Languages Fluent</label>
+            <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40 block">Languages</label>
             <Controller
               name="languageIds"
               control={control}
               render={({ field }) => (
-                <div className="flex flex-wrap gap-2 max-h-[160px] overflow-y-auto p-3 bg-[#3835A4]/5 border border-[#3835A4]/10 rounded-xl">
-                  {options.languages.map((l: any) => {
-                    const isSelected = field.value?.includes(l.id);
-                    return (
-                      <button
-                        type="button"
-                        key={l.id}
-                        onClick={() => handleToggle(l.id, field.value || [], 'languageIds')}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-150 uppercase tracking-wider ${isSelected ? 'bg-[#3835A4] text-white shadow-sm' : 'bg-white border border-[#3835A4]/10 text-[#3835A4]/50 hover:border-[#3835A4]'}`}
-                      >
-                        {l.name}
-                      </button>
-                    );
-                  })}
-                </div>
+                <MultiSelect
+                  label="Select languages..."
+                  options={options.languages}
+                  selected={field.value || []}
+                  onToggle={(id) => handleToggle(id, field.value || [], 'languageIds')}
+                />
               )}
             />
           </div>
 
           <div className="space-y-3">
-            <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40 uppercase block">Dialects Dialled</label>
+            <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40 block">Dialects</label>
             <Controller
               name="dialectIds"
               control={control}
               render={({ field }) => (
-                <div className="flex flex-wrap gap-2 max-h-[160px] overflow-y-auto p-3 bg-[#3835A4]/5 border border-[#3835A4]/10 rounded-xl">
-                  {options.dialects.map((d: any) => {
-                    const isSelected = field.value?.includes(d.id);
-                    return (
-                      <button
-                        type="button"
-                        key={d.id}
-                        onClick={() => handleToggle(d.id, field.value || [], 'dialectIds')}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-150 uppercase tracking-wider ${isSelected ? 'bg-[#3835A4] text-white shadow-sm' : 'bg-white border border-[#3835A4]/10 text-[#3835A4]/50 hover:border-[#3835A4]'}`}
-                      >
-                        {d.name}
-                      </button>
-                    );
-                  })}
-                </div>
+                <MultiSelect
+                  label="Select dialects..."
+                  options={options.dialects}
+                  selected={field.value || []}
+                  onToggle={(id) => handleToggle(id, field.value || [], 'dialectIds')}
+                />
               )}
             />
           </div>
         </div>
-      </div>
+      </AccordionSection>
 
-      {/* Structural Segment: Localization and Geography */}
-      <div className="space-y-6">
-        <h3 className="text-xs font-black tracking-widest text-[#3835A4]/40 uppercase border-b border-[#3835A4]/10 pb-2">
-          04 / Localization Parameters
-        </h3>
-
+      <AccordionSection id="04" label="04 / Location">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="space-y-1.5 group">
-            <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40 group-focus-within:text-[#3835A4] uppercase transition-colors duration-200">Passport Sovereignty</label>
+            <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40 group-focus-within:text-[#3835A4] transition-colors duration-200">Nationality</label>
             <select {...register('nationalityId')} className="w-full bg-transparent border-b-2 border-[#3835A4]/10 focus:border-[#3835A4] py-2.5 text-sm font-medium text-[#3835A4] outline-none transition-all duration-200 cursor-pointer appearance-none">
-              <option value="">Select Passport Nationality</option>
+              <option value="">Select...</option>
               {options.nationalities.map((n: any) => (
                 <option key={n.id} value={n.id}>{n.name}</option>
               ))}
@@ -222,7 +242,7 @@ const Step1BasicInfo = ({ options, onSubmit, loading, existingProfile, isFirstTi
           </div>
 
           <div className="space-y-1.5 group">
-            <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40 group-focus-within:text-[#3835A4] uppercase transition-colors duration-200">Country of Residence</label>
+            <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40 group-focus-within:text-[#3835A4] transition-colors duration-200">Country</label>
             <select 
               {...register('countryId')} 
               onChange={(e) => {
@@ -239,7 +259,7 @@ const Step1BasicInfo = ({ options, onSubmit, loading, existingProfile, isFirstTi
           </div>
 
           <div className="space-y-1.5 group">
-            <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40 group-focus-within:text-[#3835A4] uppercase transition-colors duration-200">Base Hub City</label>
+            <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40 group-focus-within:text-[#3835A4] transition-colors duration-200">City</label>
             <select {...register('cityId')} className="w-full bg-transparent border-b-2 border-[#3835A4]/10 focus:border-[#3835A4] py-2.5 text-sm font-medium text-[#3835A4] outline-none transition-all duration-200 cursor-pointer appearance-none">
               <option value="">Select City</option>
               {filteredCities.map((c: any) => (
@@ -250,19 +270,18 @@ const Step1BasicInfo = ({ options, onSubmit, loading, existingProfile, isFirstTi
         </div>
 
         <div className="space-y-1.5 group">
-          <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40 group-focus-within:text-[#3835A4] uppercase transition-colors duration-200">Physical Address Data</label>
-          <textarea {...register('address')} rows={2} placeholder="Street, Building, Suite Coordinates..." className="w-full bg-transparent border-b-2 border-[#3835A4]/10 focus:border-[#3835A4] py-2.5 text-sm font-medium text-[#3835A4] placeholder-[#3835A4]/20 outline-none transition-all duration-200 resize-none" />
+          <label className="text-[10px] font-extrabold tracking-widest text-[#3835A4]/40 group-focus-within:text-[#3835A4] transition-colors duration-200">Address</label>
+          <textarea {...register('address')} rows={2} placeholder="Street, building, suite..." className="w-full bg-transparent border-b-2 border-[#3835A4]/10 focus:border-[#3835A4] py-2.5 text-sm font-medium text-[#3835A4] placeholder-[#3835A4]/20 outline-none transition-all duration-200 resize-none" />
         </div>
-      </div>
+      </AccordionSection>
 
-      {/* Persistent Operations Submission Frame */}
-      <div className="pt-6 border-t border-[#3835A4]/10 flex items-center justify-end">
+      <div className="pt-4 flex items-center justify-end">
         <button
           type="submit"
           disabled={loading}
-          className="bg-[#3835A4] hover:bg-[#2a2780] disabled:bg-[#3835A4]/20 text-white disabled:text-white/40 font-black text-[10px] tracking-widest uppercase px-10 py-4 rounded-xl transition-all duration-200 active:scale-[0.99] disabled:pointer-events-none inline-flex items-center gap-3 shadow-lg shadow-[#3835A4]/20"
+          className="bg-[#3835A4] hover:bg-[#2a2780] disabled:bg-[#3835A4]/20 text-white disabled:text-white/40 font-black text-[10px] tracking-widest px-10 py-4 rounded-xl transition-all duration-200 active:scale-[0.99] disabled:pointer-events-none inline-flex items-center gap-3 shadow-lg shadow-[#3835A4]/20"
         >
-          {loading ? 'Saving Data...' : isFirstTime ? 'Save & Progress →' : 'Commit Changes'}
+          {loading ? 'Saving...' : isFirstTime ? 'Save & Next →' : 'Save'}
         </button>
       </div>
 

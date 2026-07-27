@@ -7,6 +7,12 @@ interface Company {
   id: string;
   name: string;
   companyName: string;
+  profileCompleted: boolean;
+  companyType: string | null;
+  website: string | null;
+  description: string | null;
+  tradeLicense: string | null;
+  tradeLicenseFile: string | null;
   isVerified: boolean;
   status: string;
   country: string;
@@ -190,7 +196,16 @@ const ManageCompanies = () => {
                 companies.map((c) => (
                   <tr key={c.id} className="border-b border-stone-100 hover:bg-stone-50">
                     <td className="px-4 py-3 text-stone-400 border-r border-stone-100">{c.slNo}</td>
-                    <td className="px-4 py-3 font-medium text-stone-800 border-r border-stone-100">{c.name}</td>
+                    <td className="px-4 py-3 font-medium text-stone-800 border-r border-stone-100">
+                      <span className="flex items-center gap-2">
+                        {c.name}
+                        {c.profileCompleted ? (
+                          <span className="text-green-500 text-xs" title="Profile complete">✓</span>
+                        ) : (
+                          <span className="text-red-400 text-xs" title="Profile incomplete">✕</span>
+                        )}
+                      </span>
+                    </td>
                     <td className="px-4 py-3 text-stone-500 border-r border-stone-100">{c.companyName}</td>
                     <td className="px-4 py-3 border-r border-stone-100 text-center">
                       <div className="flex items-center justify-center gap-2">
@@ -258,16 +273,25 @@ const ManageCompanies = () => {
                 ✕
               </button>
             </div>
-            <div className="p-4 space-y-3 text-sm">
+            <div className="p-4 space-y-3 text-sm max-h-[70vh] overflow-y-auto">
               {[
                 { label: 'Country', value: contactPopup.country },
                 { label: 'City', value: contactPopup.city },
                 { label: 'Email', value: contactPopup.email },
                 { label: 'Phone', value: contactPopup.phone },
-              ].map((item) => (
+                { label: 'Company Type', value: contactPopup.companyType },
+                { label: 'Website', value: contactPopup.website },
+                { label: 'Description', value: contactPopup.description },
+                { label: 'License No', value: contactPopup.tradeLicense },
+                { label: 'License File', value: contactPopup.tradeLicenseFile, isLink: true },
+              ].map((item: any) => (
                 <div key={item.label} className="flex items-center gap-3">
                   <span className="text-[10px] font-bold text-stone-400 uppercase w-20 shrink-0">{item.label}</span>
-                  <span className="font-medium text-stone-700 break-all">{item.value || '—'}</span>
+                  {item.isLink && item.value ? (
+                    <a href={item.value} target="_blank" rel="noreferrer" className="font-medium text-[#3835A4] underline break-all">View License ↗</a>
+                  ) : (
+                    <span className="font-medium text-stone-700 break-all">{item.value || '—'}</span>
+                  )}
                 </div>
               ))}
             </div>

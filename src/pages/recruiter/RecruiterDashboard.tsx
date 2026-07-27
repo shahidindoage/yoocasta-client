@@ -66,17 +66,56 @@ const RecruiterDashboard = () => {
       </div>
 
       {/* Critical Core Status Warning Messages */}
-            {/* Critical Core Status Warning Messages */}
       <div className="space-y-4">
+        {/* Email NOT Verified Banner */}
+        {!user?.isEmailVerified && (
+          <div className="bg-amber-50/60 border border-amber-200 rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 animate-fadeIn">
+            <div className="space-y-1">
+              <div className="text-[10px] font-black tracking-widest text-amber-700 flex items-center gap-2">
+                <span>✉️</span> Email Not Verified
+              </div>
+              <p className="text-xs font-medium text-amber-700/80 max-w-2xl">
+                Please verify your email address to access all features.
+              </p>
+            </div>
+            <Link
+              to="/verify-email-otp"
+              className="md:self-center border border-amber-300 bg-amber-100 text-amber-800 font-black text-[10px] tracking-widest px-5 py-3 rounded-xl whitespace-nowrap hover:bg-amber-200 transition-colors"
+            >
+              Verify Email →
+            </Link>
+          </div>
+        )}
+
+        {/* Profile NOT Completed Banner */}
+        {!user?.profileCompleted && (
+          <div className="bg-blue-50/60 border border-blue-200 rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 animate-fadeIn">
+            <div className="space-y-1">
+              <div className="text-[10px] font-black tracking-widest text-blue-700 flex items-center gap-2">
+                <span>📋</span> Profile Not Complete
+              </div>
+              <p className="text-xs font-medium text-blue-700/80 max-w-2xl">
+                Complete your company profile to start posting jobs and connecting with talents.
+              </p>
+            </div>
+            <Link
+              to="/dashboard/recruiter/profile-setup"
+              className="md:self-center border border-blue-300 bg-blue-100 text-blue-800 font-black text-[10px] tracking-widest px-5 py-3 rounded-xl whitespace-nowrap hover:bg-blue-200 transition-colors"
+            >
+              Complete Profile →
+            </Link>
+          </div>
+        )}
+
         {/* Profile NOT Verified by Admin Banner */}
-        {!user?.isVerified && (
+        {user?.isEmailVerified && user?.profileCompleted && !user?.isVerified && (
           <div className="bg-amber-50/60 border border-amber-200 rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 animate-fadeIn">
             <div className="space-y-1">
               <div className="text-[10px] font-black tracking-widest text-amber-700 uppercase flex items-center gap-2">
-                <span>⏳</span> Profile Authorization Pending
+                <span>⏳</span> Account Under Review
               </div>
               <p className="text-xs font-medium text-amber-700/80 max-w-2xl">
-                Your corporate identity is currently under review by the system administration team. Certain features, such as posting jobs, will be restricted until authorization is complete.
+                Your account is being reviewed by the admin team. Some features, like posting jobs, will be available once approved.
               </p>
             </div>
             <div className="md:self-center border border-amber-300 bg-amber-100 text-amber-800 font-black text-[10px] tracking-widest uppercase px-5 py-3 rounded-xl whitespace-nowrap">

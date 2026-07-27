@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import RecruiterGuard from '../../auth/RecruiterGuard';
 import { getSentInvitations } from '../../api/invitations.api';
 
 export default function SentInvitations() {
@@ -14,6 +15,7 @@ export default function SentInvitations() {
   }, []);
 
   return (
+    <RecruiterGuard>
     <div style={{ background: '#f4f4f6', minHeight: '100vh', fontFamily: 'system-ui, sans-serif', padding: '40px' }}>
       <h2 style={{ fontSize: '24px', fontWeight: 900, color: '#111', marginBottom: '24px' }}>Sent Invitations</h2>
 
@@ -25,9 +27,9 @@ export default function SentInvitations() {
         <table style={{ width: '100%', borderCollapse: 'collapse', background: '#fff', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
           <thead>
             <tr style={{ background: '#f9f9fb', borderBottom: '1px solid #eee' }}>
-              <th style={{ padding: '16px 20px', textAlign: 'left', fontSize: '12px', fontWeight: 800, color: '#888', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Job Title</th>
-              <th style={{ padding: '16px 20px', textAlign: 'center', fontSize: '12px', fontWeight: 800, color: '#888', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Roles</th>
-              <th style={{ padding: '16px 20px', textAlign: 'center', fontSize: '12px', fontWeight: 800, color: '#888', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Invitations Sent</th>
+              <th style={{ padding: '16px 20px', textAlign: 'left', fontSize: '12px', fontWeight: 800, color: '#888' }}>Job Title</th>
+              <th style={{ padding: '16px 20px', textAlign: 'center', fontSize: '12px', fontWeight: 800, color: '#888' }}>Roles</th>
+              <th style={{ padding: '16px 20px', textAlign: 'center', fontSize: '12px', fontWeight: 800, color: '#888' }}>Invitations Sent</th>
             </tr>
           </thead>
           <tbody>
@@ -49,5 +51,6 @@ export default function SentInvitations() {
         </table>
       )}
     </div>
+    </RecruiterGuard>
   );
 }

@@ -91,7 +91,7 @@ const MySubscriptionPlan = () => {
             </div>
           ) : (
             <button
-              onClick={() => alert('Payment integration coming soon.')}
+              onClick={() => navigate('/subscription-plans')}
               className="bg-[#3835A4] text-white text-[10px] font-black tracking-widest uppercase px-5 py-3 rounded-xl hover:bg-[#2a2780] transition-colors whitespace-nowrap"
             >
               Upgrade Plan
@@ -124,7 +124,7 @@ const MySubscriptionPlan = () => {
             </p>
           </div>
           <button
-            onClick={() => alert('Payment integration coming soon.')}
+            onClick={() => navigate('/subscription-plans')}
             className="bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white text-xs font-black tracking-widest uppercase px-8 py-4 rounded-xl hover:opacity-90 transition-opacity shadow-lg shadow-[#C6007E]/20"
           >
             Upgrade to Premium

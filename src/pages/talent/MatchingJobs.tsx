@@ -175,7 +175,12 @@ const MatchingJobs = () => {
       }
 
       setDraftFilters(auto);
-      setAppliedFilters(auto);
+      setAppliedFilters({
+        status: auto.status,
+        sort: auto.sort,
+        ...(auto.gender ? { gender: auto.gender } : {}),
+        ...(auto.ageTo ? { ageTo: auto.ageTo } : {}),
+      });
       setProfileReady(true);
     }).catch(() => {
       setProfileReady(true);

@@ -57,10 +57,10 @@ const Login = () => {
         {/* Section Title */}
         <div>
           <h2 className="text-xl font-black tracking-[0.25em] uppercase text-neutral-950 text-center">
-            Console Authentication
+            Sign In
           </h2>
           <p className="text-xs text-neutral-400 font-light mt-1 text-center">
-            Please populate your access credentials below.
+            Sign in to your account
           </p>
         </div>
 
@@ -77,7 +77,7 @@ const Login = () => {
           {/* Email Input Column */}
           <div className="space-y-1.5 relative group">
             <label className="text-[10px] font-extrabold text-neutral-400 group-focus-within:text-neutral-950 tracking-widest uppercase transition-colors duration-200">
-              Email Address
+              Email
             </label>
             <input
               type="email"
@@ -128,11 +128,11 @@ const Login = () => {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  Verifying Credentials...
+                  Signing In...
                 </>
               ) : (
                 <>
-                  Authenticate Console 
+                  Sign In
                   <span className="text-fuchsia-500 transition-transform group-hover:translate-x-1 duration-150">→</span>
                 </>
               )}
@@ -140,7 +140,7 @@ const Login = () => {
 
             {/* Account Switcher Footer pills */}
             <div className="flex flex-col items-start sm:items-end gap-1 shrink-0">
-              <span className="text-neutral-400 text-xs font-light">Don't have an account yet?</span>
+              <span className="text-neutral-400 text-xs font-light">No account yet?</span>
               <div className="flex items-center gap-2 mt-1">
                 <Link 
                   to="/signup/talent" 

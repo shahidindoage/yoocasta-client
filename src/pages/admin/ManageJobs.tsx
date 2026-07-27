@@ -31,7 +31,6 @@ const ManageJobs = () => {
 
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const [dropdownPos, setDropdownPos] = useState<{ top: number; left: number } | null>(null);
-  const [pendingStatus, setPendingStatus] = useState<'APPROVED' | 'PENDING' | 'REJECTED'>('APPROVED');
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -63,17 +62,14 @@ const ManageJobs = () => {
     if (left + dropdownWidth > window.innerWidth) left = window.innerWidth - dropdownWidth - 8;
     setDropdownPos({ top: rect.bottom + 4, left });
     setOpenDropdownId(j.id);
-    if (j.status === 'active') setPendingStatus('PENDING');
-    else if (j.status === 'rejected') setPendingStatus('APPROVED');
-    else setPendingStatus('APPROVED');
   };
 
-  const handleConfirmStatus = async (jobId: string) => {
+  const handleConfirmStatus = async (jobId: string, newStatus: 'APPROVED' | 'PENDING' | 'REJECTED') => {
     try {
-      const res = await updateAdminJobStatus(jobId, pendingStatus);
-      const { id, status: newStatus } = res.data.data;
+      const res = await updateAdminJobStatus(jobId, newStatus);
+      const { id, status: newStatusStr } = res.data.data;
       setJobs((prev) =>
-        prev.map((j) => (j.id === id ? { ...j, status: newStatus } : j)),
+        prev.map((j) => (j.id === id ? { ...j, status: newStatusStr } : j)),
       );
       setOpenDropdownId(null);
       setDropdownPos(null);
@@ -391,19 +387,19 @@ const ManageJobs = () => {
             >
               <div className="flex flex-col gap-1">
                 <button
-                  onClick={() => { setPendingStatus('APPROVED'); handleConfirmStatus(openDropdownId!); }}
+                  onClick={() => handleConfirmStatus(openDropdownId!, 'APPROVED')}
                   className="text-xs font-bold text-green-600 hover:bg-green-50 px-3 py-1.5 rounded-lg text-left cursor-pointer transition-colors"
                 >
                   Active
                 </button>
                 <button
-                  onClick={() => { setPendingStatus('PENDING'); handleConfirmStatus(openDropdownId!); }}
+                  onClick={() => handleConfirmStatus(openDropdownId!, 'PENDING')}
                   className="text-xs font-bold text-orange-500 hover:bg-orange-50 px-3 py-1.5 rounded-lg text-left cursor-pointer transition-colors"
                 >
                   Inactive
                 </button>
                 <button
-                  onClick={() => { setPendingStatus('REJECTED'); handleConfirmStatus(openDropdownId!); }}
+                  onClick={() => handleConfirmStatus(openDropdownId!, 'REJECTED')}
                   className="text-xs font-bold text-red-500 hover:bg-red-50 px-3 py-1.5 rounded-lg text-left cursor-pointer transition-colors"
                 >
                   Rejected

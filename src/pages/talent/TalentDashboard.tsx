@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { User, Briefcase, FileText, Image, Mail, Target, CreditCard, Lock, LogOut } from 'lucide-react';
+import { User, Briefcase, FileText, Mail, Target, CreditCard, Lock, LogOut } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { getMyProfile } from '../../api/profile.api';
 
@@ -133,7 +133,7 @@ const TalentDashboard = () => {
         
         {currentPlan === 'Basic' && (
           <button 
-            onClick={() => alert('Payment integration coming soon.')} 
+            onClick={() => navigate('/subscription-plans')} 
             className="border border-[#3835A4] bg-[#3835A4] hover:bg-[#2a2780] text-white font-black text-[10px] tracking-widest uppercase px-5 py-3.5 rounded-xl transition-all duration-150"
           >
             Upgrade Plan
@@ -146,9 +146,8 @@ const TalentDashboard = () => {
         
         {[
           { to: "/dashboard/talent/profile", icon: User, title: "My Profile", desc: "View and edit your personal information.", action: "Edit Profile →" },
-          { to: "/dashboard/talent/jobs", icon: Briefcase, title: "Browse Jobs", desc: "Find and apply to job postings.", action: "Browse Jobs →" },
+          { to: "/browse-jobs", icon: Briefcase, title: "Browse Jobs", desc: "Find and apply to job postings.", action: "Browse Jobs →" },
           { to: "/dashboard/talent/applications", icon: FileText, title: "Applications", desc: "Track your job applications and status.", action: "View Applications →" },
-          { to: "/dashboard/talent/portfolio", icon: Image, title: "Portfolio", desc: "Manage your photos and media assets.", action: "Manage Portfolio →" },
           { to: "/dashboard/talent/my-invitations", icon: Mail, title: "My Invitations", desc: "View jobs you've been invited to.", action: "View Invitations →" },
           { to: "/dashboard/talent/matching-jobs", icon: Target, title: "Matching Jobs", desc: "Jobs matched to your profile.", action: "View Matches →" },
           { to: "/dashboard/talent/subscription", icon: CreditCard, title: "My Subscription", desc: "View your plan details and usage limits.", action: "View Plan →" },

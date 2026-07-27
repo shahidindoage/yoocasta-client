@@ -134,7 +134,7 @@ export default function Header({
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 hover:text-[#C6007E] transition-colors"
                         onClick={() => setIsProfileDropdownOpen(false)}
                       >
-                        Talent Dashboard
+                         Dashboard
                       </Link>
                       <Link
                         to="/dashboard/talent/profile"
@@ -143,16 +143,46 @@ export default function Header({
                       >
                         Profile
                       </Link>
+                      <Link
+                        to="/forgot-password"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 hover:text-[#C6007E] transition-colors"
+                        onClick={() => setIsProfileDropdownOpen(false)}
+                      >
+                        Reset Password
+                      </Link>
                     </>
                   )}
                   {user?.role === 'RECRUITER' && (
-                    <Link
-                      to="/dashboard/recruiter"
-                      className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 hover:text-[#C6007E] transition-colors"
-                      onClick={() => setIsProfileDropdownOpen(false)}
-                    >
-                      Recruiter Dashboard
-                    </Link>
+                    <>
+                      <Link
+                        to="/dashboard/recruiter"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 hover:text-[#C6007E] transition-colors"
+                        onClick={() => setIsProfileDropdownOpen(false)}
+                      >
+                         Dashboard
+                      </Link>
+                      <Link
+                        to="/dashboard/recruiter/jobs"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 hover:text-[#C6007E] transition-colors"
+                        onClick={() => setIsProfileDropdownOpen(false)}
+                      >
+                        Manage Jobs
+                      </Link>
+                      <Link
+                        to="/dashboard/recruiter/post-job"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 hover:text-[#C6007E] transition-colors"
+                        onClick={() => setIsProfileDropdownOpen(false)}
+                      >
+                        Post New Job
+                      </Link>
+                      <Link
+                        to="/forgot-password"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 hover:text-[#C6007E] transition-colors"
+                        onClick={() => setIsProfileDropdownOpen(false)}
+                      >
+                        Reset Password
+                      </Link>
+                    </>
                   )}
                   <button
                     onClick={handleLogout}
@@ -262,7 +292,7 @@ export default function Header({
                     onClick={toggleMenu}
                     className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-white py-4 text-sm font-bold text-[#3835a4] hover:bg-neutral-50 transition-all"
                   >
-                    Talent Dashboard
+                     Dashboard
                   </Link>
                   <Link
                     to="/dashboard/talent/profile"
@@ -271,16 +301,46 @@ export default function Header({
                   >
                     Profile
                   </Link>
+                  <Link
+                    to="/forgot-password"
+                    onClick={toggleMenu}
+                    className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-white py-4 text-sm font-bold text-[#3835a4] hover:bg-neutral-50 transition-all"
+                  >
+                    Reset Password
+                  </Link>
                 </>
               )}
               {user?.role === 'RECRUITER' && (
-                <Link
-                  to="/dashboard/recruiter"
-                  onClick={toggleMenu}
-                  className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-white py-4 text-sm font-bold text-[#3835a4] hover:bg-neutral-50 transition-all"
-                >
-                  Recruiter Dashboard
-                </Link>
+                <>
+                  <Link
+                    to="/dashboard/recruiter"
+                    onClick={toggleMenu}
+                    className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-white py-4 text-sm font-bold text-[#3835a4] hover:bg-neutral-50 transition-all"
+                  >
+                     Dashboard
+                  </Link>
+                  <Link
+                    to="/dashboard/recruiter/jobs"
+                    onClick={toggleMenu}
+                    className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-white py-4 text-sm font-bold text-[#3835a4] hover:bg-neutral-50 transition-all"
+                  >
+                    Manage Jobs
+                  </Link>
+                  <Link
+                    to="/dashboard/recruiter/post-job"
+                    onClick={toggleMenu}
+                    className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-white py-4 text-sm font-bold text-[#3835a4] hover:bg-neutral-50 transition-all"
+                  >
+                    Post New Job
+                  </Link>
+                  <Link
+                    to="/forgot-password"
+                    onClick={toggleMenu}
+                    className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-white py-4 text-sm font-bold text-[#3835a4] hover:bg-neutral-50 transition-all"
+                  >
+                    Reset Password
+                  </Link>
+                </>
               )}
               <button
                 onClick={handleLogout}

@@ -10,3 +10,5 @@ export const verifyOtp = (data: any) => api.post('/auth/verify-otp', data);
 export const resetPassword = (data: any) => api.post('/auth/reset-password', data);
 export const verifyEmail = (token: string) => api.get(`/auth/verify-email?token=${token}`);
 export const resendVerification = (email: string) => api.post('/auth/resend-verification', { email });
+
+export const getCountries = () => api.get('/jobs/countries');

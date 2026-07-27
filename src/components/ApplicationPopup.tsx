@@ -35,10 +35,8 @@ export default function ApplicationPopup({ jobId, role, isExpired, onClose, onAp
       .then(res => {
         const u = res.data.data;
         setProfile(u);
-        if (u.talentProfile) {
-          setPhone(u.talentProfile.contactNumber || '');
-          setWhatsapp(u.whatsappNo || u.talentProfile.whatsappNo || '');
-        }
+        setPhone(u.phone || u.talentProfile?.contactNumber || '');
+        setWhatsapp(u.whatsappNo || u.talentProfile?.whatsappNo || '');
         const allMedia: any[] = u.talentProfile?.media || [];
         setMedia(allMedia);
       })
@@ -98,8 +96,8 @@ export default function ApplicationPopup({ jobId, role, isExpired, onClose, onAp
 
   const canProceed = () => {
     if (step === 0) return phone.trim().length > 0 && whatsapp.trim().length > 0;
-    if (step === 4 && isRequired('actingVideoId')) return !!actingVideoId;
-    if (step === 5 && isRequired('castingVideoId')) return !!castingVideoId;
+    if (step === 3 && isRequired('actingVideoId')) return !!actingVideoId;
+    if (step === 4 && isRequired('castingVideoId')) return !!castingVideoId;
     return true;
   };
 
@@ -305,8 +303,10 @@ function MediaSelector({
         <p className="text-xs text-stone-400 italic py-4 text-center">No items available{onUpload ? ' — upload one above' : ''}</p>
       ) : (
         <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto">
-          {items.map((item) => {
+              {items.map((item) => {
             const isSelected = selected.includes(item.id);
+            const ytId = item.videoLink && item.videoLink.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/)?.[1];
+            const isVideoFile = !!item.url && /\.(mp4|mov|avi|mkv|webm|wmv|flv)(\?.*)?$/i.test(item.url);
             return (
               <button
                 key={item.id}
@@ -315,10 +315,12 @@ function MediaSelector({
                   isSelected ? 'border-[#C6007E] ring-2 ring-[#C6007E]/30' : 'border-stone-100 hover:border-stone-200'
                 }`}
               >
-                {item.videoLink ? (
-                  <div className="w-full h-full bg-stone-100 flex items-center justify-center text-stone-400 text-2xl">▶</div>
-                ) : item.url ? (
+                {ytId ? (
+                  <img src={`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`} alt="" className="w-full h-full object-cover" />
+                ) : item.url && !isVideoFile ? (
                   <img src={item.url} alt="" className="w-full h-full object-cover" />
+                ) : item.url || item.videoLink ? (
+                  <div className="w-full h-full bg-stone-800 flex items-center justify-center"><span className="text-white text-3xl">▶</span></div>
                 ) : (
                   <div className="w-full h-full bg-stone-100 flex items-center justify-center text-stone-400 text-xs">No preview</div>
                 )}

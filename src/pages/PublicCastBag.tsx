@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getPublicCastBag } from '../api/castBag.api';
-import { MapPin, Ruler } from 'lucide-react';
+import { MapPin, Ruler, Plus, Check } from 'lucide-react';
 
 export default function PublicCastBag() {
   const { token } = useParams<{ token: string }>();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [zcardLoading, setZcardLoading] = useState(false);
 
   useEffect(() => {
     if (!token) return;
@@ -16,6 +18,59 @@ export default function PublicCastBag() {
       .catch(err => setError(err?.response?.data?.message || 'Cast bag not found'))
       .finally(() => setLoading(false));
   }, [token]);
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (!data) return;
+    if (selectedIds.size === data.talents.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(data.talents.map((t: any) => t.id)));
+    }
+  };
+
+  const generateZCard = async () => {
+    const ids = Array.from(selectedIds);
+    if (ids.length === 0 && data?.talents) {
+      // if nothing selected, default to all
+      ids.push(...data.talents.map((t: any) => t.id));
+    }
+    if (ids.length === 0) return;
+    setZcardLoading(true);
+    try {
+      const token = localStorage.getItem('accessToken');
+      const res = await fetch('http://localhost:3000/api/v1/recruiter/z-card', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ talentIds: ids }),
+      });
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(errText || `HTTP ${res.status}`);
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `zcard-${ids.length}-talents.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+    } catch (err: any) {
+      alert('Z Card failed: ' + (err?.message || 'Unknown error'));
+    } finally {
+      setZcardLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -44,11 +99,24 @@ export default function PublicCastBag() {
       <div className="max-w-7xl mx-auto px-4 sm:px-8 space-y-8">
         {/* Header */}
         <div className="bg-white border-2 border-stone-100 rounded-2xl p-6 sm:p-8 shadow-sm">
-          <div className="flex items-center gap-4">
-            <span className="text-4xl">📁</span>
-            <div>
-              <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-[#3835A4] uppercase">{data.name}</h1>
-              <p className="text-sm font-bold text-stone-500 mt-1">{data.talentCount} Talent{data.talentCount !== 1 ? 's' : ''}</p>
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <span className="text-4xl">📁</span>
+              <div>
+                <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-[#3835A4] uppercase">{data.name}</h1>
+                <p className="text-sm font-bold text-stone-500 mt-1">{data.talentCount} Talent{data.talentCount !== 1 ? 's' : ''}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              {data.talents.length > 0 && (
+                <button
+                  onClick={generateZCard}
+                  disabled={zcardLoading}
+                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white font-mono text-[10px] font-black tracking-widest uppercase hover:opacity-90 transition-opacity disabled:opacity-40"
+                >
+                  {zcardLoading ? 'Generating...' : 'Zcard Export'}
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -84,6 +152,16 @@ export default function PublicCastBag() {
                 </div>
 
                 <div className="absolute top-6 left-6 right-6 flex items-center justify-between z-30">
+                  <button
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleSelect(talent.id); }}
+                    className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                      selectedIds.has(talent.id)
+                        ? 'bg-[#C6007E] text-white shadow-lg'
+                        : 'bg-white/80 text-stone-600 hover:bg-white'
+                    }`}
+                  >
+                    {selectedIds.has(talent.id) ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                  </button>
                   {talent.plan === 'premium' ? (
                     <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white text-[9px] uppercase font-mono font-black tracking-[0.2em] px-3.5 py-1.5 rounded-xl shadow-lg">
                       <svg className="h-3 w-3 fill-current" viewBox="0 0 24 24">

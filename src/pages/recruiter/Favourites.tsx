@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, MapPin, X } from 'lucide-react';
+import RecruiterGuard from '../../auth/RecruiterGuard';
 import { getFavourites, removeFavourite } from '../../api/favourites.api';
 import { getTalentFilterOptions } from '../../api/talent.api';
 
@@ -126,6 +127,7 @@ export default function Favourites() {
   };
 
   return (
+    <RecruiterGuard>
     <div style={{ background: '#f4f4f6', minHeight: '100vh', fontFamily: 'system-ui, sans-serif', margin: 0 }}>
       <div style={{ position: 'relative', background: '#111115', color: '#fff', padding: '24px 40px', borderBottom: '1px solid #222' }}>
         <div style={{ position: 'relative', zIndex: 2 }}>
@@ -271,5 +273,6 @@ export default function Favourites() {
         )}
       </div>
     </div>
+    </RecruiterGuard>
   );
 }
