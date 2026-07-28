@@ -1,19 +1,76 @@
-import React, { useState } from 'react';
-import { INITIAL_BLOGS } from '../data';
-import { BlogItem } from '../types';
-import { Calendar, Clock, ChevronRight, X, Sparkles, Filter, ArrowUpRight, BookOpen } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Calendar, ArrowUpRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { Link, useNavigate } from 'react-router-dom';
+import api from '../api/axios';
+
+interface BlogPost {
+  id: number;
+  categoryId: number | null;
+  category: string;
+  title: string;
+  description: string;
+  date: string;
+  image: string;
+}
+
+const CATEGORIES: Record<number, string> = {
+  1: 'Actors & Extras',
+  3: 'Dancers',
+  11: 'MC/RJ/VJ/Voice Over',
+};
+
+const getImageUrl = (image: string) => {
+  if (!image) return 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&q=80&w=650';
+  if (image.startsWith('http')) return image;
+  return `https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/blogs/${image}`;
+};
+
+const formatDate = (dateStr: string) => {
+  if (!dateStr) return '';
+  try {
+    return new Date(dateStr).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  } catch {
+    return dateStr;
+  }
+};
 
 export default function BlogsSection() {
-  const [selectedArticle, setSelectedArticle] = useState<BlogItem | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const navigate = useNavigate();
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const [blogs, setBlogs] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Dynamically extract categories
-  const categories = ['All', 'Advice & Tips', 'Industry Secrets', 'Auditions'];
+  const categoryEntries = Object.entries(CATEGORIES).map(([id, name]) => ({
+    id: Number(id),
+    name,
+  }));
 
-  const filteredBlogs = selectedCategory === 'All' 
-    ? INITIAL_BLOGS 
-    : INITIAL_BLOGS.filter(blog => blog.category === selectedCategory);
+  useEffect(() => {
+    fetchBlogs();
+  }, [selectedCategory]);
+
+  const fetchBlogs = async () => {
+    setLoading(true);
+    try {
+      const params: any = { page: 1, limit: 3 };
+      if (selectedCategory) params.categoryId = selectedCategory;
+      const res = await api.get('/blogs', { params });
+      if (res.data?.success && res.data?.data?.blogs) {
+        setBlogs(res.data.data.blogs);
+      } else {
+        setBlogs([]);
+      }
+    } catch {
+      setBlogs([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="w-full bg-white py-12 border-b border-[#f2f2f2] mx-auto relative overflow-hidden">
@@ -25,184 +82,135 @@ export default function BlogsSection() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Section Header */}
-        <div className="max-w-2xl mb-12">
-          <h2 className="font-display text-3xl font-black text-neutral-900 sm:text-5xl tracking-tight leading-none mb-4">
-            Creative Industry Journal
-          </h2>
-          <p className="text-sm text-neutral-500 leading-relaxed font-medium">
-            Vetted tips, professional guide briefs, and industry guidelines compiled by international casting directors and executive model scouts.
-          </p>
+        <div className="flex items-start justify-between gap-4 mb-12">
+          <div className="max-w-2xl">
+            <h2 className="font-display text-3xl font-black text-neutral-900 sm:text-5xl tracking-tight leading-none mb-4">
+              Creative Industry Journal
+            </h2>
+            <p className="text-sm text-neutral-500 leading-relaxed font-medium">
+              Vetted tips, professional guide briefs, and industry guidelines compiled by international casting directors and executive model scouts.
+            </p>
+          </div>
+          <Link
+            to="/blogs"
+            className="hidden sm:inline-flex items-center gap-2 bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white px-6 py-3 rounded-2xl font-black text-xs tracking-wider hover:opacity-90 transition-all shadow-lg shrink-0"
+          >
+            View All Blogs
+            <ArrowUpRight className="h-3.5 w-3.5" />
+          </Link>
         </div>
-
-        {/* Interactive Categories Bar - Placed Directly Above the Blogs */}
-        <div className="flex flex-wrap items-center gap-2 bg-neutral-100/80 p-1.5 rounded-2xl border border-neutral-250/30 w-fit mb-10">
-          {categories.map((cat) => {
-            const isSelected = selectedCategory === cat;
-            return (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`relative px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
-                  isSelected 
-                    ? 'bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white shadow-md' 
-                    : 'text-neutral-500 hover:text-[#3835A4]'
-                }`}
-              >
-                {cat}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Dynamic Blog Grid */}
-        <motion.div 
-          layout
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10"
+        <Link
+          to="/blogs"
+          className="sm:hidden inline-flex items-center gap-2 bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white px-6 py-3 rounded-2xl font-black text-xs tracking-wider uppercase hover:opacity-90 transition-all shadow-lg mb-8"
         >
-          <AnimatePresence mode="popLayout">
-            {filteredBlogs.map((blog, index) => (
-              <motion.div
-                key={blog.id}
-                layout
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.35, delay: index * 0.05 }}
-                onClick={() => setSelectedArticle(blog)}
-                className="bg-white flex flex-col rounded-[2rem] overflow-hidden shadow-sm hover:shadow-xl cursor-pointer group h-full border border-neutral-200/80 hover:border-[#3835A4]/30 transition-all duration-500 relative"
-                style={{ contentVisibility: 'auto' }}
-              >
-                {/* Visual Hair-thin Accent Outline */}
-                <div className="absolute inset-2.5 border border-white/0 rounded-[1.5rem] pointer-events-none z-20 group-hover:border-neutral-900/10 transition-all duration-500" />
+          View All Blogs
+          <ArrowUpRight className="h-3.5 w-3.5" />
+        </Link>
 
-                {/* Cover Photo */}
-                <div className="h-56 w-full overflow-hidden bg-neutral-100 relative shrink-0">
-                  <img 
-                    src={blog.imageUrl} 
-                    alt={blog.title} 
-                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-103"
-                    referrerPolicy="no-referrer"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/60 via-transparent to-transparent" />
-                  <span className="absolute top-5 left-5 bg-white/95 backdrop-blur-sm text-neutral-900 text-[9px] font-mono font-black tracking-widest capitalize py-1.5 px-3.5 rounded-xl border border-neutral-250/20 shadow-md">
-                    {blog.category}
-                  </span>
-                </div>
+        {/* Filter Bar - same as BlogsPage */}
+        <div className="flex flex-wrap items-center gap-2 bg-neutral-100/80 p-1.5 rounded-2xl border border-neutral-250/30 w-fit mb-10">
+          <button
+            onClick={() => setSelectedCategory(null)}
+            className={`relative px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
+              selectedCategory === null
+                ? 'bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white shadow-md'
+                : 'text-neutral-500 hover:text-[#3835A4]'
+            }`}
+          >
+            All
+          </button>
+          {categoryEntries.map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => setSelectedCategory(cat.id)}
+              className={`relative px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                selectedCategory === cat.id
+                  ? 'bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white shadow-md'
+                  : 'text-neutral-500 hover:text-[#3835A4]'
+              }`}
+            >
+              {cat.name}
+            </button>
+          ))}
+        </div>
 
-                {/* Text contents with beautiful balance */}
-                <div className="p-7 sm:p-8 flex flex-col flex-grow justify-between bg-white relative">
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-4 text-[9px] font-mono tracking-wider font-bold text-neutral-400">
-                      <span className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" /> {blog.date}</span>
-                      <span>•</span>
-                      <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5" /> {blog.readTime}</span>
-                    </div>
-                    
-                    <h3 className="font-display text-xl sm:text-2xl font-black text-neutral-900 group-hover:text-[#3835A4] transition-colors tracking-tight line-clamp-1 leading-tight">
-                      {blog.title}
-                    </h3>
-
-                    <p className="text-xs text-neutral-500 leading-relaxed line-clamp-3 font-medium">
-                      {blog.summary}
-                    </p>
-                  </div>
-
-                  <div className="mt-8 pt-5 border-t border-neutral-100 flex items-center justify-between text-xs text-neutral-500 font-bold group-hover:text-neutral-900 transition-colors duration-300">
-                    <span className="text-[9px] tracking-[0.25em] font-mono font-black">Read Journal Article</span>
-                    <div className="p-1.5 rounded-xl bg-neutral-50 border border-neutral-200/60 group-hover:bg-gradient-to-br group-hover:from-[#C6007E] group-hover:to-[#3835A4] group-hover:text-white group-hover:border-transparent transition-all duration-300">
-                      <ArrowUpRight className="h-3.5 w-3.5" />
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="rounded-[2rem] overflow-hidden bg-neutral-100 animate-pulse h-[420px]" />
             ))}
-          </AnimatePresence>
-        </motion.div>
+          </div>
+        ) : blogs.length === 0 ? (
+          <div className="text-center py-24">
+            <p className="text-neutral-400 font-medium">No articles found.</p>
+          </div>
+        ) : (
+          <motion.div 
+            layout
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10"
+          >
+            <AnimatePresence mode="popLayout">
+              {blogs.map((blog, index) => (
+                <motion.div
+                  key={blog.id}
+                  layout
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.35, delay: index * 0.05 }}
+                  onClick={() => navigate(`/blogs/${blog.id}`)}
+                  className="bg-white flex flex-col rounded-[2rem] overflow-hidden shadow-sm hover:shadow-xl cursor-pointer group h-full border border-neutral-200/80 hover:border-[#3835A4]/30 transition-all duration-500 relative"
+                  style={{ contentVisibility: 'auto' }}
+                >
+                  {/* Visual Hair-thin Accent Outline */}
+                  <div className="absolute inset-2.5 border border-white/0 rounded-[1.5rem] pointer-events-none z-20 group-hover:border-neutral-900/10 transition-all duration-500" />
+
+                  {/* Cover Photo */}
+                  <div className="h-56 w-full overflow-hidden bg-neutral-100 relative shrink-0">
+                    <img 
+                      src={getImageUrl(blog.image)} 
+                      alt={blog.title} 
+                      className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-103"
+                      referrerPolicy="no-referrer"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/60 via-transparent to-transparent" />
+                    <span className="absolute top-5 left-5 bg-white/95 backdrop-blur-sm text-neutral-900 text-[9px] font-mono font-black tracking-widest capitalize py-1.5 px-3.5 rounded-xl border border-neutral-250/20 shadow-md">
+                      {blog.category}
+                    </span>
+                  </div>
+
+                  {/* Text contents with beautiful balance */}
+                  <div className="p-7 sm:p-8 flex flex-col flex-grow justify-between bg-white relative">
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-4 text-[9px] font-mono tracking-wider font-bold text-neutral-400">
+                        <span className="flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" /> {formatDate(blog.date)}</span>
+                      </div>
+                      
+                      <h3 className="font-display text-xl sm:text-2xl font-black text-neutral-900 group-hover:text-[#3835A4] transition-colors tracking-tight line-clamp-1 leading-tight">
+                        {blog.title}
+                      </h3>
+
+                      <p className="text-xs text-neutral-500 leading-relaxed line-clamp-3 font-medium">
+                        {blog.description}
+                      </p>
+                    </div>
+
+                    <div className="mt-8 pt-5 border-t border-neutral-100 flex items-center justify-between text-xs text-neutral-500 font-bold group-hover:text-neutral-900 transition-colors duration-300">
+                      <span className="text-[9px] tracking-[0.25em] font-mono font-black">Read Journal Article</span>
+                      <div className="p-1.5 rounded-xl bg-neutral-50 border border-neutral-200/60 group-hover:bg-gradient-to-br group-hover:from-[#C6007E] group-hover:to-[#3835A4] group-hover:text-white group-hover:border-transparent transition-all duration-300">
+                        <ArrowUpRight className="h-3.5 w-3.5" />
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
+        )}
 
       </div>
 
-      {/* Immersive Gazette Reader Modal Dialog with motion */}
-      <AnimatePresence>
-        {selectedArticle && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-950/85 backdrop-blur-md">
-            
-            {/* Modal Backdrop overlay to support click-out */}
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setSelectedArticle(null)}
-              className="absolute inset-0"
-            />
-
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95, y: 25 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 25 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-              className="relative w-full max-w-2xl rounded-3xl border border-neutral-200 bg-white shadow-2xl overflow-hidden flex flex-col max-h-[85vh] z-10"
-            >
-              
-              {/* Header Details bar */}
-              <div className="px-6 py-4 bg-neutral-50 border-b border-neutral-100 flex items-center justify-between">
-                <span className="p-1 px-3.5 rounded-xl bg-[#C6007E]/10 border border-[#C6007E]/20 text-[#C6007E] text-[9px] font-mono font-black uppercase tracking-widest">{selectedArticle.category}</span>
-                <button 
-                  onClick={() => setSelectedArticle(null)}
-                  className="p-2 rounded-xl hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 transition-colors cursor-pointer border border-transparent hover:border-neutral-250/20"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-
-              {/* Contents details */}
-              <div className="p-6 md:p-8 overflow-y-auto space-y-6 bg-white">
-                
-                {/* Hero Feature Banner */}
-                <div className="aspect-video w-full rounded-2xl overflow-hidden bg-neutral-100 border border-neutral-200 relative">
-                  <img src={selectedArticle.imageUrl} alt="" className="h-full w-full object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/40 via-transparent to-transparent" />
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex items-center gap-4 text-[10px] font-mono tracking-wider font-bold text-neutral-400">
-                    <span className="flex items-center gap-1"><Calendar className="h-3.5 w-3.5" /> Published: {selectedArticle.date}</span>
-                    <span>•</span>
-                    <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> Read time: {selectedArticle.readTime}</span>
-                  </div>
-                  <h1 className="font-display text-2xl md:text-3xl font-black text-neutral-900 leading-tight">{selectedArticle.title}</h1>
-                </div>
-
-                {/* Styled Pull-quote Summary */}
-                <div className="p-5 bg-[#3835A4]/5 border-l-2 border-[#3835A4] text-xs italic text-neutral-800 leading-relaxed rounded-r-xl font-medium">
-                  {selectedArticle.summary}
-                </div>
-
-                {/* Core Article Markdown/Copy */}
-                <p className="text-sm text-neutral-600 leading-relaxed whitespace-pre-line font-medium">
-                  {selectedArticle.content}
-                </p>
-
-                {/* Deluxe Footer Branding inside Reader */}
-                <div className="pt-8 border-t border-neutral-100 text-center flex flex-col items-center gap-3">
-                  <div className="h-10 w-10 rounded-xl bg-[#3835A4]/10 flex items-center justify-center text-[#3835A4]">
-                    <BookOpen className="h-5 w-5" />
-                  </div>
-                  <p className="text-xs text-neutral-500 font-mono max-w-sm mx-auto">Want to secure absolute career exposure? Upgrade to premium modeling membership to land direct agency opportunities.</p>
-                  
-                  <button
-                    onClick={() => setSelectedArticle(null)}
-                    className="mt-2 bg-gradient-to-r from-[#C6007E] to-[#3835A4] hover:opacity-95 text-white text-xs font-bold py-2.5 px-6 rounded-xl transition-all cursor-pointer shadow-md"
-                  >
-                    Close Article
-                  </button>
-                </div>
-              </div>
-
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

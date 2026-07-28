@@ -27,11 +27,26 @@ const CATEGORIES: Record<number, string> = {
 
 export default function BlogsPage() {
   const navigate = useNavigate();
-  const [blogs, setBlogs] = useState<BlogPost[]>([]);
+  const blogsCacheKey = (cat: number | null, pg: number) => `blogs_page_${cat ?? 'all'}_${pg}`;
+  const [blogs, setBlogs] = useState<BlogPost[]>(() => {
+    try {
+      const cached = sessionStorage.getItem(blogsCacheKey(null, 1));
+      if (cached) return JSON.parse(cached);
+    } catch {}
+    return [];
+  });
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => {
+    try { return !sessionStorage.getItem(blogsCacheKey(null, 1)); } catch { return true; }
+  });
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [totalPages, setTotalPages] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem(`blogs_pagination_all_1`);
+      if (cached) return JSON.parse(cached);
+    } catch {}
+    return 1;
+  });
 
   useEffect(() => {
     setPage(1);
@@ -42,14 +57,18 @@ export default function BlogsPage() {
   }, [selectedCategory, page]);
 
   const fetchBlogs = async () => {
-    setLoading(true);
+    if (!sessionStorage.getItem(blogsCacheKey(selectedCategory, page))) setLoading(true);
     try {
       const params: any = { page, limit: 9 };
       if (selectedCategory) params.categoryId = selectedCategory;
       const res = await api.get('/blogs', { params });
       if (res.data?.success && res.data?.data?.blogs) {
-        setBlogs(res.data.data.blogs);
-        setTotalPages(res.data.data.pagination?.totalPages || 1);
+        const data = res.data.data.blogs;
+        const pages = res.data.data.pagination?.totalPages || 1;
+        setBlogs(data);
+        setTotalPages(pages);
+        sessionStorage.setItem(blogsCacheKey(selectedCategory, page), JSON.stringify(data));
+        sessionStorage.setItem(`blogs_pagination_${selectedCategory ?? 'all'}_${page}`, JSON.stringify(pages));
       }
     } catch {
       setBlogs([]);

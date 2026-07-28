@@ -1,5 +1,6 @@
-import { useState, useEffect , useRef} from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+
 import { getTalentFilterOptions, searchTalents } from '../../api/talent.api';
 import {
   FaTheaterMasks,
@@ -142,36 +143,6 @@ const SkeletonBlock = ({ width = '100%', height = '40px' }: { width?: string; he
   <div style={{ ...shimmerStyle, width, height }} />
 );
 
-const FiltersSkeleton = () => (
-  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-    {/* category icon grid placeholders */}
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '10px' }}>
-      {Array.from({ length: 10 }).map((_, i) => <SkeletonBlock key={i} height="70px" />)}
-    </div>
-
-    {/* search/sort/gender/country/city/apply row */}
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
-      {Array.from({ length: 5 }).map((_, i) => <SkeletonBlock key={i} height="40px" />)}
-    </div>
-
-    {/* age/ethnicity/nationality/languages/dialects row */}
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', padding: '20px', background: '#fff', borderRadius: '12px', border: '1px solid #f5d0e3' }}>
-      {Array.from({ length: 5 }).map((_, i) => (
-        <div key={i}>
-          <SkeletonBlock height="12px" width="60%" />
-          <div style={{ marginTop: '8px' }}><SkeletonBlock height="40px" /></div>
-        </div>
-      ))}
-    </div>
-
-    {/* toggle buttons */}
-    <div style={{ display: 'flex', gap: '10px' ,justifyContent:'center'}}>
-      <SkeletonBlock width="180px" height="32px" />
-      <SkeletonBlock width="160px" height="32px" />
-    </div>
-  </div>
-);
-
 const TalentCardSkeleton = () => (
   <div style={{
     position: 'relative',
@@ -199,12 +170,44 @@ const TalentCardSkeleton = () => (
 
 const BrowseTalents = () => {
   // const [options, setOptions] = useState<any>(null);
-  const [talents, setTalents] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [pagination, setPagination] = useState({ total: 0, page: 1, totalPages: 1 });
+  const [talents, setTalents] = useState<any[]>(() => {
+    try {
+      const cacheRaw = sessionStorage.getItem('bt_cache');
+      if (cacheRaw) {
+        const parsed = JSON.parse(cacheRaw);
+        const key = JSON.stringify({ filters: appliedFilters, page: 1 });
+        if (parsed.key === key) return parsed.talents;
+      }
+    } catch {}
+    return [];
+  });
+  const [loading, setLoading] = useState(() => {
+    try {
+      const cacheRaw = sessionStorage.getItem('bt_cache');
+      if (cacheRaw) {
+        const parsed = JSON.parse(cacheRaw);
+        const key = JSON.stringify({ filters: appliedFilters, page: 1 });
+        if (parsed.key === key) return false;
+      }
+    } catch {}
+    return true;
+  });
+  const [pagination, setPagination] = useState(() => {
+    try {
+      const cacheRaw = sessionStorage.getItem('bt_cache');
+      if (cacheRaw) {
+        const parsed = JSON.parse(cacheRaw);
+        const key = JSON.stringify({ filters: appliedFilters, page: 1 });
+        if (parsed.key === key) return parsed.pagination;
+      }
+    } catch {}
+    return { total: 0, page: 1, totalPages: 1 };
+  });
 
   const [draftFilters, setDraftFilters] = useState<any>(DEFAULT_FILTERS);
-  const [appliedFilters, setAppliedFilters] = useState<any>(DEFAULT_FILTERS);
+  const [searchParams] = useSearchParams();
+  const hasUrlParams = !!(searchParams.get('search') || searchParams.get('gender') || searchParams.get('category') || searchParams.get('city'));
+  const [appliedFilters, setAppliedFilters] = useState<any>(hasUrlParams ? null : DEFAULT_FILTERS);
   // const [showFilters, setShowFilters] = useState(false);
   const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
   const [detailTalent, setDetailTalent] = useState<any>(null);
@@ -215,8 +218,9 @@ const BrowseTalents = () => {
 const [showPhysicalFilters, setShowPhysicalFilters] = useState(false); // new: Physical Filters tab
 
 
-const [options, setOptions] = useState<any>(null);
-const [optionsLoading, setOptionsLoading] = useState(true);
+const [dynamicOptions, setDynamicOptions] = useState<any>(null);
+const [dynamicLoading, setDynamicLoading] = useState(true);
+const [filterData, setFilterData] = useState<any>(null);
 
 const { user } = useAuthStore();
 const [favouriteIds, setFavouriteIds] = useState<string[]>([]);
@@ -257,24 +261,80 @@ const toggleFavourite = async (talentUserId: string) => {
 };
 
 useEffect(() => {
-  setOptionsLoading(true);
-  getTalentFilterOptions()
-    .then(res => setOptions(res.data.data))
-    .finally(() => setOptionsLoading(false));
+  fetch('/static/filterOptions.json')
+    .then(r => r.json())
+    .then(setFilterData);
 }, []);
 
+useEffect(() => {
+  if (!filterData) return;
+  const initial: any = { ...DEFAULT_FILTERS };
+  let hasParam = false;
+
+  const search = searchParams.get('search');
+  const gender = searchParams.get('gender');
+  const categoryName = searchParams.get('category');
+  const cityName = searchParams.get('city');
+
+  if (search) { initial.search = search; hasParam = true; }
+  if (gender) { initial.gender = gender; hasParam = true; }
+
+  if (categoryName) {
+    const match = filterData.categories.find((c: any) => c.name === categoryName);
+    if (match) { initial.categories = [match.id]; hasParam = true; }
+  }
+
+  if (cityName) {
+    const match = filterData.cities.find((c: any) => c.name === cityName);
+    if (match) {
+      initial.cityId = match.id;
+      initial.countryId = match.countryId;
+      hasParam = true;
+    }
+  }
+
+  if (hasParam) {
+    setDraftFilters(initial);
+  }
+  setAppliedFilters(initial);
+}, [filterData, searchParams]);
+
+useEffect(() => {
+  if ((showFilters || showPhysicalFilters) && !dynamicOptions) {
+    setDynamicLoading(true);
+    getTalentFilterOptions()
+      .then(res => setDynamicOptions(res.data.data))
+      .finally(() => setDynamicLoading(false));
+  }
+}, [showFilters, showPhysicalFilters, dynamicOptions]);
 
   useEffect(() => {
-    getTalentFilterOptions().then(res => setOptions(res.data.data));
-  }, []);
-
-  useEffect(() => {
+    if (!appliedFilters) return;
     const fetchTalents = async () => {
-      setLoading(true);
+      const cacheKey = JSON.stringify({ filters: appliedFilters, page: pagination.page });
+      let hasCached = false;
+
+      try {
+        const cached = sessionStorage.getItem('bt_cache');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed.key === cacheKey) {
+            setTalents(parsed.talents);
+            setPagination(parsed.pagination);
+            hasCached = true;
+          }
+        }
+      } catch {}
+
+      if (hasCached) setLoading(false); else setLoading(true);
+
       try {
         const res = await searchTalents({ ...appliedFilters, page: pagination.page, limit: 12 });
-        setTalents(res.data.data.data);
-        setPagination(res.data.data.pagination);
+        const talents = res.data.data.data;
+        const pg = res.data.data.pagination;
+        setTalents(talents);
+        setPagination(pg);
+        sessionStorage.setItem('bt_cache', JSON.stringify({ key: cacheKey, talents, pagination: pg }));
       } catch (err) {
         console.error(err);
       } finally {
@@ -330,6 +390,8 @@ const setProfessionalText = (key: string, val: string) => {
   });
 };
 
+
+
   return (
     <div style={{ background: '#ffffffff', minHeight: '100vh', fontFamily: 'system-ui, sans-serif', margin: 0 }}>
       
@@ -363,11 +425,8 @@ const setProfessionalText = (key: string, val: string) => {
       </button>
     </div>
 
-    {optionsLoading ? (
-      <FiltersSkeleton />
-    ) : options && (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-           
+      {filterData ? <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            
           {/* CATEGORY ICON GRID — MULTI-SELECT */}
 <svg width="0" height="0" style={{ position: 'absolute' }}>
   <defs>
@@ -379,7 +438,7 @@ const setProfessionalText = (key: string, val: string) => {
 </svg>
 
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '10px' }}>
-  {options.categories
+  {filterData.categories
     .filter((c: any) => c.name !== 'Additional Category')
     .map((c: any) => {
       const isSelected = (draftFilters.categories || []).includes(c.id);
@@ -433,17 +492,17 @@ const setProfessionalText = (key: string, val: string) => {
                 <option value="">All Genders</option>
                 <option value="male">Male</option>
                 <option value="female">Female</option>
-                <option value="other">Other</option>
+                {/* <option value="other">Other</option> */}
               </select>
 
               <select value={draftFilters.countryId || ''} onChange={e => { handleFilterChange('countryId', e.target.value); handleFilterChange('cityId', null); }} style={{ background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
                 <option value="">All Countries</option>
-                {options.countries.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                {filterData.countries.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
 
               <select value={draftFilters.cityId || ''} onChange={e => handleFilterChange('cityId', e.target.value)} style={{ background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
                 <option value="">All Cities</option>
-                {options.cities.filter((c: any) => !draftFilters.countryId || c.countryId === draftFilters.countryId).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                {filterData.cities.filter((c: any) => !draftFilters.countryId || c.countryId === draftFilters.countryId).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
 
               <button 
@@ -475,27 +534,27 @@ const setProfessionalText = (key: string, val: string) => {
 
   <MultiSelectDropdown
   label="Ethnicity"
-  options={options.ethnicities}
+  options={filterData.ethnicities}
   selected={draftFilters.ethnicities || []}
   onToggle={(id) => handleMultiChange('ethnicities', id)}
 />
   <MultiSelectDropdown
   label="Nationality"
-  options={options.nationalities}
+  options={filterData.nationalities}
   selected={draftFilters.nationalities || []}
   onToggle={(id) => handleMultiChange('nationalities', id)}
 />
 
 <MultiSelectDropdown
   label="Languages"
-  options={options.languages}
+  options={filterData.languages}
   selected={draftFilters.languages || []}
   onToggle={(id) => handleMultiChange('languages', id)}
 />
 
 <MultiSelectDropdown
   label="Dialects"
-  options={options.dialects}
+  options={filterData.dialects}
   selected={draftFilters.dialects || []}
   onToggle={(id) => handleMultiChange('dialects', id)}
 />
@@ -516,9 +575,11 @@ const setProfessionalText = (key: string, val: string) => {
             {showFilters && (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '24px', padding: '24px', background: '#fff', borderRadius: '12px', border: '1px solid #f5d0e3' }}>
              
-
-                {/* 8. PROFESSIONAL FILTERS (CATEGORIZED EAV) */}
-{options.attributes && options.attributes.length > 0 && (
+              {dynamicLoading ? (
+                <div style={{ padding: '40px', textAlign: 'center', color: '#999', fontSize: '13px', gridColumn: '1 / -1' }}>
+                  <div style={{ ...shimmerStyle, height: '16px', width: '180px', margin: '0 auto' }} />
+                </div>
+              ) : dynamicOptions.attributes && dynamicOptions.attributes.length > 0 && (
   <div style={{ gridColumn: '1 / -1', borderTop: '1px solid #f5d0e3', paddingTop: '20px', marginTop: '4px' }}>
     <span style={{ fontSize: '11px', color: '#C6007E', fontWeight: 'bold', display: 'block', marginBottom: '16px', letterSpacing: '0.5px' }}>
       PROFESSIONAL ATTRIBUTES
@@ -526,7 +587,7 @@ const setProfessionalText = (key: string, val: string) => {
 
     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
       {Object.entries(EAV_CONFIG).map(([category, fields]) => {
-        const fieldKeys = Object.keys(fields).filter(k => options.attributes.includes(k));
+        const fieldKeys = Object.keys(fields).filter(k => dynamicOptions.attributes.includes(k));
         if (fieldKeys.length === 0) return null;
         // const currentEav = draftFilters.professional || [];
 
@@ -547,7 +608,7 @@ const setProfessionalText = (key: string, val: string) => {
              {fieldKeys.map(key => {
   const field = fields[key];
   const currentValues: string[] = (draftFilters.professional || []).find((p: any) => p.key === key)?.values || [];
-  const values = field.staticOptions ?? (options.attributeValues?.[key] || []);
+  const values = field.staticOptions ?? (dynamicOptions.attributeValues?.[key] || []);
 
   if (field.type === 'multiSelect') {
     return (
@@ -615,7 +676,11 @@ const setProfessionalText = (key: string, val: string) => {
   <div style={{ padding: '24px', background: '#fff', borderRadius: '12px', border: '1px solid #f5d0e3' }}>
     <span style={{ fontSize: '11px', color: '#C6007E', fontWeight: 'bold', display: 'block', marginBottom: '16px', letterSpacing: '0.5px' }}>PHYSICAL SPECIFICATIONS</span>
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
-
+    {dynamicLoading ? (
+      <div style={{ padding: '40px', textAlign: 'center', color: '#999', fontSize: '13px', gridColumn: '1 / -1' }}>
+        <div style={{ ...shimmerStyle, height: '16px', width: '140px', margin: '0 auto' }} />
+      </div>
+    ) : (<>
       {([
         ['height', 'Height'], ['weight', 'Weight'], ['chest', 'Chest'], ['waist', 'Waist'], ['shoeSize', 'Shoe Size'],
       ] as const).map(([field, label]) => (
@@ -627,7 +692,7 @@ const setProfessionalText = (key: string, val: string) => {
             style={{ flex: 1, background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '6px', borderRadius: '6px', fontSize: '12px' }}
           >
             <option value="">From</option>
-            {(options.physicalNumeric?.[field] || []).map((v: number) => <option key={v} value={v}>{v}</option>)}
+            {(dynamicOptions.physicalNumeric?.[field] || []).map((v: number) => <option key={v} value={v}>{v}</option>)}
           </select>
           <select
             value={draftFilters.physical?.[`${field}To`] || ''}
@@ -635,7 +700,7 @@ const setProfessionalText = (key: string, val: string) => {
             style={{ flex: 1, background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '6px', borderRadius: '6px', fontSize: '12px' }}
           >
             <option value="">To</option>
-            {(options.physicalNumeric?.[field] || []).map((v: number) => <option key={v} value={v}>{v}</option>)}
+            {(dynamicOptions.physicalNumeric?.[field] || []).map((v: number) => <option key={v} value={v}>{v}</option>)}
           </select>
         </div>
       ))}
@@ -651,16 +716,48 @@ const setProfessionalText = (key: string, val: string) => {
           style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '8px', borderRadius: '6px', fontSize: '12px' }}
         >
           <option value="">All {label}</option>
-          {(options.physicalCategorical?.[field] || []).map((v: string) => <option key={v} value={v}>{v}</option>)}
+          {(dynamicOptions.physicalCategorical?.[field] || []).map((v: string) => <option key={v} value={v}>{v}</option>)}
         </select>
       ))}
-
+    </>)}
     </div>
   </div>
 )}
-          </div>
-    )}
-
+          </div> : <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+  {/* Category icon grid skeleton */}
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '10px' }}>
+    {Array.from({ length: 10 }).map((_, i) => (
+      <div key={i} style={{ ...shimmerStyle, height: '80px', borderRadius: '12px' }} />
+    ))}
+  </div>
+  {/* Primary core row skeleton */}
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
+    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '8px' }} />
+    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '8px' }} />
+    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '8px' }} />
+    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '8px' }} />
+    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '8px', width: '120px' }} />
+  </div>
+  {/* Always-visible filters skeleton */}
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', padding: '20px', background: '#fff', borderRadius: '12px', border: '1px solid #f5d0e3' }}>
+    <div>
+      <div style={{ ...shimmerStyle, height: '12px', width: '100px', marginBottom: '8px', borderRadius: '4px' }} />
+      <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ ...shimmerStyle, flex: 1, height: '42px', borderRadius: '6px' }} />
+        <div style={{ ...shimmerStyle, flex: 1, height: '42px', borderRadius: '6px' }} />
+      </div>
+    </div>
+    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '6px' }} />
+    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '6px' }} />
+    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '6px' }} />
+    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '6px' }} />
+  </div>
+  {/* Toggle buttons skeleton */}
+  <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+    <div style={{ ...shimmerStyle, height: '36px', width: '220px', borderRadius: '6px' }} />
+    <div style={{ ...shimmerStyle, height: '36px', width: '180px', borderRadius: '6px' }} />
+  </div>
+</div>}
   </div>
   {/* ⬆️ END NEW WRAPPER */}
 
@@ -673,7 +770,7 @@ const setProfessionalText = (key: string, val: string) => {
         </h2>
         <select
           value={draftFilters.sort}
-          onChange={e => { handleFilterChange('sort', e.target.value); applyFilters(); }}
+          onChange={e => { const val = e.target.value; setDraftFilters((prev: any) => ({ ...prev, sort: val })); setPagination(prev => ({ ...prev, page: 1 })); setAppliedFilters((prev: any) => ({ ...prev, sort: val })); }}
           style={{ background: '#fff', color: '#000000ff', border: '1px solid #f5d0e3', padding: '10px 14px', borderRadius: '8px', fontSize: '13px', fontWeight: 'bold' }}
         >
           <option value="newest">Newest Members</option>
@@ -756,8 +853,8 @@ const setProfessionalText = (key: string, val: string) => {
                       Invite to Apply
                     </div>
                   </div>
-                )}
-              </div>
+    )}
+    </div>
 
               <div className="absolute top-6 left-6 right-6 flex items-start z-30">
                 <div className="flex items-center gap-2">

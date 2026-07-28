@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
-import { getJobOptions, getPublicJobs } from '../../api/job.api';
+import { getPublicJobs } from '../../api/job.api';
+
 import { getMyApplications } from '../../api/application.api';
 import { getMyProfile } from '../../api/profile.api';
 import { useAuthStore } from '../../store/authStore';
@@ -50,7 +51,7 @@ const MultiSelectDropdown = ({
   return (
     <div ref={ref} style={{ position: 'relative' }}>
       <span style={{ fontSize: '11px', color: '#C6007E', fontWeight: 'bold', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>
-        {label.toUpperCase()}
+        {label}
       </span>
       <button
         type="button"
@@ -134,10 +135,6 @@ const shimmerStyle: CSSProperties = {
   borderRadius: '8px',
 };
 
-const SkeletonBlock = ({ width = '100%', height = '40px' }: { width?: string; height?: string } & { [key: string]: any }) => (
-  <div style={{ ...shimmerStyle, width, height }} />
-);
-
 const JobCardSkeleton = () => (
   <div style={{
     borderRadius: '24px', overflow: 'hidden', background: '#fff',
@@ -149,11 +146,29 @@ const JobCardSkeleton = () => (
 
 const BrowseJobs = () => {
   const { user } = useAuthStore();
-  const [options, setOptions] = useState<any>(null);
-  const [optionsLoading, setOptionsLoading] = useState(true);
-  const [jobs, setJobs] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [pagination, setPagination] = useState({ total: 0, page: 1, totalPages: 1 });
+  const cacheKey = () => `browse_jobs_${JSON.stringify(appliedFilters)}_page_${pagination.page}`;
+  const [jobs, setJobs] = useState<any[]>(() => {
+    try {
+      const key = `browse_jobs_${JSON.stringify(DEFAULT_FILTERS)}_page_1`;
+      const cached = sessionStorage.getItem(key);
+      if (cached) return JSON.parse(cached);
+    } catch {}
+    return [];
+  });
+  const [loading, setLoading] = useState(() => {
+    try {
+      const key = `browse_jobs_${JSON.stringify(DEFAULT_FILTERS)}_page_1`;
+      return !sessionStorage.getItem(key);
+    } catch { return true; }
+  });
+  const [pagination, setPagination] = useState(() => {
+    try {
+      const key = `browse_jobs_pagination_${JSON.stringify(DEFAULT_FILTERS)}_page_1`;
+      const cached = sessionStorage.getItem(key);
+      if (cached) return JSON.parse(cached);
+    } catch {}
+    return { total: 0, page: 1, totalPages: 1 };
+  });
   const [draftFilters, setDraftFilters] = useState<any>(DEFAULT_FILTERS);
   const [appliedFilters, setAppliedFilters] = useState<any>(DEFAULT_FILTERS);
   const [quickJob, setQuickJob] = useState<any>(null);
@@ -161,23 +176,27 @@ const BrowseJobs = () => {
   const [appliedRoleIds, setAppliedRoleIds] = useState<Set<string>>(new Set());
   const [loadingApplied, setLoadingApplied] = useState(false);
   const [limitMessage, setLimitMessage] = useState<string | null>(null);
+  const [filterData, setFilterData] = useState<any>(null);
   const draftRef = useRef(draftFilters);
   draftRef.current = draftFilters;
 
   useEffect(() => {
-    setOptionsLoading(true);
-    getJobOptions()
-      .then(res => setOptions(res.data.data))
-      .finally(() => setOptionsLoading(false));
+    fetch('/static/filterOptions.json')
+      .then(r => r.json())
+      .then(setFilterData);
   }, []);
 
   useEffect(() => {
     const fetch = async () => {
-      setLoading(true);
+      if (!sessionStorage.getItem(cacheKey())) setLoading(true);
       try {
         const res = await getPublicJobs({ ...appliedFilters, page: pagination.page, limit: 12 });
-        setJobs(res.data.data.data);
-        setPagination(res.data.data.pagination);
+        const data = res.data.data.data;
+        const pag = res.data.data.pagination;
+        setJobs(data);
+        setPagination(pag);
+        sessionStorage.setItem(cacheKey(), JSON.stringify(data));
+        sessionStorage.setItem(`browse_jobs_pagination_${JSON.stringify(appliedFilters)}_page_${pagination.page}`, JSON.stringify(pag));
       } catch (err) {
         console.error(err);
       } finally {
@@ -218,6 +237,8 @@ const BrowseJobs = () => {
     setPagination({ total: 0, page: 1, totalPages: 1 });
   };
 
+  const fd = filterData ?? { categories: [], projectTypes: [], countries: [], languages: [], nationalities: [] };
+
   return (
     <div style={{ background: '#ffffffff', minHeight: '100vh', fontFamily: 'system-ui, sans-serif', margin: 0 }}>
 
@@ -236,27 +257,12 @@ const BrowseJobs = () => {
             <h2 style={{ margin: 0, fontSize: '22px', fontWeight: 900, letterSpacing: '-0.02em',color:"#ffed24" }}>
               Browse Jobs
             </h2>
-            <button onClick={resetFilters} style={{ fontSize: '12px', color: '#cdcdcdff', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>
+            <button onClick={resetFilters} style={{ fontSize: '12px', color: '#cdcdcdff', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'bold', letterSpacing: '1px' }}>
               Reset All
             </button>
           </div>
 
-          {optionsLoading ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '10px' }}>
-                {Array.from({ length: 8 }).map((_, i) => <SkeletonBlock key={i} height="60px" />)}
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
-                {Array.from({ length: 6 }).map((_, i) => <SkeletonBlock key={i} height="40px" />)}
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', padding: '20px', background: '#fff', borderRadius: '12px', border: '1px solid #f5d0e3' }}>
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i}><SkeletonBlock height="12px" width="60%" /><div style={{ marginTop: '8px' }}><SkeletonBlock height="40px" /></div></div>
-                ))}
-              </div>
-            </div>
-          ) : options && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {filterData ? <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
               {/* Primary Core Row */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
@@ -264,7 +270,7 @@ const BrowseJobs = () => {
                   {/* <span style={{ fontSize: '11px', color: '#888', fontWeight: 'bold', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>CATEGORY</span> */}
                   <select value={draftFilters.categoryIds || ''} onChange={e => handleFilterChange('categoryIds', e.target.value)} style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
                     <option value="">All Categories</option>
-                    {options.categories?.filter((c: any) => c.name !== 'Additional Category').map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                    {fd.categories?.filter((c: any) => c.name !== 'Additional Category').map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
                   </select>
                 </div>
 
@@ -291,7 +297,7 @@ const BrowseJobs = () => {
                   {/* <span style={{ fontSize: '11px', color: '#888', fontWeight: 'bold', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>PROJECT TYPE</span> */}
                   <select value={draftFilters.projectTypeId || ''} onChange={e => handleFilterChange('projectTypeId', e.target.value)} style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
                     <option value="">All Project Types</option>
-                    {options.projectTypes?.map((pt: any) => <option key={pt.id} value={pt.id}>{pt.name}</option>)}
+                    {fd.projectTypes?.map((pt: any) => <option key={pt.id} value={pt.id}>{pt.name}</option>)}
                   </select>
                 </div>
               </div>
@@ -299,7 +305,7 @@ const BrowseJobs = () => {
               {/* Age + Multi-select Filters */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', padding: '20px', background: '#fff', borderRadius: '12px', border: '1px solid #f5d0e3' }}>
                 <div>
-                  <span style={{ fontSize: '11px', color: '#C6007E', fontWeight: 'bold', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>AGE PARAMETERS</span>
+                  <span style={{ fontSize: '11px', color: '#C6007E', fontWeight: 'bold', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>Age Parameters</span>
                   <div style={{ display: 'flex', gap: '8px' }}>
                     <select value={draftFilters.ageFrom || ''} onChange={e => handleFilterChange('ageFrom', e.target.value)} style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '12px', borderRadius: '6px', fontSize: '12px' }}>
                       <option value="">Min Age</option>
@@ -312,9 +318,9 @@ const BrowseJobs = () => {
                   </div>
                 </div>
 
-                <MultiSelectDropdown label="Country" options={options.countries || []} selected={draftFilters.countryIds || []} onToggle={(id) => handleMultiChange('countryIds', id)} />
-                <MultiSelectDropdown label="Language" options={options.languages || []} selected={draftFilters.languageIds || []} onToggle={(id) => handleMultiChange('languageIds', id)} />
-                <MultiSelectDropdown label="Nationality" options={options.nationalities || []} selected={draftFilters.nationalityIds || []} onToggle={(id) => handleMultiChange('nationalityIds', id)} />
+                <MultiSelectDropdown label="Country" options={fd.countries || []} selected={draftFilters.countryIds || []} onToggle={(id) => handleMultiChange('countryIds', id)} />
+                <MultiSelectDropdown label="Language" options={fd.languages || []} selected={draftFilters.languageIds || []} onToggle={(id) => handleMultiChange('languageIds', id)} />
+                <MultiSelectDropdown label="Nationality" options={fd.nationalities || []} selected={draftFilters.nationalityIds || []} onToggle={(id) => handleMultiChange('nationalityIds', id)} />
               </div>
 
               <button
@@ -326,8 +332,30 @@ const BrowseJobs = () => {
                 Apply Filters
               </button>
 
-            </div>
-          )}
+            </div> : <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+  {/* Primary core row skeleton */}
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
+    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '8px' }} />
+    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '8px' }} />
+    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '8px' }} />
+    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '8px' }} />
+  </div>
+  {/* Age + multi-select skeleton */}
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', padding: '20px', background: '#fff', borderRadius: '12px', border: '1px solid #f5d0e3' }}>
+    <div>
+      <div style={{ ...shimmerStyle, height: '12px', width: '100px', marginBottom: '8px', borderRadius: '4px' }} />
+      <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ ...shimmerStyle, flex: 1, height: '42px', borderRadius: '6px' }} />
+        <div style={{ ...shimmerStyle, flex: 1, height: '42px', borderRadius: '6px' }} />
+      </div>
+    </div>
+    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '6px' }} />
+    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '6px' }} />
+    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '6px' }} />
+  </div>
+  {/* Apply button skeleton */}
+  <div style={{ ...shimmerStyle, height: '42px', width: '140px', borderRadius: '8px' }} />
+</div>}
 
         </div>
       </div>
@@ -392,27 +420,27 @@ const BrowseJobs = () => {
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/75 via-neutral-950/25 to-transparent transition-opacity group-hover:via-neutral-950/30" />
                         <div className="absolute top-5 left-5 right-5 flex items-center justify-between z-10">
-                          <span className="bg-white/95 backdrop-blur-md text-neutral-900 text-[9px] font-mono font-black tracking-[0.15em] uppercase px-3.5 py-1.5 rounded-xl shadow-md border border-neutral-200/50">
-                            {job.category?.name || 'General'}
+                        <span className="bg-white/95 backdrop-blur-md text-neutral-900 text-[9px] font-mono font-black tracking-[0.15em] px-3.5 py-1.5 rounded-xl shadow-md border border-neutral-200/50">
+                          {job.category?.name || 'General'}
+                        </span>
+                        {job.paymentInfo && (
+                          <span className="bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white text-[9px] font-mono font-black tracking-[0.15em] px-3.5 py-1.5 rounded-xl border border-white/10 shadow-lg">
+                            {job.paymentInfo === 'paid' ? 'Paid' : 'Unpaid'}
                           </span>
-                          {job.paymentInfo && (
-                            <span className="bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white text-[9px] font-mono font-black tracking-[0.15em] px-3.5 py-1.5 rounded-xl border border-white/10 shadow-lg">
-                              {job.paymentInfo === 'paid' ? 'PAID' : 'UNPAID'}
-                            </span>
-                          )}
+                        )}
                         </div>
                         
                         {!isExpired && daysLeft !== null && (
                           <div className="absolute bottom-5 left-5 z-10 flex items-center gap-1.5 text-[9px] font-mono text-neutral-200 bg-neutral-950/80 backdrop-blur-md py-2 px-3.5 rounded-xl border border-white/10 shadow-sm font-bold">
                             <svg className="h-3.5 w-3.5 text-[#C6007E] animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            <span>EXPIRES IN {daysLeft} DAYS</span>
+                            <span>Expires in {daysLeft} days</span>
                           </div>
                         )}
                       </div>
 
                       <div className="p-8 flex flex-col flex-grow justify-between relative bg-white">
                         <div className="space-y-3">
-                          <div className="flex items-center gap-1.5 text-[9px] text-neutral-400 tracking-wider uppercase font-black">
+                          <div className="flex items-center gap-1.5 text-[9px] text-neutral-400 tracking-wider font-black">
                             <svg className="h-3 w-3 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
                             <span>{job.company?.companyName || 'Company'}</span>
                             {job.company?.user?.isVerified && (
@@ -452,7 +480,7 @@ const BrowseJobs = () => {
                               </div>
                               <div className="space-y-0.5">
                                 <span className="text-xs text-neutral-950 font-black font-mono tracking-wide">
-                                  {formatBudget(firstRole) || firstRole.paymentType?.replace(/_/g, ' ').toUpperCase()}
+                                  {formatBudget(firstRole) || firstRole.paymentType?.replace(/_/g, ' ')}
                                 </span>
                               </div>
                             </div>
@@ -463,7 +491,7 @@ const BrowseJobs = () => {
                           <div>
                             {isExpired ? (
                               <span className="inline-flex items-center text-[9px] font-mono font-black bg-red-50 text-red-600 border border-red-200/60 px-2.5 py-1 rounded-lg tracking-wider">
-                                EXPIRED
+                                Expired
                               </span>
                             ) : (
                               <div className="w-1" />
@@ -515,7 +543,7 @@ const BrowseJobs = () => {
                               }}
                               className="flex items-center gap-2 cursor-pointer"
                             >
-                              <span className="text-[10px] font-mono font-black uppercase text-neutral-500 group-hover:text-[#3835A4] transition-colors duration-300">
+                              <span className="text-[10px] font-mono font-black text-neutral-500 group-hover:text-[#3835A4] transition-colors duration-300">
                                 Quick Apply
                               </span>
                               <div className="p-1.5 rounded-xl bg-neutral-50 border border-neutral-200/60 group-hover:bg-gradient-to-br group-hover:from-[#C6007E] group-hover:to-[#3835A4] group-hover:text-white group-hover:border-transparent transition-all duration-300">
@@ -524,8 +552,8 @@ const BrowseJobs = () => {
                             </div>
                           )}
                           {isExpired && (
-                            <span className="text-[10px] font-mono font-black uppercase text-neutral-500">
-                              Application Closed
+                            <span className="text-[10px] font-mono font-black text-neutral-500">
+                              Application closed
                             </span>
                           )}
                         </div>
@@ -589,12 +617,12 @@ const BrowseJobs = () => {
                 <>
                   {quickJob.description && (
                     <div>
-                      <p className="text-[10px] font-extrabold tracking-widest text-stone-400 uppercase mb-2">Description</p>
+                      <p className="text-[10px] font-extrabold tracking-widest text-stone-400 mb-2">Description</p>
                       <p className="text-sm text-stone-700 leading-relaxed">{stripHtml(quickJob.description).slice(0, 300)}</p>
                     </div>
                   )}
                   <div>
-                    <p className="text-[10px] font-extrabold tracking-widest text-stone-400 uppercase mb-3">
+                    <p className="text-[10px] font-extrabold tracking-widest text-stone-400 mb-3">
                       Roles ({quickJob.roles?.length || 0})
                     </p>
                     <div className="space-y-2">
@@ -608,13 +636,13 @@ const BrowseJobs = () => {
                             </p>
                           </div>
                           {appliedRoleIds.has(role.id) ? (
-                            <span className="bg-green-100 text-green-700 px-4 py-2 rounded-lg font-black uppercase tracking-widest text-[10px] whitespace-nowrap ml-3">
+                            <span className="bg-green-100 text-green-700 px-4 py-2 rounded-lg font-black tracking-widest text-[10px] whitespace-nowrap ml-3">
                               Applied
                             </span>
                           ) : (
                             <button
                               onClick={() => setApplyRole(role)}
-                              className="bg-[#C6007E] text-white px-4 py-2 rounded-lg font-black uppercase tracking-widest text-[10px] hover:bg-[#a10065] transition-all whitespace-nowrap ml-3"
+                              className="bg-[#C6007E] text-white px-4 py-2 rounded-lg font-black tracking-widest text-[10px] hover:bg-[#a10065] transition-all whitespace-nowrap ml-3"
                             >
                               Apply
                             </button>

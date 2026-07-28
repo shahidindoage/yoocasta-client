@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import * as Icons from 'lucide-react';
 import {
   MapPin,
@@ -7,20 +7,80 @@ import {
   ArrowUpRight,
   DollarSign,
   AlertCircle,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { CATEGORIES } from '../data';
-import { CastingCall } from '../types';
+import { Link } from 'react-router-dom';
+import { getTalentCategoryCounts } from '../api/talent.api';
+import { getPublicJobs } from '../api/job.api';
+import { getMyApplications } from '../api/application.api';
+import { getMyProfile } from '../api/profile.api';
+import { useAuthStore } from '../store/authStore';
+import ApplicationPopup from './ApplicationPopup';
+
+let cachedCounts: { map: Record<string, number>; total: number } | null = null;
+
+const CATEGORY_IMAGES: Record<string, string> = {
+  'Actors & Extras': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/actors_image.jpg',
+  'Dancers': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/category.jpg',
+  'Models': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/WhatsApp_Image_2024-10-11_at_3_22_56_PM.jpeg',
+  'Photographers': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/2892613_8705625.jpg',
+  'Makeup & Hairstylists': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/makeup.jpg',
+  'Singers': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/singers.jpg',
+  'Directors': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/Directors.jpg',
+  'Cinematographers / Videographers': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/Videographers.jpg',
+};
+const DEFAULT_CATEGORY_IMAGE = 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/pexels-bertellifotografia-2608515.jpg';
+const getCategoryImage = (name: string | undefined) => CATEGORY_IMAGES[name || ''] || DEFAULT_CATEGORY_IMAGE;
+
+const stripHtml = (str: string) => str.replace(new RegExp('<[^>]*>', 'g'), '');
+
+const daysUntil = (dateStr: string) => {
+  const diff = new Date(dateStr).getTime() - Date.now();
+  return Math.ceil(diff / (1000 * 60 * 60 * 24));
+};
+
+const PAYMENT_TYPE_ALIAS: Record<string, string> = {
+  per_hour: 'per_hour', per_hour_pay: 'per_hour',
+  per_day: 'per_day', per_day_pay: 'per_day',
+  per_week: 'per_week',
+  per_month: 'per_month', per_month_pay: 'per_month',
+  package: 'package', package_pay: 'package',
+};
+
+const formatBudget = (role: any): string | null => {
+  if (!role?.payment) return null;
+  const p = role.payment;
+  const t = PAYMENT_TYPE_ALIAS[role.paymentType] || role.paymentType;
+  switch (t) {
+    case 'per_hour': return p.hourBudgetPerHour ? `${p.hourBudgetPerHour} AED / HOUR` : null;
+    case 'per_day': {
+      if (p.dayBudgetFullDay && p.dayBudgetHalfDay) return `${p.dayBudgetFullDay} AED / DAY (Full) • ${p.dayBudgetHalfDay} AED / HALF DAY`;
+      if (p.dayBudgetFullDay) return `${p.dayBudgetFullDay} AED / DAY`;
+      if (p.dayBudgetHalfDay) return `${p.dayBudgetHalfDay} AED / HALF DAY`;
+      return p.dayTotalBudget ? `${p.dayTotalBudget} AED` : null;
+    }
+    case 'per_week': return p.weekBudgetPerWeek ? `${p.weekBudgetPerWeek} AED / WEEK` : null;
+    case 'per_month': return p.monthBudgetPerMonth ? `${p.monthBudgetPerMonth} AED / MONTH` : null;
+    case 'package': return p.packageTotalBudget ? `${p.packageTotalBudget} AED` : null;
+    default: return null;
+  }
+};
+
+const shimmerStyle = {
+  background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
+  backgroundSize: '200% 100%',
+  animation: 'shimmer 1.2s ease-in-out infinite',
+  borderRadius: '4px',
+  display: 'inline-block',
+};
 
 interface TalentAndCastingSectionProps {
   selectedCategory: string;
   onSelectCategory: (categoryName: string) => void;
-  castings: CastingCall[];
-  onCastingClick: (casting: CastingCall) => void;
 }
-
-const TIME_ANCHOR = new Date('2026-07-03').getTime();
-const MS_IN_DAY = 1000 * 3600 * 24;
 
 const CATEGORY_TAGS: Record<string, string> = {
   'all': "Unified Talents • Gulf-Wide",
@@ -51,9 +111,49 @@ const CATEGORY_COLORS: Record<string, { bg: string; border: string; glow: string
 export default function TalentAndCastingSection({
   selectedCategory,
   onSelectCategory,
-  castings,
-  onCastingClick,
 }: TalentAndCastingSectionProps) {
+  const [categoryCounts, setCategoryCounts] = useState<{ map: Record<string, number>; total: number } | null>(cachedCounts);
+
+  useEffect(() => {
+    if (cachedCounts) return;
+    getTalentCategoryCounts()
+      .then(res => {
+        const map: Record<string, number> = {};
+        res.data.data.categories.forEach((c: any) => { map[c.name] = c.count; });
+        cachedCounts = { map, total: res.data.data.total };
+        setCategoryCounts(cachedCounts);
+      })
+      .catch(() => {});
+  }, []);
+
+  const { user } = useAuthStore();
+  const [jobs, setJobs] = useState<any[]>(() => {
+    try {
+      const cached = sessionStorage.getItem('home_jobs_cache');
+      if (cached) return JSON.parse(cached);
+    } catch {}
+    return [];
+  });
+  const [jobsLoading, setJobsLoading] = useState(() => {
+    try { return !sessionStorage.getItem('home_jobs_cache'); } catch { return true; }
+  });
+  const [quickJob, setQuickJob] = useState<any>(null);
+  const [applyRole, setApplyRole] = useState<any>(null);
+  const [appliedRoleIds, setAppliedRoleIds] = useState<Set<string>>(new Set());
+  const [loadingApplied, setLoadingApplied] = useState(false);
+  const [limitMessage, setLimitMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    getPublicJobs({ page: 1, limit: 6, sort: 'latest' })
+      .then(res => {
+        const data = res.data.data.data || [];
+        setJobs(data);
+        sessionStorage.setItem('home_jobs_cache', JSON.stringify(data));
+      })
+      .catch(() => {})
+      .finally(() => setJobsLoading(false));
+  }, []);
+
   return (
     <div id="directors-board" className="w-full bg-white py-16 border-y border-[#f2f2f2] relative overflow-hidden space-y-24">
       {/* Background Ornaments */}
@@ -126,12 +226,12 @@ export default function TalentAndCastingSection({
 
                     <div className="flex items-center justify-between pt-2 border-t border-dashed border-neutral-200/50 group-hover:border-neutral-300/80">
                       <span className={`text-[10px] font-mono font-bold ${isActive ? 'text-pink-100' : 'text-neutral-500 group-hover:text-[#3835A4]'}`}>
-                        {cat.count.toLocaleString()} Active
+                        {categoryCounts ? (cat.id === 'all' ? categoryCounts.total : (categoryCounts.map[cat.name] ?? cat.count)).toLocaleString() : <span style={{ ...shimmerStyle, height: '12px', width: '50px', verticalAlign: 'middle' }} />} Active
                       </span>
                       <div className="flex items-center gap-1">
-                        <span className={`text-[8px] capitalize tracking-wider font-mono font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${isActive ? 'text-white' : 'text-neutral-700'}`}>
+                        <Link to={cat.url} className={`text-[8px] capitalize tracking-wider font-mono font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${isActive ? 'text-white' : 'text-neutral-700'}`}>
                           View
-                        </span>
+                        </Link>
                         <ArrowUpRight className={`h-3.5 w-3.5 transition-transform duration-300 ${isActive ? 'text-white translate-x-0.5 -translate-y-0.5' : 'text-neutral-400 group-hover:text-[#3835A4] group-hover:translate-x-0.5 group-hover:-translate-y-0.5'}`} />
                       </div>
                     </div>
@@ -142,7 +242,7 @@ export default function TalentAndCastingSection({
           </div>
         </section>
 
-        {/* SECTION 2: Casting Opportunities */}
+        {/* SECTION 2: Latest Job Openings */}
         <section>
           <div className="space-y-3 max-w-7xl mb-12 pb-6 border-b border-neutral-200/65">
             <h2 className="font-display text-3xl font-black text-neutral-900 sm:text-5xl tracking-tight leading-none">
@@ -153,98 +253,120 @@ export default function TalentAndCastingSection({
             </p>
           </div>
 
-          {castings.length === 0 ? (
+          {jobsLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="bg-white flex flex-col rounded-[2.25rem] overflow-hidden border border-neutral-200 h-[520px]">
+                  <div style={{ height: '224px', background: 'linear-gradient(90deg, #fce7f3 25%, #fbcfe8 50%, #fce7f3 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.4s ease-in-out infinite' }} />
+                  <div className="p-8 space-y-4 flex-1">
+                    <div style={{ height: '14px', width: '60%', background: 'linear-gradient(90deg, #fce7f3 25%, #fbcfe8 50%, #fce7f3 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.4s ease-in-out infinite', borderRadius: '6px' }} />
+                    <div style={{ height: '20px', width: '80%', background: 'linear-gradient(90deg, #fce7f3 25%, #fbcfe8 50%, #fce7f3 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.4s ease-in-out infinite', borderRadius: '6px' }} />
+                    <div style={{ height: '12px', width: '40%', background: 'linear-gradient(90deg, #fce7f3 25%, #fbcfe8 50%, #fce7f3 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.4s ease-in-out infinite', borderRadius: '6px', marginTop: 'auto' }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : jobs.length === 0 ? (
             <div className="text-center py-24 bg-neutral-50 border border-dashed border-neutral-200/80 rounded-[2rem] max-w-2xl mx-auto">
               <div className="h-14 w-14 rounded-2xl bg-neutral-100 flex items-center justify-center mx-auto mb-6">
                 <AlertCircle className="h-7 w-7 text-neutral-400" />
               </div>
               <h3 className="font-display text-xl font-black text-neutral-950">No active briefs listed</h3>
               <p className="text-sm text-neutral-500 mt-2 max-w-sm mx-auto leading-relaxed">
-                There are currently no open roles published under this segment. Check back shortly as new campaigns launch daily.
+                There are currently no open roles published. Check back shortly as new campaigns launch daily.
               </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
-              {castings.map((casting, index) => {
-                const expiryTime = new Date(casting.expiryDate).getTime();
-                const calculatedDaysLeft = Math.ceil((expiryTime - TIME_ANCHOR) / MS_IN_DAY);
-                
-                const isForcedExpired = index >= castings.length - 2;
-                const isExpired = calculatedDaysLeft <= 0 || isForcedExpired;
-                const daysLeft = isForcedExpired ? 0 : calculatedDaysLeft;
+              {jobs.map((job: any) => {
+                const firstRole = job.roles?.[0];
+                const daysLeft = job.lastDateToApply ? daysUntil(job.lastDateToApply) : null;
+                const isExpired = daysLeft !== null && daysLeft <= 0;
 
                 return (
                   <motion.div
-                    key={casting.id}
+                    key={job.id}
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-40px" }}
-                    transition={{ duration: 0.4, delay: (index % 3) * 0.05 }}
-                    onClick={() => onCastingClick(casting)}
-                    className="bg-white flex flex-col rounded-[2.25rem] overflow-hidden border border-neutral-200 hover:border-[#3835A4]/40 hover:shadow-2xl transition-all duration-500 cursor-pointer h-full group relative"
-                    style={{ contentVisibility: 'auto' }}
+                    transition={{ duration: 0.4 }}
+                    className="bg-white flex flex-col rounded-[2.25rem] overflow-hidden border border-neutral-200 hover:border-[#3835A4]/40 hover:shadow-2xl transition-all duration-500 h-full group relative"
                   >
                     <div className="relative h-56 w-full overflow-hidden bg-neutral-100 shrink-0">
                       <img
-                        src={casting.imageUrl}
-                        alt={casting.title}
+                        src={getCategoryImage(job.category?.name)}
+                        alt={job.title}
                         className="h-full w-full object-cover transition-transform duration-[1000ms] ease-out group-hover:scale-105 filter brightness-95 group-hover:brightness-90"
                         referrerPolicy="no-referrer"
                         loading="lazy"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/75 via-neutral-950/25 to-transparent transition-opacity group-hover:via-neutral-950/30" />
                       <div className="absolute top-5 left-5 right-5 flex items-center justify-between z-10">
-                        <span className="bg-white/95 backdrop-blur-md text-neutral-900 text-[9px] font-mono font-black tracking-[0.15em] capitalize px-3.5 py-1.5 rounded-xl shadow-md border border-neutral-200/50">
-                          {casting.category}
+                        <span className="bg-white/95 backdrop-blur-md text-neutral-900 text-[9px] font-mono font-black tracking-[0.15em] px-3.5 py-1.5 rounded-xl shadow-md border border-neutral-200/50">
+                          {job.category?.name || 'General'}
                         </span>
-                        <span className="bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white text-[9px] font-mono font-black tracking-[0.15em] px-3.5 py-1.5 rounded-xl border border-white/10 shadow-lg">
-                          {casting.paymentType}
-                        </span>
+                        {job.paymentInfo && (
+                          <span className="bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white text-[9px] font-mono font-black tracking-[0.15em] px-3.5 py-1.5 rounded-xl border border-white/10 shadow-lg">
+                            {job.paymentInfo === 'paid' ? 'Paid' : 'Unpaid'}
+                          </span>
+                        )}
                       </div>
                       
-                      {!isExpired && (
-                        <div className="capitalize absolute bottom-5 left-5 z-10 flex items-center gap-1.5 text-[9px] font-mono text-neutral-200 bg-neutral-950/80 backdrop-blur-md py-2 px-3.5 rounded-xl border border-white/10 shadow-sm font-bold">
+                      {!isExpired && daysLeft !== null && (
+                        <div className="absolute bottom-5 left-5 z-10 flex items-center gap-1.5 text-[9px] font-mono text-neutral-200 bg-neutral-950/80 backdrop-blur-md py-2 px-3.5 rounded-xl border border-white/10 shadow-sm font-bold">
                           <Clock className="h-3.5 w-3.5 text-[#C6007E] animate-pulse" />
-                          <span>Expires in {daysLeft} Days</span>
+                          <span>Expires in {daysLeft} days</span>
                         </div>
                       )}
                     </div>
 
                     <div className="p-8 flex flex-col flex-grow justify-between relative bg-white">
                       <div className="space-y-3">
-                        <div className="flex items-center gap-1.5 text-[9px] text-neutral-400 tracking-wider uppercase font-black">
+                        <div className="flex items-center gap-1.5 text-[9px] text-neutral-400 tracking-wider font-black">
                           <Landmark className="h-3 w-3 text-neutral-400" />
-                          <span className='capitalize'>{casting.client}</span>
-                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          <span>{job.company?.companyName || 'Company'}</span>
+                          {job.company?.user?.isVerified && (
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                          )}
                         </div>
 
-                        <h3 className="font-display text-xl sm:text-2xl font-black text-neutral-900 group-hover:text-[#3835A4] transition-colors tracking-tight line-clamp-1 leading-tight">
-                          {casting.title}
-                        </h3>
+                        <Link to={`/jobs/${job.id}`} className="no-underline">
+                          <h3 className="font-display text-xl sm:text-2xl font-black text-neutral-900 hover:text-[#3835A4] transition-colors tracking-tight line-clamp-1 leading-tight">
+                            {job.title || 'Untitled'}
+                          </h3>
+                        </Link>
 
                         <p className="text-xs text-neutral-500 line-clamp-3 leading-relaxed font-medium">
-                          {casting.description}
+                          {job.description ? stripHtml(job.description) : ''}
                         </p>
                       </div>
 
                       <div className="pt-6 mt-6 border-t border-neutral-100 flex flex-col gap-4">
-                        <div className="flex items-start gap-3.5 group/meta">
-                          <div className="h-9 w-9 rounded-xl bg-neutral-50 border border-neutral-200/80 flex items-center justify-center text-neutral-500 shrink-0 group-hover/meta:border-neutral-900/40 transition-colors">
-                            <MapPin className="h-4 w-4" />
+                        {job.castingCity && (
+                          <div className="flex items-start gap-3.5 group/meta">
+                            <div className="h-9 w-9 rounded-xl bg-neutral-50 border border-neutral-200/80 flex items-center justify-center text-neutral-500 shrink-0 group-hover/meta:border-neutral-900/40 transition-colors">
+                              <MapPin className="h-4 w-4" />
+                            </div>
+                            <div className="space-y-0.5">
+                              <span className="text-xs text-neutral-900 font-extrabold tracking-wide">
+                                {job.castingCity.name}{job.castingCity.country ? `, ${job.castingCity.country.name}` : ''}
+                              </span>
+                            </div>
                           </div>
-                          <div className="space-y-0.5">
-                            <span className="text-xs text-neutral-900 font-extrabold tracking-wide">{casting.location}</span>
-                          </div>
-                        </div>
+                        )}
 
-                        <div className="flex items-start gap-3.5 group/meta">
-                          <div className="h-9 w-9 rounded-xl bg-[#3835A4]/5 border border-[#3835A4]/10 flex items-center justify-center text-[#3835A4] shrink-0 group-hover/meta:border-[#3835A4] transition-colors">
-                            <DollarSign className="h-4 w-4" />
+                        {firstRole && (formatBudget(firstRole) || firstRole.paymentType) && (
+                          <div className="flex items-start gap-3.5 group/meta">
+                            <div className="h-9 w-9 rounded-xl bg-[#3835A4]/5 border border-[#3835A4]/10 flex items-center justify-center text-[#3835A4] shrink-0 group-hover/meta:border-[#3835A4] transition-colors">
+                              <DollarSign className="h-4 w-4" />
+                            </div>
+                            <div className="space-y-0.5">
+                              <span className="text-xs text-neutral-950 font-black font-mono tracking-wide">
+                                {formatBudget(firstRole) || firstRole.paymentType?.replace(/_/g, ' ')}
+                              </span>
+                            </div>
                           </div>
-                          <div className="space-y-0.5">
-                            <span className="text-xs text-neutral-950 font-black font-mono tracking-wide">{casting.rate}</span>
-                          </div>
-                        </div>
+                        )}
                       </div>
 
                       <div className="pt-6 mt-6 border-t border-dashed border-neutral-200 flex items-center justify-between">
@@ -258,14 +380,63 @@ export default function TalentAndCastingSection({
                           )}
                         </div>
 
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-mono font-black capitalize text-neutral-500 group-hover:text-[#3835A4] transition-colors duration-300">
-                            Apply
-                          </span>
-                          <div className="p-1.5 rounded-xl bg-neutral-50 border border-neutral-200/60 group-hover:bg-gradient-to-br group-hover:from-[#C6007E] group-hover:to-[#3835A4] group-hover:text-white group-hover:border-transparent transition-all duration-300">
-                            <ArrowUpRight className="h-3.5 w-3.5" />
+                        {!isExpired && (
+                          <div
+                            onClick={async (e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              if (!user) { alert('Please login to apply'); return; }
+                              setQuickJob(job);
+                              if (user.role === 'RECRUITER') {
+                                setLimitMessage('This feature is for talent only. Please register as a talent to apply for jobs.');
+                                return;
+                              }
+                              setLoadingApplied(true);
+                              try {
+                                const [appsRes, profileRes] = await Promise.all([
+                                  getMyApplications(),
+                                  getMyProfile()
+                                ]);
+                                const plan = profileRes.data.data?.subscription?.plan;
+                                const maxJobsPerMonth = plan?.maxJobsPerMonth ?? 1;
+                                if (maxJobsPerMonth < 999) {
+                                  const now = new Date();
+                                  const thisMonthCount = (appsRes.data.data || []).filter((a: any) => {
+                                    const d = new Date(a.createdAt);
+                                    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+                                  }).length;
+                                  if (thisMonthCount >= maxJobsPerMonth) {
+                                    setLimitMessage(`You've reached your application limit (${maxJobsPerMonth}/month). Upgrade to Premium for unlimited applications.`);
+                                    return;
+                                  }
+                                }
+                                const apps = appsRes.data.data || [];
+                                const roleIds = apps
+                                  .filter((a: any) => a.role?.job?.id === job.id)
+                                  .map((a: any) => a.roleId);
+                                setAppliedRoleIds(new Set(roleIds));
+                              } catch (err) {
+                                console.error(err);
+                                setAppliedRoleIds(new Set());
+                              } finally {
+                                setLoadingApplied(false);
+                              }
+                            }}
+                            className="flex items-center gap-2 cursor-pointer"
+                          >
+                            <span className="text-[10px] font-mono font-black text-neutral-500 group-hover:text-[#3835A4] transition-colors duration-300">
+                              Quick Apply
+                            </span>
+                            <div className="p-1.5 rounded-xl bg-neutral-50 border border-neutral-200/60 group-hover:bg-gradient-to-br group-hover:from-[#C6007E] group-hover:to-[#3835A4] group-hover:text-white group-hover:border-transparent transition-all duration-300">
+                              <ArrowUpRight className="h-3.5 w-3.5" />
+                            </div>
                           </div>
-                        </div>
+                        )}
+                        {isExpired && (
+                          <span className="text-[10px] font-mono font-black text-neutral-500">
+                            Application closed
+                          </span>
+                        )}
                       </div>
                     </div>
                   </motion.div>
@@ -273,7 +444,95 @@ export default function TalentAndCastingSection({
               })}
             </div>
           )}
+
+          <div className="text-center mt-12">
+            <Link to="/browse-jobs" className="inline-flex items-center gap-2 bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white px-8 py-4 rounded-2xl font-black text-sm tracking-wider  hover:opacity-90 transition-all shadow-lg">
+              View All Jobs
+              <ArrowUpRight className="h-4 w-4" />
+            </Link>
+          </div>
         </section>
+
+        {/* Quick Apply Popup */}
+        {quickJob && !applyRole && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={(e) => { if (e.target === e.currentTarget) { setQuickJob(null); setLimitMessage(null); } }}>
+            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+              <div className="sticky top-0 bg-white z-10 border-b border-stone-100 px-6 py-4 flex items-center justify-between rounded-t-3xl">
+                <div>
+                  <h2 className="text-lg font-black tracking-tight text-[#3835A4]">{quickJob.title || 'Untitled'}</h2>
+                  <p className="text-xs text-stone-500 font-medium mt-0.5">{quickJob.company?.companyName || ''}</p>
+                </div>
+                <button onClick={() => { setQuickJob(null); setLimitMessage(null); }} className="text-stone-400 hover:text-stone-600 text-xl leading-none">&times;</button>
+              </div>
+              <div className="px-6 py-5 space-y-5">
+                {loadingApplied && !limitMessage ? (
+                  <div className="flex flex-col items-center justify-center py-12">
+                    <div className="w-10 h-10 border-4 border-[#C6007E] border-t-transparent rounded-full animate-spin" />
+                    <p className="text-xs text-stone-400 font-medium mt-4">Loading application info...</p>
+                  </div>
+                ) : limitMessage ? (
+                  <div className="flex flex-col items-center text-center py-8 px-4">
+                    <div className="w-16 h-16 rounded-full bg-[#C6007E]/10 flex items-center justify-center mb-4">
+                      <AlertCircle className="w-8 h-8 text-[#C6007E]" />
+                    </div>
+                    <h3 className="text-lg font-black text-[#C6007E] mb-2">{limitMessage.includes('application limit') ? 'Application Limit Reached' : 'Notice'}</h3>
+                    <p className="text-sm text-stone-600 leading-relaxed max-w-sm">{limitMessage}</p>
+                  </div>
+                ) : (
+                  <>
+                    {quickJob.description && (
+                      <div>
+                        <p className="text-[10px] font-extrabold tracking-widest text-stone-400 uppercase mb-2">Description</p>
+                        <p className="text-sm text-stone-700 leading-relaxed">{stripHtml(quickJob.description).slice(0, 300)}</p>
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-[10px] font-extrabold tracking-widest text-stone-400 uppercase mb-3">
+                        Roles ({quickJob.roles?.length || 0})
+                      </p>
+                      <div className="space-y-2">
+                        {(quickJob.roles || []).map((role: any) => (
+                          <div key={role.id} className="flex items-center justify-between bg-stone-50 rounded-xl px-4 py-3 border border-stone-100">
+                            <div>
+                              <p className="text-sm font-bold text-[#3835A4]">{role.title || 'Untitled Role'}</p>
+                              <p className="text-[10px] text-stone-500">
+                                {role.gender && `${role.gender} · `}{role.ageMin && `${role.ageMin}${role.ageMax ? `-${role.ageMax}` : '+'} yrs`}
+                                {role.noOfCast && ` · ${role.noOfCast} talent${role.noOfCast > 1 ? 's' : ''}`}
+                              </p>
+                            </div>
+                            {appliedRoleIds.has(role.id) ? (
+                              <span className="bg-green-100 text-green-700 px-4 py-2 rounded-lg font-black uppercase tracking-widest text-[10px] whitespace-nowrap ml-3">
+                                Applied
+                              </span>
+                            ) : (
+                              <button
+                                onClick={() => setApplyRole(role)}
+                                className="bg-[#C6007E] text-white px-4 py-2 rounded-lg font-black uppercase tracking-widest text-[10px] hover:bg-[#a10065] transition-all whitespace-nowrap ml-3"
+                              >
+                                Apply
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Role Application Popup */}
+        {applyRole && (
+          <ApplicationPopup
+            jobId={quickJob?.id}
+            role={applyRole}
+            isExpired={false}
+            onClose={() => setApplyRole(null)}
+            onApplied={() => { setApplyRole(null); setQuickJob(null); }}
+          />
+        )}
 
       </div>
     </div>

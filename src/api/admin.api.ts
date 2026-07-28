@@ -53,3 +53,18 @@ export const getTalentSubscriptionDetails = (talentId: string) =>
 
 export const loginAsTalent = (talentId: string) =>
   api.post(`/admin/talents/${talentId}/login`);
+
+export const getAdminBlogs = (page: number, limit: number = 20) =>
+  api.get('/admin/blogs', { params: { page, limit } });
+
+export const createBlog = (data: { title: string; description: string; image: string; date: string; categoryId: number | null }) =>
+  api.post('/admin/blogs', data);
+
+export const updateBlog = (blogId: number, data: { title: string; description: string; image?: string; date: string; categoryId: number | null }) =>
+  api.put(`/admin/blogs/${blogId}`, data);
+
+export const uploadBlogImage = (data: FormData) =>
+  api.post('/admin/blogs/image', data, { headers: { 'Content-Type': 'multipart/form-data' } });
+
+export const deleteBlog = (blogId: number) =>
+  api.delete(`/admin/blogs/${blogId}`);

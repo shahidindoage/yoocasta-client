@@ -1,16 +1,16 @@
 import { Talent, CastingCall, Testimonial, BlogItem } from './types';
 
 export const CATEGORIES = [
-  { id: 'all', name: 'All Categories', count: 24433 },
-  { id: 'actors', name: 'Actors & Extras', count: 7931, icon: 'Clapperboard' },
-  { id: 'singers', name: 'Singers', count: 837, icon: 'Mic' },
-  { id: 'dancers', name: 'Dancers', count: 1382, icon: 'Footprints' },
-  { id: 'models', name: 'Models', count: 8308, icon: 'Sparkles' },
-  { id: 'photographers', name: 'Photographers', count: 642, icon: 'Camera' },
-  { id: 'directors', name: 'Directors & Crew', count: 424, icon: 'Film' },
-  { id: 'promoters', name: 'Promoters & Hosts', count: 2802, icon: 'Megaphone' },
-  { id: 'makeup', name: 'Makeup & Hair Artists', count: 519, icon: 'Scissors' },
-  { id: 'voiceover', name: 'Voice Over Artists', count: 1588, icon: 'Volume2' },
+  { id: 'all', name: 'All Categories', count: 24433, url:'/browse-talents' },
+  { id: 'actors', name: 'Actors & Extras', count: 7931, icon: 'Clapperboard', url:'/browse-talents?category=Actors+%26+Extras' },
+  { id: 'singers', name: 'Singers', count: 837, icon: 'Mic', url:'/browse-talents?category=Singers' },
+  { id: 'dancers', name: 'Dancers', count: 1382, icon: 'Footprints',url:'/browse-talents?category=Dancers' },
+  { id: 'models', name: 'Models', count: 8308, icon: 'Sparkles', url:'/browse-talents?category=Models' },
+  { id: 'photographers', name: 'Photographers', count: 642, icon: 'Camera',url:'/browse-talents?category=Cinematographers+%2F+Videographers' },
+  { id: 'directors', name: 'Directors & Crew', count: 424, icon: 'Film',url:'/browse-talents?category=Directors' },
+  { id: 'promoters', name: 'Promoters & Hosts', count: 2802, icon: 'Megaphone',url:'/browse-talents?category=Promoters' },
+  { id: 'makeup', name: 'Makeup & Hair Artists', count: 519, icon: 'Scissors',url:'/browse-talents?category=Makeup+%26+Hairstylists' },
+  { id: 'voiceover', name: 'Voice Over Artists', count: 1588, icon: 'Volume2',url:'/browse-talents?category=MC%2FRJ%2FVJ%2FVoice+Over' },
 ];
 
 export const LOCATIONS = [

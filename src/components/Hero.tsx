@@ -1,30 +1,37 @@
 import React, { useState } from 'react';
 import { Search } from 'lucide-react';
-import { CATEGORIES, LOCATIONS } from '../data';
+import { useNavigate } from 'react-router-dom';
 
-interface HeroProps {
-  onSearch: (filters: { category: string; location: string; gender: string; keyword: string }) => void;
-}
+const CATEGORIES = [
+  'Actors & Extras', 'Cinematographers / Videographers', 'Dancers',
+  'Directors', 'Hostesses', 'MC/RJ/VJ/Voice Over', 'Makeup & Hairstylists',
+  'Models', 'Photographers', 'Promoters', 'Singers',
+];
 
-export default function Hero({ onSearch }: HeroProps) {
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedLocation, setSelectedLocation] = useState('All Locations');
-  const [selectedGender, setSelectedGender] = useState('All');
+const LOCATIONS = [
+  'Sharjah, United Arab Emirates', 'Dubai, United Arab Emirates',
+  'Abu Dhabi, United Arab Emirates', 'Al Ayn, United Arab Emirates',
+  '`Ajman, United Arab Emirates', 'Al Fujayrah, United Arab Emirates',
+];
+
+export default function Hero() {
+  const navigate = useNavigate();
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedLocation, setSelectedLocation] = useState('');
+  const [selectedGender, setSelectedGender] = useState('');
   const [keyword, setKeyword] = useState('');
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSearch({
-      category: selectedCategory,
-      location: selectedLocation,
-      gender: selectedGender,
-      keyword,
-    });
-    
-    const target = document.getElementById('talents-anchor');
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const params = new URLSearchParams();
+    if (keyword.trim()) params.set('search', keyword.trim());
+    if (selectedGender) params.set('gender', selectedGender.toLowerCase());
+    if (selectedCategory) params.set('category', selectedCategory);
+    if (selectedLocation) {
+      const cityName = selectedLocation.split(',')[0].trim();
+      params.set('city', cityName);
     }
+    navigate(`/browse-talents?${params.toString()}`);
   };
 
   return (
@@ -97,39 +104,39 @@ export default function Hero({ onSearch }: HeroProps) {
           <form onSubmit={handleSearchSubmit}>
             <div className="flex items-center gap-2">
               <div className="flex-1 bg-[#fef1f5] rounded-xl border border-[#f5d0e3] focus-within:border-[#C6007E] transition-colors px-3 py-2">
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full bg-transparent text-xs text-stone-900 font-black focus:outline-none cursor-pointer"
-                >
-                  <option value="all" className="bg-white">Any Specialization</option>
-                  {CATEGORIES.filter(c => c.id !== 'all').map((cat) => (
-                    <option key={cat.id} value={cat.name} className="bg-white">{cat.name}</option>
-                  ))}
-                </select>
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="w-full bg-transparent text-xs text-stone-900 font-black focus:outline-none cursor-pointer"
+                  >
+                    <option value="" className="bg-white">Any Specialization</option>
+                    {CATEGORIES.map((cat) => (
+                      <option key={cat} value={cat} className="bg-white">{cat}</option>
+                    ))}
+                  </select>
               </div>
               <div className="flex-1 bg-[#fef1f5] rounded-xl border border-[#f5d0e3] focus-within:border-[#C6007E] transition-colors px-3 py-2">
-                <select
-                  value={selectedLocation}
-                  onChange={(e) => setSelectedLocation(e.target.value)}
-                  className="w-full bg-transparent text-xs text-stone-900 font-black focus:outline-none cursor-pointer"
-                >
-                  {LOCATIONS.map((loc) => (
-                    <option key={loc} value={loc} className="bg-white">{loc}</option>
-                  ))}
-                </select>
+                  <select
+                    value={selectedLocation}
+                    onChange={(e) => setSelectedLocation(e.target.value)}
+                    className="w-full bg-transparent text-xs text-stone-900 font-black focus:outline-none cursor-pointer"
+                  >
+                    <option value="" className="bg-white">All Locations</option>
+                    {LOCATIONS.map((loc) => (
+                      <option key={loc} value={loc} className="bg-white">{loc}</option>
+                    ))}
+                  </select>
               </div>
               <div className="flex-1 bg-[#fef1f5] rounded-xl border border-[#f5d0e3] focus-within:border-[#C6007E] transition-colors px-3 py-2">
-                <select
-                  value={selectedGender}
-                  onChange={(e) => setSelectedGender(e.target.value)}
-                  className="w-full bg-transparent text-xs text-stone-900 font-black focus:outline-none cursor-pointer"
-                >
-                  <option value="All" className="bg-white">All Genders</option>
-                  <option value="Female" className="bg-white">Female</option>
-                  <option value="Male" className="bg-white">Male</option>
-                  <option value="Non-binary" className="bg-white">Non-binary</option>
-                </select>
+                  <select
+                    value={selectedGender}
+                    onChange={(e) => setSelectedGender(e.target.value)}
+                    className="w-full bg-transparent text-xs text-stone-900 font-black focus:outline-none cursor-pointer"
+                  >
+                    <option value="" className="bg-white">All Genders</option>
+                    <option value="male" className="bg-white">Male</option>
+                    <option value="female" className="bg-white">Female</option>
+                  </select>
               </div>
               <div className="flex-[2] bg-[#fef1f5] rounded-xl border border-[#f5d0e3] focus-within:border-[#C6007E] transition-colors px-3 py-2 flex items-center gap-2">
                 <Search className="h-4 w-4 text-[#C6007E] shrink-0" />

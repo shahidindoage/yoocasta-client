@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 // import Header from '../components/Header';
 import Hero from '../components/Hero';
 import CategoryBrowser from '../components/CategoryBrowser';
@@ -30,11 +30,10 @@ export default function Home() {
   const [talents, setTalents] = useState<Talent[]>(INITIAL_TALENTS);
   const [castings, setCastings] = useState<CastingCall[]>(INITIAL_CASTINGS);
 
-  // Search and Filter conditions
+  // Home page filter state (for FeaturedTalent component)
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedGender, setSelectedGender] = useState('All');
   const [selectedLocation, setSelectedLocation] = useState('All Locations');
-  const [searchKeyword, setSearchKeyword] = useState('');
 
   // Active Modals States
   const [activeTalentDetails, setActiveTalentDetails] = useState<Talent | null>(null);
@@ -55,40 +54,6 @@ export default function Home() {
   const [premiumUserPhone, setPremiumUserPhone] = useState('');
   const [premiumUserEmail, setPremiumUserEmail] = useState('');
   const [isPremiumActivated, setIsPremiumActivated] = useState(false);
-
-  // Callback to execute searches from the Hero search engine
-  const handleHeroSearch = (filters: { category: string; location: string; gender: string; keyword: string }) => {
-    setSelectedCategory(filters.category);
-    setSelectedLocation(filters.location);
-    setSelectedGender(filters.gender);
-    setSearchKeyword(filters.keyword);
-  };
-
-  // Live filtered list computed cleanly
-  const filteredTalents = useMemo(() => {
-    return talents.filter((talent) => {
-      // Check gender match
-      const matchesGender =
-        selectedGender === 'All' ||
-        talent.gender === selectedGender;
-
-      // Check location match
-      const matchesLocation =
-        selectedLocation === 'All Locations' ||
-        talent.location === selectedLocation;
-
-      // Check keyword filter (e.g. name, ethnicity, bio features)
-      const matchesKeyword =
-        !searchKeyword ||
-        talent.name.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-        talent.bio.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-        talent.stats.hairColor.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-        talent.stats.eyeColor.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-        talent.categories.some(cat => cat.toLowerCase().includes(searchKeyword.toLowerCase()));
-
-      return matchesGender && matchesLocation && matchesKeyword;
-    });
-  }, [talents, selectedGender, selectedLocation, searchKeyword]);
 
   // Handle adding new talent profile live
   const handleNewTalentPublish = (newTalent: Talent) => {
@@ -141,22 +106,17 @@ export default function Home() {
       {/* 1. Brand Header (Moved to App.tsx) */}
 
       {/* 2. Immersive Video-feel Hero */}
-      <Hero 
-        onSearch={handleHeroSearch} 
-        registeredCount={talents.length} 
-      />
+      <Hero />
 
       {/* 3. Category Browser Grid */}
       <TalentAndCastingSection
   selectedCategory={selectedCategory}
   onSelectCategory={setSelectedCategory}
-  castings={castings}
-  onCastingClick={setActiveCastingDetails}
 />
 
       {/* 4. Filterable Talent Grid portfolio */}
       <FeaturedTalent
-        talents={filteredTalents}
+        talents={talents}
         onTalentClick={setActiveTalentDetails}
         selectedCategory={selectedCategory}
         selectedGender={selectedGender}
