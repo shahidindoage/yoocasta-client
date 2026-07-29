@@ -261,13 +261,14 @@ const toggleFavourite = async (talentUserId: string) => {
 };
 
 useEffect(() => {
-  fetch('/static/filterOptions.json')
-    .then(r => r.json())
-    .then(setFilterData);
+  const url = 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/static/filterOptions.json?t=' + Date.now();
+  fetch(url)
+    .then(r => { if (!r.ok) throw new Error('R2 fetch failed'); return r.json(); })
+    .then(setFilterData)
+    .catch(() => fetch('/static/filterOptions.json').then(r => r.json()).then(setFilterData));
 }, []);
 
 useEffect(() => {
-  if (!filterData) return;
   const initial: any = { ...DEFAULT_FILTERS };
   let hasParam = false;
 
@@ -279,12 +280,12 @@ useEffect(() => {
   if (search) { initial.search = search; hasParam = true; }
   if (gender) { initial.gender = gender; hasParam = true; }
 
-  if (categoryName) {
+  if (categoryName && filterData) {
     const match = filterData.categories.find((c: any) => c.name === categoryName);
     if (match) { initial.categories = [match.id]; hasParam = true; }
   }
 
-  if (cityName) {
+  if (cityName && filterData) {
     const match = filterData.cities.find((c: any) => c.name === cityName);
     if (match) {
       initial.cityId = match.id;

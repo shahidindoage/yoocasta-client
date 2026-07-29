@@ -5,6 +5,7 @@ import { getPublicJobs } from '../../api/job.api';
 import { getMyApplications } from '../../api/application.api';
 import { getMyProfile } from '../../api/profile.api';
 import { useAuthStore } from '../../store/authStore';
+import api from '../../api/axios';
 import ApplicationPopup from '../../components/ApplicationPopup';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
@@ -181,9 +182,10 @@ const BrowseJobs = () => {
   draftRef.current = draftFilters;
 
   useEffect(() => {
-    fetch('/static/filterOptions.json')
-      .then(r => r.json())
-      .then(setFilterData);
+    fetch('https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/static/filterOptions.json?t=' + Date.now())
+      .then(r => { if (!r.ok) throw new Error('R2 fetch failed'); return r.json(); })
+      .then(setFilterData)
+      .catch(() => fetch('/static/filterOptions.json').then(r => r.json()).then(setFilterData));
   }, []);
 
   useEffect(() => {

@@ -54,6 +54,7 @@ import AdminJobEdit from './pages/admin/AdminJobEdit';
 import TalentSubscription from './pages/admin/TalentSubscription';
 import Report from './pages/admin/Report';
 import ManageWork from './pages/admin/ManageWork';
+import ManageLanguage from './pages/admin/ManageLanguage';
 
 // Placeholder dashboard pages (we'll build these next)
 
@@ -105,6 +106,7 @@ function App() {
               <Route path="/admin/jobs/:id/payment" element={<JobPaymentDetails />} />
               <Route path="/admin/jobs/:id/edit" element={<AdminJobEdit />} />
               <Route path="/admin/work" element={<ManageWork />} />
+              <Route path="/admin/language" element={<ManageLanguage />} />
               <Route path="/admin/report" element={<Report />} />
             </Route>
           </Route>

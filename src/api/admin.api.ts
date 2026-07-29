@@ -68,3 +68,15 @@ export const uploadBlogImage = (data: FormData) =>
 
 export const deleteBlog = (blogId: number) =>
   api.delete(`/admin/blogs/${blogId}`);
+
+export const getLanguages = (page: number = 1, limit: number = 20) =>
+  api.get('/admin/languages', { params: { page, limit } });
+
+export const createLanguage = (name: string) =>
+  api.post('/admin/languages', { name });
+
+export const deleteLanguage = (id: string) =>
+  api.delete(`/admin/languages/${id}`);
+
+export const updateLanguage = (id: string, name: string) =>
+  api.put(`/admin/languages/${id}`, { name });
