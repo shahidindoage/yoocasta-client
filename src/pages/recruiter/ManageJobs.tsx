@@ -176,11 +176,10 @@ export default function ManageJobs() {
              <span className="bg-gray-100 text-gray-600 border border-gray-200 px-2 py-1 rounded text-[10px] font-bold ">{job.status}</span>
             )}
            </td>
-           <td className="p-4 text-right space-x-3 whitespace-nowrap">
-            <Link to={`/jobs/${job.id}`} className="text-xs font-bold text-[#3835A4] hover:text-[#C6007E] transition-colors">View</Link>
-            {/* Edit isn't fully implemented per instructions, so placeholder link */}
-            <button onClick={() => alert("Edit job not implemented yet")} className="text-xs font-bold text-[#3835A4]/50 hover:text-[#3835A4] transition-colors">Edit</button>
-           </td>
+            <td className="p-4 text-right space-x-3 whitespace-nowrap">
+             <Link to={`/jobs/${job.id}`} className="text-xs font-bold text-[#3835A4] hover:text-[#C6007E] transition-colors">View</Link>
+             <Link to={`/dashboard/recruiter/jobs/${job.id}/edit`} className="text-xs font-bold text-[#3835A4]/50 hover:text-[#3835A4] transition-colors">Edit</Link>
+            </td>
           </tr>
          );
         })

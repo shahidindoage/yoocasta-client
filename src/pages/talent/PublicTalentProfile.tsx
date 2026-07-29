@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getPublicProfile } from '../../api/talent.api';
+import { useAuthStore } from '../../store/authStore';
 
 import {
   FaTheaterMasks,
@@ -142,6 +143,9 @@ const PublicTalentProfile = () => {
   const [showAllCourses, setShowAllCourses] = useState(false);
   const [showAllPortfolio, setShowAllPortfolio] = useState(false);
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+
+  const { user } = useAuthStore();
+  const isRecruiter = user?.role === 'RECRUITER';
 
   const hasFetched = useRef(false);
 
@@ -296,6 +300,18 @@ const PublicTalentProfile = () => {
                   {tp?.city?.name ? `${tp.city.name}, ${tp.city.country?.name || ''}` : 'Global Hub'}
                 </span>
               </div>
+              {isRecruiter && profile.email && (
+                <div className="bg-white border-2 border-[#C6007E] p-4 rounded-2xl shadow-[4px_4px_0px_0px_#C6007E] flex flex-col justify-between h-24 text-left transform rotate-1">
+                  <span className="text-[8px] font-black text-[#C6007E] font-sans">Email</span>
+                  <span className="text-xs font-display text-stone-900 truncate block">{profile.email}</span>
+                </div>
+              )}
+              {isRecruiter && profile.phone && (
+                <div className="col-span-2 sm:col-span-1 bg-white border-2 border-[#C6007E] p-4 rounded-2xl shadow-[4px_4px_0px_0px_#C6007E] flex flex-col justify-between h-24 text-left transform -rotate-1">
+                  <span className="text-[8px] font-black text-[#C6007E] font-sans">Phone</span>
+                  <span className="text-xs font-display text-stone-900 truncate block">{profile.phone}</span>
+                </div>
+              )}
             </div>
 
             {/* CATEGORIES DISPLAYED AS HIGH-CONTRAST CHIPS */}
@@ -321,6 +337,9 @@ const PublicTalentProfile = () => {
             )}
           </div>
         </div>
+
+
+         {user && (<>
 
         {/* BRUTALIST GRID BLOCK: BIOMETRICS & SPECS */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
@@ -664,6 +683,8 @@ const PublicTalentProfile = () => {
     </div>
   )}
 </div>
+
+  </>)}
 
       </div>
 

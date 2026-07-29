@@ -52,1203 +52,963 @@
     "countries": [
         {
             "id": "f3353e66-280f-47fc-b990-dfded00ed03d",
-            "name": "Afghanistan",
-            "phoneCode": ""
+            "name": "Afghanistan"
         },
         {
             "id": "178357a8-01d0-469d-ac40-f2fbc8bd2ee5",
-            "name": "Albania",
-            "phoneCode": ""
+            "name": "Albania"
         },
         {
             "id": "1388bc9a-a28f-43bc-a7f3-d958c05e792f",
-            "name": "Algeria",
-            "phoneCode": ""
+            "name": "Algeria"
         },
         {
             "id": "43963c82-0673-4550-97c6-171c7709c371",
-            "name": "American Samoa",
-            "phoneCode": ""
+            "name": "American Samoa"
         },
         {
             "id": "da55c19a-170d-48bc-b1eb-4b8995036039",
-            "name": "Andorra",
-            "phoneCode": ""
+            "name": "Andorra"
         },
         {
             "id": "9d12087a-768a-40ff-bea2-572c2042cb44",
-            "name": "Angola",
-            "phoneCode": ""
+            "name": "Angola"
         },
         {
             "id": "701e389f-ef13-4dc1-b8fb-c2a1c6c2b763",
-            "name": "Anguilla",
-            "phoneCode": ""
+            "name": "Anguilla"
         },
         {
             "id": "8e370a81-a8f0-4dc2-9e20-15d3d2738d6a",
-            "name": "Antarctica",
-            "phoneCode": ""
+            "name": "Antarctica"
         },
         {
             "id": "c8aa0b92-db36-405a-a031-d63bae5e707f",
-            "name": "Antigua & Barbuda",
-            "phoneCode": ""
+            "name": "Antigua & Barbuda"
         },
         {
             "id": "d593652c-f4ca-4882-9dd5-e2874c0b4052",
-            "name": "Argentina",
-            "phoneCode": ""
+            "name": "Argentina"
         },
         {
             "id": "92b079a1-ee4a-455f-bd22-09b84c11380e",
-            "name": "Armenia",
-            "phoneCode": ""
+            "name": "Armenia"
         },
         {
             "id": "acf2c81a-a07c-456f-8ee1-460324a4ded1",
-            "name": "Aruba",
-            "phoneCode": ""
+            "name": "Aruba"
         },
         {
             "id": "85d4390d-823c-4e46-962a-2947f1823308",
-            "name": "Australia",
-            "phoneCode": ""
+            "name": "Australia"
         },
         {
             "id": "88c706ba-be26-433f-b669-a46bd698701f",
-            "name": "Austria",
-            "phoneCode": ""
+            "name": "Austria"
         },
         {
             "id": "b8052485-c1d4-4e05-ab06-ef6811d9ecc9",
-            "name": "Azerbaijan",
-            "phoneCode": ""
+            "name": "Azerbaijan"
         },
         {
             "id": "fece928a-7e7f-4afe-bd09-bb127e231583",
-            "name": "Bahamas",
-            "phoneCode": ""
+            "name": "Bahamas"
         },
         {
             "id": "cf666236-919c-41f1-9283-f8193da967e6",
-            "name": "Bahrain",
-            "phoneCode": ""
+            "name": "Bahrain"
         },
         {
             "id": "ab151891-a3fd-4b0e-bac8-85670269f2ef",
-            "name": "Bangladesh",
-            "phoneCode": ""
+            "name": "Bangladesh"
         },
         {
             "id": "ff395dbb-eb9e-4c64-8377-09bf173641cd",
-            "name": "Barbados",
-            "phoneCode": ""
+            "name": "Barbados"
         },
         {
             "id": "87173b95-96d1-4ff5-a261-88a2c4f0e9af",
-            "name": "Belarus",
-            "phoneCode": ""
+            "name": "Belarus"
         },
         {
             "id": "dfbf70fe-fcf7-488e-8d1d-40508742994b",
-            "name": "Belgium",
-            "phoneCode": ""
+            "name": "Belgium"
         },
         {
             "id": "d4903f1d-e341-4f4d-baf1-524839783130",
-            "name": "Belize",
-            "phoneCode": ""
+            "name": "Belize"
         },
         {
             "id": "a9e34af6-55e4-443c-88d1-9259c997ec5d",
-            "name": "Benin",
-            "phoneCode": ""
+            "name": "Benin"
         },
         {
             "id": "51db4699-6e4b-4571-b606-412b5c357061",
-            "name": "Bermuda",
-            "phoneCode": ""
+            "name": "Bermuda"
         },
         {
             "id": "a9b0215f-a958-42c6-a4cf-6336adf907a6",
-            "name": "Bhutan",
-            "phoneCode": ""
+            "name": "Bhutan"
         },
         {
             "id": "3f034e02-d4b5-46c8-8ead-a12acaa7d8d4",
-            "name": "Bolivia",
-            "phoneCode": ""
+            "name": "Bolivia"
         },
         {
             "id": "ab610571-e6f0-4993-932d-68033b857ac8",
-            "name": "Bosnia",
-            "phoneCode": ""
+            "name": "Bosnia"
         },
         {
             "id": "f62bda6c-885a-44c0-9159-5a3049404ec9",
-            "name": "Bosnia and Herzegovina",
-            "phoneCode": ""
+            "name": "Bosnia and Herzegovina"
         },
         {
             "id": "e616e344-251d-4088-ba3f-fa23a91eea71",
-            "name": "Botswana",
-            "phoneCode": ""
+            "name": "Botswana"
         },
         {
             "id": "b7110e03-c0df-4d71-acd2-5c00cca61abf",
-            "name": "Brazil",
-            "phoneCode": ""
+            "name": "Brazil"
         },
         {
             "id": "608c3628-fcf9-4a99-9112-c35eef419771",
-            "name": "British Virgin Islands",
-            "phoneCode": ""
+            "name": "British Virgin Islands"
         },
         {
             "id": "8c1fb148-d26d-4a14-8224-74a967bbb2af",
-            "name": "Brunei",
-            "phoneCode": ""
+            "name": "Brunei"
         },
         {
             "id": "e7f563b8-0c59-40ae-812e-af338204e767",
-            "name": "Bulgaria",
-            "phoneCode": ""
+            "name": "Bulgaria"
         },
         {
             "id": "fdabfe6f-59dd-4548-9ab7-02bd6728c376",
-            "name": "Burkina Faso",
-            "phoneCode": ""
+            "name": "Burkina Faso"
         },
         {
             "id": "a7fa0bde-06fd-4ce7-83f4-edb434cd4135",
-            "name": "Burundi",
-            "phoneCode": ""
+            "name": "Burundi"
         },
         {
             "id": "4e292b02-ab40-4527-bf14-26310a0ddf72",
-            "name": "Cambodia",
-            "phoneCode": ""
+            "name": "Cambodia"
         },
         {
             "id": "aaed5ccc-9468-4c94-870b-dcf1ed70dd41",
-            "name": "Cameroon",
-            "phoneCode": ""
+            "name": "Cameroon"
         },
         {
             "id": "14e0570c-5d4c-482d-abaa-3ccadfc15370",
-            "name": "Canada",
-            "phoneCode": ""
+            "name": "Canada"
         },
         {
             "id": "06874dd8-d275-4846-a2aa-00d937768d8a",
-            "name": "Cape Verde",
-            "phoneCode": ""
+            "name": "Cape Verde"
         },
         {
             "id": "7080e705-54fa-4857-b456-73cafd2445dd",
-            "name": "Caribbean Netherlands",
-            "phoneCode": ""
+            "name": "Caribbean Netherlands"
         },
         {
             "id": "3baf2452-d03b-4c56-b19a-65293c6069ae",
-            "name": "Cayman Islands",
-            "phoneCode": ""
+            "name": "Cayman Islands"
         },
         {
             "id": "f9eb7cb7-610b-4cd5-a4c6-629061343ae3",
-            "name": "Central African Republic",
-            "phoneCode": ""
+            "name": "Central African Republic"
         },
         {
             "id": "4342c7d2-9488-4ba3-9103-f6df080c283d",
-            "name": "Chad",
-            "phoneCode": ""
+            "name": "Chad"
         },
         {
             "id": "2b24e057-091e-4138-96bc-8d28345866ef",
-            "name": "Chile",
-            "phoneCode": ""
+            "name": "Chile"
         },
         {
             "id": "9ea33e5c-f161-41cf-accd-8be98e7e9a00",
-            "name": "China",
-            "phoneCode": ""
+            "name": "China"
         },
         {
             "id": "fe80c9ec-fdf4-4199-92d0-e179b984aed9",
-            "name": "Christmas Island",
-            "phoneCode": ""
+            "name": "Christmas Island"
         },
         {
             "id": "b43aec53-b275-41ac-be89-468362393ab9",
-            "name": "Colombia",
-            "phoneCode": ""
+            "name": "Colombia"
         },
         {
             "id": "28ea22a8-700d-4d3e-8df1-35407f565303",
-            "name": "Comoros",
-            "phoneCode": ""
+            "name": "Comoros"
         },
         {
             "id": "c66cbbc7-e3b0-4054-a835-c9caf0c05c16",
-            "name": "Congo - Brazzaville",
-            "phoneCode": ""
+            "name": "Congo - Brazzaville"
         },
         {
             "id": "7dfb80c2-027b-4561-985f-2d98cf65c571",
-            "name": "Congo - Kinshasa",
-            "phoneCode": ""
+            "name": "Congo - Kinshasa"
         },
         {
             "id": "0a82a361-93e8-4b5c-9e83-3bbb15ebd3df",
-            "name": "Cook Islands",
-            "phoneCode": ""
+            "name": "Cook Islands"
         },
         {
             "id": "41a97049-1eef-4861-a321-79c1220d9a4d",
-            "name": "Costa Rica",
-            "phoneCode": ""
+            "name": "Costa Rica"
         },
         {
             "id": "bbcc40ad-7c19-4ec6-aa44-edb1e6dfa4dd",
-            "name": "Croatia",
-            "phoneCode": ""
+            "name": "Croatia"
         },
         {
             "id": "6401fb51-9bad-4137-b431-a2e2c977f1b8",
-            "name": "Cuba",
-            "phoneCode": ""
+            "name": "Cuba"
         },
         {
             "id": "a2804d1f-9006-4f80-b7f8-650c27d49261",
-            "name": "Curaçao",
-            "phoneCode": ""
+            "name": "Curaçao"
         },
         {
             "id": "230fc201-fe82-4065-997d-737fafad087d",
-            "name": "Cyprus",
-            "phoneCode": ""
+            "name": "Cyprus"
         },
         {
             "id": "1e62178c-689f-44d1-b359-9014d6fa97d1",
-            "name": "Czech Republic",
-            "phoneCode": ""
+            "name": "Czech Republic"
         },
         {
             "id": "77185977-d73d-41b7-b072-45989a525479",
-            "name": "Czechia",
-            "phoneCode": ""
+            "name": "Czechia"
         },
         {
             "id": "59809589-247d-467a-b95b-265f2d541d7c",
-            "name": "Côte d’Ivoire",
-            "phoneCode": ""
+            "name": "Côte d’Ivoire"
         },
         {
             "id": "2c805f23-6c6b-46ed-9414-9bfcd5ec9b3a",
-            "name": "Denmark",
-            "phoneCode": ""
+            "name": "Denmark"
         },
         {
             "id": "dfd1bd44-9641-4dc1-8421-f03bb0c63c48",
-            "name": "Djibouti",
-            "phoneCode": ""
+            "name": "Djibouti"
         },
         {
             "id": "d0ed346c-a47b-4132-85b8-94596bb7cbac",
-            "name": "Dominica",
-            "phoneCode": ""
+            "name": "Dominica"
         },
         {
             "id": "40f27f7f-78a6-42c6-b180-0538ca8b3911",
-            "name": "Dominican Republic",
-            "phoneCode": ""
+            "name": "Dominican Republic"
         },
         {
             "id": "0ea3167c-94a2-4727-9b8d-d7ba4df15477",
-            "name": "Ecuador",
-            "phoneCode": ""
+            "name": "Ecuador"
         },
         {
             "id": "0e50a8bc-ee16-4b7f-a39f-4af6ef6616d7",
-            "name": "Egypt",
-            "phoneCode": ""
+            "name": "Egypt"
         },
         {
             "id": "e883ab16-0862-4e4b-b68f-c331d3872cc6",
-            "name": "El Salvador",
-            "phoneCode": ""
+            "name": "El Salvador"
         },
         {
             "id": "eb850250-c621-4f9e-9902-02d06b9844b6",
-            "name": "Equatorial Guinea",
-            "phoneCode": ""
+            "name": "Equatorial Guinea"
         },
         {
             "id": "45ad7791-85c8-478a-bf57-a51d33c26706",
-            "name": "Eritrea",
-            "phoneCode": ""
+            "name": "Eritrea"
         },
         {
             "id": "66d99358-9906-4360-b20e-7f056dc0e4a7",
-            "name": "Estonia",
-            "phoneCode": ""
+            "name": "Estonia"
         },
         {
             "id": "20b7e7b0-faba-4cf8-9b4b-a29ee69c51f3",
-            "name": "Ethiopia",
-            "phoneCode": ""
+            "name": "Ethiopia"
         },
         {
             "id": "075bde85-1670-4e30-9983-264140081af5",
-            "name": "Falkland Islands",
-            "phoneCode": ""
+            "name": "Falkland Islands"
         },
         {
             "id": "9f0a87a1-bc11-494e-b958-a23c53b3c716",
-            "name": "Faroe Islands",
-            "phoneCode": ""
+            "name": "Faroe Islands"
         },
         {
             "id": "e4d0fc69-c698-4a12-a423-acc1f5317d02",
-            "name": "Fiji",
-            "phoneCode": ""
+            "name": "Fiji"
         },
         {
             "id": "b53bf021-125e-48c6-83a6-873c9db858d3",
-            "name": "Finland",
-            "phoneCode": ""
+            "name": "Finland"
         },
         {
             "id": "cd676b3c-2c17-4acd-894a-00670a4c58a4",
-            "name": "France",
-            "phoneCode": ""
+            "name": "France"
         },
         {
             "id": "2d415af0-50fb-4486-be3b-f052c26d9a6a",
-            "name": "French Guiana",
-            "phoneCode": ""
+            "name": "French Guiana"
         },
         {
             "id": "47c9d2b5-61d0-4a4f-a77c-c2c55e7935fa",
-            "name": "French Polynesia",
-            "phoneCode": ""
+            "name": "French Polynesia"
         },
         {
             "id": "c55f631b-dbb0-4bcf-8131-2c0818138956",
-            "name": "French Southern Territories",
-            "phoneCode": ""
+            "name": "French Southern Territories"
         },
         {
             "id": "12960eec-7542-4a0c-b968-4c42654f384c",
-            "name": "Gabon",
-            "phoneCode": ""
+            "name": "Gabon"
         },
         {
             "id": "85890e36-7e47-4c8a-a355-fff297d2c09d",
-            "name": "Gambia",
-            "phoneCode": ""
+            "name": "Gambia"
         },
         {
             "id": "1fee6c42-1e6f-40a3-bd27-a32d3896a9ad",
-            "name": "Georgia",
-            "phoneCode": ""
+            "name": "Georgia"
         },
         {
             "id": "820313d1-4542-42c7-84f2-7185d97d6c46",
-            "name": "Germany",
-            "phoneCode": ""
+            "name": "Germany"
         },
         {
             "id": "9dbe02e8-0641-4293-9a8d-8a3ff21ff28e",
-            "name": "Ghana",
-            "phoneCode": ""
+            "name": "Ghana"
         },
         {
             "id": "70898904-f3b4-4797-abf3-42d21ab808bd",
-            "name": "Gibraltar",
-            "phoneCode": ""
+            "name": "Gibraltar"
         },
         {
             "id": "8559633b-1281-4f67-a3cb-b3f08fa06952",
-            "name": "Greece",
-            "phoneCode": ""
+            "name": "Greece"
         },
         {
             "id": "4199f4b3-6ba9-40ee-b245-2a0f6eaa4314",
-            "name": "Greenland",
-            "phoneCode": ""
+            "name": "Greenland"
         },
         {
             "id": "657dac71-a61a-4b70-b002-45b6bfc8e286",
-            "name": "Grenada",
-            "phoneCode": ""
+            "name": "Grenada"
         },
         {
             "id": "4d7c056f-7b55-404f-b847-3838ade426bd",
-            "name": "Guadeloupe",
-            "phoneCode": ""
+            "name": "Guadeloupe"
         },
         {
             "id": "0e68717e-b135-4119-aa7a-007a9af8cbed",
-            "name": "Guam",
-            "phoneCode": ""
+            "name": "Guam"
         },
         {
             "id": "3c7f9fd1-f411-4637-a5f3-1f16710a1d6b",
-            "name": "Guatemala",
-            "phoneCode": ""
+            "name": "Guatemala"
         },
         {
             "id": "8d8876a4-c6ef-4007-90f9-b873606d1dcb",
-            "name": "Guernsey",
-            "phoneCode": ""
+            "name": "Guernsey"
         },
         {
             "id": "bd8e1c3e-4e6b-41d0-919d-2295d4267476",
-            "name": "Guinea",
-            "phoneCode": ""
+            "name": "Guinea"
         },
         {
             "id": "8b0cc780-6c35-4daa-b9e6-90a09b9910c2",
-            "name": "Guinea-Bissau",
-            "phoneCode": ""
+            "name": "Guinea-Bissau"
         },
         {
             "id": "3845f916-dd7a-4dd0-b8a2-42742a3a2f2f",
-            "name": "Guyana",
-            "phoneCode": ""
+            "name": "Guyana"
         },
         {
             "id": "bbd5329d-57ef-46a3-ab92-58e4c3b3bda7",
-            "name": "Haiti",
-            "phoneCode": ""
+            "name": "Haiti"
         },
         {
             "id": "b5e845a5-5c1d-44df-a05a-8794b81a6dc0",
-            "name": "Honduras",
-            "phoneCode": ""
+            "name": "Honduras"
         },
         {
             "id": "0a875a6a-e197-4d5c-9c11-a7815806c4db",
-            "name": "Hong Kong",
-            "phoneCode": ""
+            "name": "Hong Kong"
         },
         {
             "id": "349c2625-8494-42b3-b622-96e5cd588f76",
-            "name": "Hungary",
-            "phoneCode": ""
+            "name": "Hungary"
         },
         {
             "id": "403e69c0-797b-4e3a-b6ca-8e834303c03c",
-            "name": "Iceland",
-            "phoneCode": ""
+            "name": "Iceland"
         },
         {
             "id": "6132c582-dc01-478a-863a-a29e48993344",
-            "name": "India",
-            "phoneCode": ""
+            "name": "India"
         },
         {
             "id": "0e6a89a5-e574-429c-8969-b0e3cdd16c33",
-            "name": "Indonesia",
-            "phoneCode": ""
+            "name": "Indonesia"
         },
         {
             "id": "2d1a0a7a-3351-4913-a41f-8bb5582eed0a",
-            "name": "Iran",
-            "phoneCode": ""
+            "name": "Iran"
         },
         {
             "id": "ccc02a3d-c073-4aa8-8e44-1caafec6f5c0",
-            "name": "Iraq",
-            "phoneCode": ""
+            "name": "Iraq"
         },
         {
             "id": "9d0c2809-5585-40f8-8c53-dbdfc549306c",
-            "name": "Ireland",
-            "phoneCode": ""
+            "name": "Ireland"
         },
         {
             "id": "68c89c8f-b2bb-4d6a-ab48-10a172565edf",
-            "name": "Isle of Man",
-            "phoneCode": ""
+            "name": "Isle of Man"
         },
         {
             "id": "96184861-6951-4c70-a382-df5ac9b45758",
-            "name": "Israel",
-            "phoneCode": ""
+            "name": "Israel"
         },
         {
             "id": "4b83bc99-4953-4324-94f2-7ecdaab7fbab",
-            "name": "Italy",
-            "phoneCode": ""
+            "name": "Italy"
         },
         {
             "id": "9f6ace1d-7e86-428b-bb31-d8c8626ef1f7",
-            "name": "Ivory Coast",
-            "phoneCode": ""
+            "name": "Ivory Coast"
         },
         {
             "id": "1e1affcf-0ce0-440e-b38e-b600b995821f",
-            "name": "Jamaica",
-            "phoneCode": ""
+            "name": "Jamaica"
         },
         {
             "id": "a63840dd-b8c9-4cde-b3b1-d4a76363e35b",
-            "name": "Japan",
-            "phoneCode": ""
+            "name": "Japan"
         },
         {
             "id": "f2c3aab9-3bbe-4856-a413-615779b14f2e",
-            "name": "Jersey",
-            "phoneCode": ""
+            "name": "Jersey"
         },
         {
             "id": "9de3e20c-1e9e-4d88-b862-c980b0fc25b1",
-            "name": "Jordan",
-            "phoneCode": ""
+            "name": "Jordan"
         },
         {
             "id": "3c543d2a-b715-4c37-99f6-1f81a1baa133",
-            "name": "Kazakhstan",
-            "phoneCode": ""
+            "name": "Kazakhstan"
         },
         {
             "id": "31c5857b-3407-4b69-b16f-6e7b6b9dcb4b",
-            "name": "Kenya",
-            "phoneCode": ""
+            "name": "Kenya"
         },
         {
             "id": "d720e266-f4df-4958-a4d8-305e60c83c51",
-            "name": "Kiribati",
-            "phoneCode": ""
+            "name": "Kiribati"
         },
         {
             "id": "999687e2-ada3-4648-9a4d-afc90bbd790e",
-            "name": "Kuwait",
-            "phoneCode": ""
+            "name": "Kuwait"
         },
         {
             "id": "eacb6668-33af-4bdd-a05e-5d194d433564",
-            "name": "Kyrgyzstan",
-            "phoneCode": ""
+            "name": "Kyrgyzstan"
         },
         {
             "id": "ea317cfe-6f65-497a-aad7-e3f988928d10",
-            "name": "Laos",
-            "phoneCode": ""
+            "name": "Laos"
         },
         {
             "id": "2663e860-2dfe-475c-962e-8241116973b8",
-            "name": "Latvia",
-            "phoneCode": ""
+            "name": "Latvia"
         },
         {
             "id": "1b82d1ad-f0fa-4801-9cdc-f6883addfb7d",
-            "name": "Lebanon",
-            "phoneCode": ""
+            "name": "Lebanon"
         },
         {
             "id": "b9cc0e3a-9f23-490c-9908-fbc70a90e138",
-            "name": "Lesotho",
-            "phoneCode": ""
+            "name": "Lesotho"
         },
         {
             "id": "a9646546-1d93-4144-9f7c-7b309b895474",
-            "name": "Liberia",
-            "phoneCode": ""
+            "name": "Liberia"
         },
         {
             "id": "98535201-d4da-45a5-a4e5-93ce888b824f",
-            "name": "Libya",
-            "phoneCode": ""
+            "name": "Libya"
         },
         {
             "id": "c2daba9f-d064-4efa-b5dd-dd7af6d8b066",
-            "name": "Liechtenstein",
-            "phoneCode": ""
+            "name": "Liechtenstein"
         },
         {
             "id": "e160c7d1-b0ae-49fe-a735-c4f958046867",
-            "name": "Lithuania",
-            "phoneCode": ""
+            "name": "Lithuania"
         },
         {
             "id": "6df44754-14bb-495b-a591-d0f4267f6a48",
-            "name": "Luxembourg",
-            "phoneCode": ""
+            "name": "Luxembourg"
         },
         {
             "id": "f4db6f07-9e54-4171-abc1-b270296294a4",
-            "name": "Macau",
-            "phoneCode": ""
+            "name": "Macau"
         },
         {
             "id": "79eba3d6-d5c1-44c2-83f4-e37ff6b871d2",
-            "name": "Macedonia",
-            "phoneCode": ""
+            "name": "Macedonia"
         },
         {
             "id": "9f0756d8-9e10-4360-8560-b8c21154f36b",
-            "name": "Madagascar",
-            "phoneCode": ""
+            "name": "Madagascar"
         },
         {
             "id": "ec44013f-aa73-42bd-86c1-d01959c179f5",
-            "name": "Malawi",
-            "phoneCode": ""
+            "name": "Malawi"
         },
         {
             "id": "bd727d7e-eba7-4e40-bbd8-f12a2f2392e8",
-            "name": "Malaysia",
-            "phoneCode": ""
+            "name": "Malaysia"
         },
         {
             "id": "ddd75c06-3a23-4e5b-82f5-11c3e1b54e68",
-            "name": "Maldives",
-            "phoneCode": ""
+            "name": "Maldives"
         },
         {
             "id": "29649450-599b-4405-8811-a43dae439d5c",
-            "name": "Mali",
-            "phoneCode": ""
+            "name": "Mali"
         },
         {
             "id": "7930cfed-cf1d-438b-9876-94d18477a9b4",
-            "name": "Malta",
-            "phoneCode": ""
+            "name": "Malta"
         },
         {
             "id": "5af603ae-1dd5-49e2-a380-dd0a63cf83a4",
-            "name": "Martinique",
-            "phoneCode": ""
+            "name": "Martinique"
         },
         {
             "id": "105df219-c3b6-4b75-bf89-e4bd10378514",
-            "name": "Mauritania",
-            "phoneCode": ""
+            "name": "Mauritania"
         },
         {
             "id": "f36f8cff-172e-42a2-a4bb-62a6131695a9",
-            "name": "Mauritius",
-            "phoneCode": ""
+            "name": "Mauritius"
         },
         {
             "id": "80f3ddc2-a73f-4b35-bec0-6b44cab7b531",
-            "name": "Mayotte",
-            "phoneCode": ""
+            "name": "Mayotte"
         },
         {
             "id": "15513a6f-a003-4e8b-b563-42ff5422aca2",
-            "name": "Mexico",
-            "phoneCode": ""
+            "name": "Mexico"
         },
         {
             "id": "0a6a69fa-be34-4cf4-a757-5fe4a669596a",
-            "name": "Moldova",
-            "phoneCode": ""
+            "name": "Moldova"
         },
         {
             "id": "ba0b691f-1521-4f04-80db-69ff61c00e13",
-            "name": "Monaco",
-            "phoneCode": ""
+            "name": "Monaco"
         },
         {
             "id": "a41086d7-3b16-426e-807f-5cb0b887f8e6",
-            "name": "Mongolia",
-            "phoneCode": ""
+            "name": "Mongolia"
         },
         {
             "id": "5e869b11-9719-436e-89b7-258cb4004cc9",
-            "name": "Montenegro",
-            "phoneCode": ""
+            "name": "Montenegro"
         },
         {
             "id": "14ab6e78-bffe-4b96-8338-ff1f35af82e6",
-            "name": "Montserrat",
-            "phoneCode": ""
+            "name": "Montserrat"
         },
         {
             "id": "1dd900be-4b57-4f1e-af94-db4f2796259e",
-            "name": "Morocco",
-            "phoneCode": ""
+            "name": "Morocco"
         },
         {
             "id": "93e5c702-12f7-4e04-9974-1fb03e2ff79f",
-            "name": "Mozambique",
-            "phoneCode": ""
+            "name": "Mozambique"
         },
         {
             "id": "deb12e57-a817-4a8a-a9dd-ae195a642211",
-            "name": "Myanmar",
-            "phoneCode": ""
+            "name": "Myanmar"
         },
         {
             "id": "f3d07b83-277e-4699-9651-9cd5e6e4c241",
-            "name": "Namibia",
-            "phoneCode": ""
+            "name": "Namibia"
         },
         {
             "id": "0805edac-d46a-46d2-8baa-b4de03490553",
-            "name": "Nauru",
-            "phoneCode": ""
+            "name": "Nauru"
         },
         {
             "id": "dcb49fa4-14a7-4b87-8d9a-22acd608ddfd",
-            "name": "Nepal",
-            "phoneCode": ""
+            "name": "Nepal"
         },
         {
             "id": "920214a4-7145-4082-ac0c-7dfa592c2db1",
-            "name": "Netherlands",
-            "phoneCode": ""
+            "name": "Netherlands"
         },
         {
             "id": "41a0c874-1593-49ad-b870-688fa290e013",
-            "name": "New Caledonia",
-            "phoneCode": ""
+            "name": "New Caledonia"
         },
         {
             "id": "33d56452-fd30-49fe-9ffc-2d81cef5f82c",
-            "name": "New Zealand",
-            "phoneCode": ""
+            "name": "New Zealand"
         },
         {
             "id": "080ff2e3-ad4f-4b35-8beb-8bb61e11c81c",
-            "name": "Nicaragua",
-            "phoneCode": ""
+            "name": "Nicaragua"
         },
         {
             "id": "9f470850-b384-4532-b74d-e2ca622d0eb9",
-            "name": "Niger",
-            "phoneCode": ""
+            "name": "Niger"
         },
         {
             "id": "d35a2101-13f7-4838-83db-573a1353cc73",
-            "name": "Nigeria",
-            "phoneCode": ""
+            "name": "Nigeria"
         },
         {
             "id": "67c8e8bb-c9c3-4184-9fc4-9a29f2e35bd7",
-            "name": "Niue",
-            "phoneCode": ""
+            "name": "Niue"
         },
         {
             "id": "3d315b80-0c20-4c28-a070-9104907128f2",
-            "name": "Norfolk Island",
-            "phoneCode": ""
+            "name": "Norfolk Island"
         },
         {
             "id": "a047422f-9bef-464f-85d7-1239c431f0db",
-            "name": "Northern Mariana Islands",
-            "phoneCode": ""
+            "name": "Northern Mariana Islands"
         },
         {
             "id": "91bb0b5e-7645-4819-808f-89a9737651da",
-            "name": "Norway",
-            "phoneCode": ""
+            "name": "Norway"
         },
         {
             "id": "848cf688-32b3-4b89-b0d9-a537b25c6719",
-            "name": "Oman",
-            "phoneCode": ""
+            "name": "Oman"
         },
         {
             "id": "407e4b21-0977-4b91-9f47-a9258f80c851",
-            "name": "Pakistan",
-            "phoneCode": ""
+            "name": "Pakistan"
         },
         {
             "id": "0d802cb5-f838-4b74-8e87-af4a5108bd0e",
-            "name": "Palestine",
-            "phoneCode": ""
+            "name": "Palestine"
         },
         {
             "id": "f5931a96-3118-4d0a-8acc-1e7e5371151a",
-            "name": "Panama",
-            "phoneCode": ""
+            "name": "Panama"
         },
         {
             "id": "959171c9-124e-40e2-9e14-bff928c6f297",
-            "name": "Papua New Guinea",
-            "phoneCode": ""
+            "name": "Papua New Guinea"
         },
         {
             "id": "c325e0c0-37f6-47b0-b648-103526f07be8",
-            "name": "Paraguay",
-            "phoneCode": ""
+            "name": "Paraguay"
         },
         {
             "id": "0e5b1e0c-7bb1-41f6-9e69-64fa5cd3f1f8",
-            "name": "Peru",
-            "phoneCode": ""
+            "name": "Peru"
         },
         {
             "id": "4164990e-768b-4e6a-96d4-4e65010ada3a",
-            "name": "Philippines",
-            "phoneCode": ""
+            "name": "Philippines"
         },
         {
             "id": "e2833a2b-699c-4a65-ac09-12605b23a9c7",
-            "name": "Pitcairn Islands",
-            "phoneCode": ""
+            "name": "Pitcairn Islands"
         },
         {
             "id": "8cee3cec-0a9b-43a9-bd9d-5bb45dc8290a",
-            "name": "Poland",
-            "phoneCode": ""
+            "name": "Poland"
         },
         {
             "id": "f7c9d0ea-f182-4d43-9082-5a94be6f98fa",
-            "name": "Portugal",
-            "phoneCode": ""
+            "name": "Portugal"
         },
         {
             "id": "15d323ad-79aa-481f-b3ca-b225afbb7a65",
-            "name": "Puerto Rico",
-            "phoneCode": ""
+            "name": "Puerto Rico"
         },
         {
             "id": "59e16cb3-e636-4e1a-845f-1103de50fa65",
-            "name": "Qatar",
-            "phoneCode": ""
+            "name": "Qatar"
         },
         {
             "id": "84d6509c-c751-45e0-b62a-ae4b54e4f4b2",
-            "name": "Romania",
-            "phoneCode": ""
+            "name": "Romania"
         },
         {
             "id": "913b34e2-91cd-4de2-8f2e-7fddcf6db841",
-            "name": "Russia",
-            "phoneCode": ""
+            "name": "Russia"
         },
         {
             "id": "9c30b23b-7c6f-4403-ba83-98b72dfdc9a4",
-            "name": "Rwanda",
-            "phoneCode": ""
+            "name": "Rwanda"
         },
         {
             "id": "80a08c3e-cbda-4c9d-930f-8fb3d5374045",
-            "name": "Réunion",
-            "phoneCode": ""
+            "name": "Réunion"
         },
         {
             "id": "168f9255-4a59-4133-82d4-5aaa94f3ff7a",
-            "name": "Samoa",
-            "phoneCode": ""
+            "name": "Samoa"
         },
         {
             "id": "c2d111b4-87be-44b9-bdd5-c9f16624f9bb",
-            "name": "San Marino",
-            "phoneCode": ""
+            "name": "San Marino"
         },
         {
             "id": "72fd31ed-3983-4664-be9b-d75c6103ed35",
-            "name": "Saudi Arabia",
-            "phoneCode": ""
+            "name": "Saudi Arabia"
         },
         {
             "id": "3998a594-aad5-4085-a036-d96473fd6b84",
-            "name": "Senegal",
-            "phoneCode": ""
+            "name": "Senegal"
         },
         {
             "id": "2b469d67-42f6-4d2d-bc8b-62bcd7117a3d",
-            "name": "Serbia",
-            "phoneCode": ""
+            "name": "Serbia"
         },
         {
             "id": "9f5401b5-6339-4c58-aa78-f55cdb1750e7",
-            "name": "Seychelles",
-            "phoneCode": ""
+            "name": "Seychelles"
         },
         {
             "id": "206f442c-f1c3-4e96-9293-49eb1e53950e",
-            "name": "Sierra Leone",
-            "phoneCode": ""
+            "name": "Sierra Leone"
         },
         {
             "id": "2d2c3c8c-dbfb-4a26-b545-e7009b9d20f7",
-            "name": "Singapore",
-            "phoneCode": ""
+            "name": "Singapore"
         },
         {
             "id": "41b5c2d8-fd46-4fc5-9070-883b4c819b3e",
-            "name": "Sint Maarten",
-            "phoneCode": ""
+            "name": "Sint Maarten"
         },
         {
             "id": "a31b2967-9bcb-4be2-86e2-a5456f16d3a1",
-            "name": "Slovakia",
-            "phoneCode": ""
+            "name": "Slovakia"
         },
         {
             "id": "a02329c5-ffe8-4fd2-b77b-85400efee525",
-            "name": "Slovenia",
-            "phoneCode": ""
+            "name": "Slovenia"
         },
         {
             "id": "5be685e7-2dd6-4f5b-a7fe-204281de1b51",
-            "name": "Solomon Islands",
-            "phoneCode": ""
+            "name": "Solomon Islands"
         },
         {
             "id": "09a7cdec-8163-4ab2-8d54-66d9b829de34",
-            "name": "Somalia",
-            "phoneCode": ""
+            "name": "Somalia"
         },
         {
             "id": "268660b5-db98-472c-84c7-240bb47e2b16",
-            "name": "South Africa",
-            "phoneCode": ""
+            "name": "South Africa"
         },
         {
             "id": "405c105b-f89b-4bbf-9542-5e5b517ecd9f",
-            "name": "South Georgia & South Sandwich Islands",
-            "phoneCode": ""
+            "name": "South Georgia & South Sandwich Islands"
         },
         {
             "id": "f86f8d79-e3a4-4687-b180-39282768e920",
-            "name": "South Korea",
-            "phoneCode": ""
+            "name": "South Korea"
         },
         {
             "id": "5cd6a5ba-86c0-4b10-afd5-a56bdae0067e",
-            "name": "South Sudan",
-            "phoneCode": ""
+            "name": "South Sudan"
         },
         {
             "id": "3c391aed-6494-4a41-af34-295837e94ad3",
-            "name": "Spain",
-            "phoneCode": ""
+            "name": "Spain"
         },
         {
             "id": "d1f00ccb-bb93-42e6-a7c4-d135a3d3b30f",
-            "name": "Sri Lanka",
-            "phoneCode": ""
+            "name": "Sri Lanka"
         },
         {
             "id": "ec3013c5-6834-4bd1-bdae-d3041e12f031",
-            "name": "St. Barthélemy",
-            "phoneCode": ""
+            "name": "St. Barthélemy"
         },
         {
             "id": "a030e47e-b6a8-41e2-819e-6aec0edc9a69",
-            "name": "St. Kitts & Nevis",
-            "phoneCode": ""
+            "name": "St. Kitts & Nevis"
         },
         {
             "id": "5faf028f-e188-4654-b6b6-3d9861a0dd48",
-            "name": "St. Lucia",
-            "phoneCode": ""
+            "name": "St. Lucia"
         },
         {
             "id": "7c144309-114a-4640-b0da-1ecb739587c5",
-            "name": "St. Martin",
-            "phoneCode": ""
+            "name": "St. Martin"
         },
         {
             "id": "d7eeadbf-15b8-4a21-a921-be56ff06828b",
-            "name": "St. Pierre & Miquelon",
-            "phoneCode": ""
+            "name": "St. Pierre & Miquelon"
         },
         {
             "id": "7098e53d-888e-46f6-95d5-f92a3d0bcd43",
-            "name": "St. Vincent & Grenadines",
-            "phoneCode": ""
+            "name": "St. Vincent & Grenadines"
         },
         {
             "id": "bb5f4dbe-d6fe-48f0-9aeb-deb6608dda78",
-            "name": "Sudan",
-            "phoneCode": ""
+            "name": "Sudan"
         },
         {
             "id": "2a3e2170-b4cb-4596-ae01-bac901a32b0f",
-            "name": "Suriname",
-            "phoneCode": ""
+            "name": "Suriname"
         },
         {
             "id": "b5e69759-df58-47a7-b6dc-8105d79cdde7",
-            "name": "Svalbard & Jan Mayen",
-            "phoneCode": ""
+            "name": "Svalbard & Jan Mayen"
         },
         {
             "id": "5bbeda74-6fc4-4d2b-b29e-119924e1364c",
-            "name": "Swaziland",
-            "phoneCode": ""
+            "name": "Swaziland"
         },
         {
             "id": "0a5a2393-ce8c-4646-bb92-b1e561c4d74c",
-            "name": "Sweden",
-            "phoneCode": ""
+            "name": "Sweden"
         },
         {
             "id": "55fa132f-0eb3-47d0-a78e-71f839525d4b",
-            "name": "Switzerland",
-            "phoneCode": ""
+            "name": "Switzerland"
         },
         {
             "id": "0b39add0-5739-4965-ae66-2f07e5208243",
-            "name": "Syria",
-            "phoneCode": ""
+            "name": "Syria"
         },
         {
             "id": "13d6663e-eaec-4299-aaf9-351ab5fe272d",
-            "name": "São Tomé & Príncipe",
-            "phoneCode": ""
+            "name": "São Tomé & Príncipe"
         },
         {
             "id": "0ad05a30-50f1-4b5b-b348-ececffa4b277",
-            "name": "Taiwan",
-            "phoneCode": ""
+            "name": "Taiwan"
         },
         {
             "id": "4d60b32d-c2c0-43fd-b85a-3973ef1718fd",
-            "name": "Tajikistan",
-            "phoneCode": ""
+            "name": "Tajikistan"
         },
         {
             "id": "654fd92b-154f-42f6-a901-a8e45662c3c3",
-            "name": "Tanzania",
-            "phoneCode": ""
+            "name": "Tanzania"
         },
         {
             "id": "8dd024c6-683c-444b-80ba-49d5f6c80857",
-            "name": "Thailand",
-            "phoneCode": ""
+            "name": "Thailand"
         },
         {
             "id": "a456e8f6-e82a-4626-9c9e-02a8729f5c09",
-            "name": "Timor-Leste",
-            "phoneCode": ""
+            "name": "Timor-Leste"
         },
         {
             "id": "b4e31dac-ec04-4c1b-90be-b9d58c13642d",
-            "name": "Togo",
-            "phoneCode": ""
+            "name": "Togo"
         },
         {
             "id": "7b9e821e-b243-4ec7-adc9-8401cd3d3901",
-            "name": "Tokelau",
-            "phoneCode": ""
+            "name": "Tokelau"
         },
         {
             "id": "1730d1c9-715e-48b1-a32a-f6bd79a919f0",
-            "name": "Tonga",
-            "phoneCode": ""
+            "name": "Tonga"
         },
         {
             "id": "fa6826a7-6818-40a4-8b06-e10286a98a38",
-            "name": "Trinidad & Tobago",
-            "phoneCode": ""
+            "name": "Trinidad & Tobago"
         },
         {
             "id": "c7c2e281-b1b0-41ca-b45e-659b88b5d3bb",
-            "name": "Tunisia",
-            "phoneCode": ""
+            "name": "Tunisia"
         },
         {
             "id": "08f08827-b995-484f-b679-6bf79259c08c",
-            "name": "Turkey",
-            "phoneCode": ""
+            "name": "Turkey"
         },
         {
             "id": "3d367fc0-0a58-4fa5-b45a-94df852a7c95",
-            "name": "Turkmenistan",
-            "phoneCode": ""
+            "name": "Turkmenistan"
         },
         {
             "id": "7b5d6b77-1ffa-4318-96d1-8258fe004a54",
-            "name": "Turks & Caicos Islands",
-            "phoneCode": ""
+            "name": "Turks & Caicos Islands"
         },
         {
             "id": "84369374-aafb-4d75-a6dd-d7c0899b33f2",
-            "name": "Tuvalu",
-            "phoneCode": ""
+            "name": "Tuvalu"
         },
         {
             "id": "024734ad-6bbe-45d8-bc5d-3ccf0639fcb4",
-            "name": "U.S. Virgin Islands",
-            "phoneCode": ""
+            "name": "U.S. Virgin Islands"
         },
         {
             "id": "b2a0301e-f27c-4c74-84f0-48842f1083b0",
-            "name": "Uganda",
-            "phoneCode": ""
+            "name": "Uganda"
         },
         {
             "id": "405b074d-1780-49fa-bd90-6c4d8d008902",
-            "name": "Ukraine",
-            "phoneCode": ""
+            "name": "Ukraine"
         },
         {
             "id": "1e295b11-ce57-47b6-9332-9ddf437bd0dc",
-            "name": "United Arab Emirates",
-            "phoneCode": ""
+            "name": "United Arab Emirates"
         },
         {
             "id": "fe4da24f-7ac0-435d-83d2-ffa219197026",
-            "name": "United Kingdom",
-            "phoneCode": ""
+            "name": "United Kingdom"
         },
         {
             "id": "17b995fc-fc8e-488a-90e2-f34e25b873bf",
-            "name": "United States",
-            "phoneCode": ""
+            "name": "United States"
         },
         {
             "id": "2d22f682-f3c0-4b41-bf27-22b81ac97914",
-            "name": "Uruguay",
-            "phoneCode": ""
+            "name": "Uruguay"
         },
         {
             "id": "dd08fe47-f506-40f2-8a97-4d7bc41674da",
-            "name": "Uzbekistan",
-            "phoneCode": ""
+            "name": "Uzbekistan"
         },
         {
             "id": "619330b7-a20c-4940-84fc-200fb1a1d267",
-            "name": "Vanuatu",
-            "phoneCode": ""
+            "name": "Vanuatu"
         },
         {
             "id": "cccf3a67-8015-4dfc-b617-2796ac8ce048",
-            "name": "Venezuela",
-            "phoneCode": ""
+            "name": "Venezuela"
         },
         {
             "id": "3e31af25-97a3-4ab5-a775-4d496ed404ca",
-            "name": "Vietnam",
-            "phoneCode": ""
+            "name": "Vietnam"
         },
         {
             "id": "96f8f904-f3ce-49a4-9d3b-75032744dd15",
-            "name": "Wallis & Futuna",
-            "phoneCode": ""
+            "name": "Wallis & Futuna"
         },
         {
             "id": "5882d7fa-e6ec-4d3c-874d-860c40013166",
-            "name": "Yemen",
-            "phoneCode": ""
+            "name": "Yemen"
         },
         {
             "id": "ff5465b7-cabe-4c42-8d4f-9b4de05d8373",
-            "name": "Zambia",
-            "phoneCode": ""
+            "name": "Zambia"
         },
         {
             "id": "4a6efc5a-ab8b-486a-b032-5970fd5499e7",
-            "name": "Zimbabwe",
-            "phoneCode": ""
+            "name": "Zimbabwe"
         },
         {
             "id": "33d5b64f-f1b5-4fa1-afbf-ae067cb89b21",
-            "name": "not set",
-            "phoneCode": ""
+            "name": "not set"
         }
     ],
     "cities": [

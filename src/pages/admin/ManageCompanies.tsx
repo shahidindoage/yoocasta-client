@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { getCompanies, updateCompanyVerify, updateCompanyStatus, loginAsRecruiter } from '../../api/admin.api';
+import { getCompanies, updateCompanyVerify, updateCompanyStatus, loginAsRecruiter, toggleInternalCompany } from '../../api/admin.api';
 import { Search, LogIn } from 'lucide-react';
 
 interface Company {
@@ -20,6 +20,7 @@ interface Company {
   email: string;
   phone: string;
   registeredDate: string;
+  isInternalCompany: boolean;
 }
 
 const ManageCompanies = () => {
@@ -172,8 +173,8 @@ const ManageCompanies = () => {
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-stone-50 border-b border-stone-200">
-                {['No', 'Name', 'Company Name', 'Action', 'Status'].map((h) => (
-                  <th key={h} className={`px-4 py-3 text-[10px] font-bold text-stone-500 uppercase tracking-wider whitespace-nowrap border-r border-stone-100 last:border-r-0 ${h === 'Action' || h === 'Status' ? 'text-center' : 'text-left'}`}>
+                {['No', 'Name', 'Company Name', 'Internal', 'Action', 'Status'].map((h) => (
+                  <th key={h} className={`px-4 py-3 text-[10px] font-bold text-stone-500 uppercase tracking-wider whitespace-nowrap border-r border-stone-100 last:border-r-0 ${h === 'Action' || h === 'Status' || h === 'Internal' ? 'text-center' : 'text-left'}`}>
                     {h}
                   </th>
                 ))}
@@ -206,7 +207,22 @@ const ManageCompanies = () => {
                         )}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-stone-500 border-r border-stone-100">{c.companyName}</td>
+                        <td className="px-4 py-3 text-stone-500 border-r border-stone-100">{c.companyName}</td>
+                        <td className="px-4 py-3 text-center border-r border-stone-100">
+                          <button
+                            onClick={async () => {
+                              try {
+                                const res = await toggleInternalCompany(c.id);
+                                setCompanies((prev) => prev.map((x) => x.id === c.id ? { ...x, isInternalCompany: res.data.data.isInternalCompany } : x));
+                              } catch {}
+                            }}
+                            className={`px-3 py-1 text-xs font-bold cursor-pointer transition-colors ${
+                              c.isInternalCompany ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-stone-200 text-stone-500 hover:bg-stone-300'
+                            }`}
+                          >
+                            {c.isInternalCompany ? 'YES' : 'NO'}
+                          </button>
+                        </td>
                     <td className="px-4 py-3 border-r border-stone-100 text-center">
                       <div className="flex items-center justify-center gap-2">
                         <button

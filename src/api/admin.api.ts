@@ -48,6 +48,9 @@ export const updateCompanyStatus = (companyId: string, status: 'ACTIVE' | 'INACT
 export const updateTalentStatus = (talentId: string, status: 'ACTIVE' | 'INACTIVE') =>
   api.patch(`/admin/talents/${talentId}/status`, { status });
 
+export const toggleInternalCompany = (companyId: string) =>
+  api.post(`/admin/companies/${companyId}/toggle-internal`);
+
 export const getTalentSubscriptionDetails = (talentId: string) =>
   api.get(`/admin/talents/${talentId}/subscription`);
 
@@ -80,3 +83,75 @@ export const deleteLanguage = (id: string) =>
 
 export const updateLanguage = (id: string, name: string) =>
   api.put(`/admin/languages/${id}`, { name });
+
+export const getNationalities = (page: number = 1, limit: number = 20) =>
+  api.get('/admin/nationalities', { params: { page, limit } });
+
+export const createNationality = (name: string) =>
+  api.post('/admin/nationalities', { name });
+
+export const updateNationality = (id: string, name: string) =>
+  api.put(`/admin/nationalities/${id}`, { name });
+
+export const deleteNationality = (id: string) =>
+  api.delete(`/admin/nationalities/${id}`);
+
+export const getEthnicities = (page: number = 1, limit: number = 20) =>
+  api.get('/admin/ethnicities', { params: { page, limit } });
+
+export const createEthnicity = (name: string) =>
+  api.post('/admin/ethnicities', { name });
+
+export const updateEthnicity = (id: string, name: string) =>
+  api.put(`/admin/ethnicities/${id}`, { name });
+
+export const deleteEthnicity = (id: string) =>
+  api.delete(`/admin/ethnicities/${id}`);
+
+export const getAdminCategories = (page: number = 1, limit: number = 20) =>
+  api.get('/admin/categories', { params: { page, limit } });
+
+export const createAdminCategory = (name: string) =>
+  api.post('/admin/categories', { name });
+
+export const updateAdminCategory = (id: string, name: string) =>
+  api.put(`/admin/categories/${id}`, { name });
+
+export const deleteAdminCategory = (id: string) =>
+  api.delete(`/admin/categories/${id}`);
+
+export const getAdminCities = (page: number = 1, limit: number = 20, countryId?: string) =>
+  api.get('/admin/cities', { params: { page, limit, countryId } });
+
+export const getAllCountries = () =>
+  api.get('/admin/countries/all');
+
+export const createCity = (data: { name: string; countryId: string | null }) =>
+  api.post('/admin/cities', data);
+
+export const updateCity = (id: string, data: { name: string; countryId: string | null }) =>
+  api.put(`/admin/cities/${id}`, data);
+
+export const deleteCity = (id: string) =>
+  api.delete(`/admin/cities/${id}`);
+
+export const getAdminCountries = (page: number = 1, limit: number = 20) =>
+  api.get('/admin/countries', { params: { page, limit } });
+
+export const createCountry = (name: string) =>
+  api.post('/admin/countries', { name });
+
+export const updateCountry = (id: string, name: string) =>
+  api.put(`/admin/countries/${id}`, { name });
+
+export const deleteCountry = (id: string) =>
+  api.delete(`/admin/countries/${id}`);
+
+export const getEmailTemplates = () =>
+  api.get('/admin/email-templates');
+
+export const getEmailTemplateByKey = (key: string) =>
+  api.get(`/admin/email-templates/${key}`);
+
+export const updateEmailTemplate = (key: string, data: { subject: string; body: string }) =>
+  api.put(`/admin/email-templates/${key}`, data);

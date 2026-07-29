@@ -120,7 +120,7 @@ const PublicJobPage = () => {
 
   if (!job) return null;
 
-  if (user?.role === 'RECRUITER') {
+  if (user?.role !== 'ADMIN') {
     if (job.status === 'PENDING') {
       return <StatusMessage icon="⏳" title="Awaiting Approval" message="This job posting is currently under review." />;
     }

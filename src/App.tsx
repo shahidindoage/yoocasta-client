@@ -22,6 +22,7 @@ import RecruiterProfileSetup from './pages/recruiter/RecruiterProfileSetup';
 import RecruiterDashboard from './pages/recruiter/RecruiterDashboard';
 import PostJob from './pages/recruiter/post-job/PostJob';
 import ManageJobs from './pages/recruiter/ManageJobs';
+import EditJob from './pages/recruiter/EditJob';
 import JobApplications from './pages/recruiter/JobApplications';
 import ApplicationDetails from './pages/recruiter/ApplicationDetails';
 import PublicJobPage from './pages/jobs/PublicJobPage';
@@ -55,6 +56,12 @@ import TalentSubscription from './pages/admin/TalentSubscription';
 import Report from './pages/admin/Report';
 import ManageWork from './pages/admin/ManageWork';
 import ManageLanguage from './pages/admin/ManageLanguage';
+import ManageNationality from './pages/admin/ManageNationality';
+import ManageEthnicity from './pages/admin/ManageEthnicity';
+import ManageCategory from './pages/admin/ManageCategory';
+import ManageCity from './pages/admin/ManageCity';
+import ManageCountry from './pages/admin/ManageCountry';
+import ManageTemplates from './pages/admin/ManageTemplates';
 
 // Placeholder dashboard pages (we'll build these next)
 
@@ -107,6 +114,12 @@ function App() {
               <Route path="/admin/jobs/:id/edit" element={<AdminJobEdit />} />
               <Route path="/admin/work" element={<ManageWork />} />
               <Route path="/admin/language" element={<ManageLanguage />} />
+              <Route path="/admin/nationality" element={<ManageNationality />} />
+              <Route path="/admin/ethnicity" element={<ManageEthnicity />} />
+              <Route path="/admin/category" element={<ManageCategory />} />
+              <Route path="/admin/city" element={<ManageCity />} />
+              <Route path="/admin/country" element={<ManageCountry />} />
+              <Route path="/admin/templates" element={<ManageTemplates />} />
               <Route path="/admin/report" element={<Report />} />
             </Route>
           </Route>
@@ -128,6 +141,7 @@ function App() {
             <Route path="/dashboard/recruiter/profile-setup" element={<RecruiterProfileSetup />} /> 
             <Route path="/dashboard/recruiter/post-job" element={<PostJob />} />
             <Route path="/dashboard/recruiter/jobs" element={<ManageJobs />} />
+            <Route path="/dashboard/recruiter/jobs/:jobId/edit" element={<EditJob />} />
             <Route path="/dashboard/recruiter/cast-bags" element={<CastBags />} />
             <Route path="/dashboard/recruiter/favourites" element={<Favourites />} />
             <Route path="/dashboard/recruiter/sent-invitations" element={<SentInvitations />} />

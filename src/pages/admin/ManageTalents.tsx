@@ -157,7 +157,7 @@ const ManageTalents = () => {
     <div>
       <div className="flex items-start justify-between mb-6">
         <div>
-          <h2 className="text-4xl font-medium text-[#3835A4]">Talent List</h2>
+          <h2 className="text-3xl font-black text-[#3835A4]">Talent List</h2>
           <p className="text-sm text-stone-400">{total} total talents</p>
         </div>
         <button
