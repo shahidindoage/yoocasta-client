@@ -15,7 +15,9 @@ export const uploadProfilePhoto = (file: File) => {
 export const getPortfolioMedia = () => api.get('/profile/portfolio');
 
 export const uploadPortfolioMedia = (formData: FormData) =>
-  api.post('/profile/portfolio', formData);
+  api.post('/profile/portfolio', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
 
 export const deletePortfolioMedia = (mediaId: string) =>
   api.delete(`/profile/portfolio/${mediaId}`);
