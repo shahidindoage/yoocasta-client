@@ -9,17 +9,13 @@ export const updateBioDescription = (data: any) => api.put('/profile/bio-descrip
 export const uploadProfilePhoto = (file: File) => {
   const formData = new FormData();
   formData.append('profilePhoto', file);
-  return api.post('/profile/photo', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-  });
+  return api.post('/profile/photo', formData);
 };
 
 export const getPortfolioMedia = () => api.get('/profile/portfolio');
 
 export const uploadPortfolioMedia = (formData: FormData) =>
-  api.post('/profile/portfolio', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-  });
+  api.post('/profile/portfolio', formData);
 
 export const deletePortfolioMedia = (mediaId: string) =>
   api.delete(`/profile/portfolio/${mediaId}`);

@@ -47,7 +47,7 @@ export default function PublicCastBag() {
     setZcardLoading(true);
     try {
       const token = localStorage.getItem('accessToken');
-      const res = await fetch('http://localhost:3000/api/v1/recruiter/z-card', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/recruiter/z-card`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ talentIds: ids }),
