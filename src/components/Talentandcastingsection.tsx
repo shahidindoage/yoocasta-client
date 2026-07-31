@@ -294,8 +294,9 @@ export default function TalentAndCastingSection({
                   >
                     <div className="relative h-56 w-full overflow-hidden bg-neutral-100 shrink-0">
                       <img
-                        src={getCategoryImage(job.category?.name)}
+                        src={job.image || getCategoryImage(job.category?.name)}
                         alt={job.title}
+                        onError={(e) => { const fallback = getCategoryImage(job.category?.name); if (e.currentTarget.src !== fallback) e.currentTarget.src = fallback; }}
                         className="h-full w-full object-cover transition-transform duration-[1000ms] ease-out group-hover:scale-105 filter brightness-95 group-hover:brightness-90"
                         referrerPolicy="no-referrer"
                         loading="lazy"
@@ -477,6 +478,12 @@ export default function TalentAndCastingSection({
                     </div>
                     <h3 className="text-lg font-black text-[#C6007E] mb-2">{limitMessage.includes('application limit') ? 'Application Limit Reached' : 'Notice'}</h3>
                     <p className="text-sm text-stone-600 leading-relaxed max-w-sm">{limitMessage}</p>
+                    {limitMessage.includes('application limit') && (
+                      <Link to="/subscription-plans" className="mt-5 inline-flex items-center gap-2 bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white px-6 py-3 rounded-xl font-black text-xs tracking-wider uppercase hover:opacity-90 transition-all">
+                        Upgrade Plan
+                        <ArrowUpRight className="h-3.5 w-3.5" />
+                      </Link>
+                    )}
                   </div>
                 ) : (
                   <>

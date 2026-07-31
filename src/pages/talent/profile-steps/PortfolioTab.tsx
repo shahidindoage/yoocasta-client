@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { 
  uploadPortfolioMedia, 
  deletePortfolioMedia, 
@@ -234,6 +235,21 @@ const PortfolioTab = ({ existingProfile }: Props) => {
        Uploading...
       </p>
      )}
+    </div>
+   )}
+
+   {/* Upgrade plan card for basic users */}
+   {(plan?.name || 'Basic').toLowerCase() === 'basic' && (
+    <div className="bg-gradient-to-br from-[#C6007E]/10 via-[#C6007E]/5 to-[#3835A4]/10 border-2 border-dashed border-[#C6007E]/40 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+     <div className="space-y-1">
+      <h3 className="text-sm font-black text-[#C6007E]">Unlock More with Premium</h3>
+      <p className="text-xs text-[#3835A4]/70 font-medium">
+       Upgrade your plan to increase your media portfolio limits and stand out to more casting directors.
+      </p>
+     </div>
+     <Link to="/subscription-plans" className="bg-[#C6007E] text-white text-xs font-black px-6 py-3 rounded-xl hover:bg-[#a10065] transition-colors whitespace-nowrap">
+      Upgrade Plan
+     </Link>
     </div>
    )}
 

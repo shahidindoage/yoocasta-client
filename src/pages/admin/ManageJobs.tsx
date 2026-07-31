@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { getAdminJobs, updateAdminJobStatus, getActiveCompanies, adminCreateJob, adminAddRole } from '../../api/admin.api';
+import { getAdminJobs, updateAdminJobStatus, getActiveCompanies, adminCreateJob, adminAddRole, uploadAdminJobImage } from '../../api/admin.api';
 import { getJobOptions } from '../../api/job.api';
 import { Search } from 'lucide-react';
 import RolesStep from '../recruiter/post-job/RolesStep';
@@ -97,7 +97,25 @@ const ManageJobs = () => {
   const [optionsLoading, setOptionsLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [postError, setPostError] = useState('');
+  const [imageUploading, setImageUploading] = useState(false);
 
+  const handleJobImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { setPostError('Please select an image file'); return; }
+    setImageUploading(true);
+    setPostError('');
+    try {
+      const formData = new FormData();
+      formData.append('jobImage', file);
+      const res = await uploadAdminJobImage(formData);
+      updateJobData({ image: res.data.data.url });
+    } catch {
+      setPostError('Image upload failed');
+    } finally {
+      setImageUploading(false);
+    }
+  };
   const [jobData, setJobData] = useState({
     companyId: '',
     castingService: 'portal',
@@ -115,6 +133,7 @@ const ManageJobs = () => {
     shootingCityId: '',
     shootingCountryId: '',
     shootingDates: [] as string[],
+    image: '',
   });
 
   const [rolesData, setRolesData] = useState<any[]>([]);
@@ -193,6 +212,7 @@ const ManageJobs = () => {
         shootingCityId: '',
         shootingCountryId: '',
         shootingDates: [],
+        image: '',
       });
       setRolesData([]);
       setActiveTab('list');
@@ -543,6 +563,24 @@ const ManageJobs = () => {
                       value={jobData.description}
                       onChange={(html) => updateJobData({ description: html })}
                     />
+                  </div>
+                  <div className="space-y-1.5 md:col-span-2">
+                    <label className="block text-[10px] font-extrabold tracking-widest text-stone-500 uppercase">Job Image</label>
+                    <div className="flex items-center gap-4">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleJobImageUpload}
+                        className="w-full bg-transparent border-b-2 border-stone-200 py-3 text-sm outline-none focus:border-[#3835A4] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-[#3835A4]/10 file:text-[#3835A4]"
+                      />
+                      {imageUploading && <span className="text-xs text-[#C6007E] font-bold whitespace-nowrap animate-pulse">Uploading...</span>}
+                    </div>
+                    {jobData.image && (
+                      <div className="mt-2">
+                        <img src={jobData.image} alt="Job" className="h-28 w-auto object-contain border border-stone-200 rounded-lg" />
+                        <button type="button" onClick={() => updateJobData({ image: '' })} className="mt-1 text-[10px] font-bold text-red-500 hover:underline">Remove</button>
+                      </div>
+                    )}
                   </div>
                   <div className="space-y-1.5 md:col-span-2">
                     <label className="block text-[10px] font-extrabold tracking-widest text-stone-500 uppercase">Usage *</label>

@@ -13,23 +13,24 @@ export default function PostJob() {
  const [submitting, setSubmitting] = useState(false);
  const [error, setError] = useState('');
 
- const [jobData, setJobData] = useState({
-  castingService: 'portal',
-  title: '',
-  subTitle: '',
-  description: '',
-  usage: '',
-  categoryId: '',
-  projectTypeId: '',
-  paymentInfo: '',
-  castingCityId: '',
-  castingCountryId: '',
-  castingDates: [] as string[],
-  lastDateToApply: '',
-  shootingCityId: '',
-  shootingCountryId: '',
-  shootingDates: [] as string[],
- });
+  const [jobData, setJobData] = useState({
+   castingService: 'portal',
+   title: '',
+   subTitle: '',
+   description: '',
+   usage: '',
+   categoryId: '',
+   projectTypeId: '',
+   paymentInfo: '',
+   castingCityId: '',
+   castingCountryId: '',
+   castingDates: [] as string[],
+   lastDateToApply: '',
+   shootingCityId: '',
+   shootingCountryId: '',
+   shootingDates: [] as string[],
+   image: '',
+  });
 
  const [rolesData, setRolesData] = useState<any[]>([]);
 

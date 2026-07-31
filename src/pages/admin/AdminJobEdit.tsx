@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getAdminJobById, adminUpdateJob, adminAddRole, adminUpdateRole, getActiveCompanies } from '../../api/admin.api';
+import { getAdminJobById, adminUpdateJob, adminAddRole, adminUpdateRole, getActiveCompanies, uploadAdminJobImage } from '../../api/admin.api';
 import { getJobOptions } from '../../api/job.api';
 import { ArrowLeft, Plus, Save } from 'lucide-react';
 import HtmlEditor from '../../components/HtmlEditor';
@@ -29,6 +29,24 @@ const AdminJobEdit = () => {
 
   const [form, setForm] = useState<any>({ castingDates: [], shootingDates: [] });
   const [roles, setRoles] = useState<any[]>([]);
+  const [imageUploading, setImageUploading] = useState(false);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { setCastingDateWarn('Please select an image file'); return; }
+    setImageUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('jobImage', file);
+      const res = await uploadAdminJobImage(formData);
+      setForm((prev: any) => ({ ...prev, image: res.data.data.url }));
+    } catch {
+      setCastingDateWarn('Image upload failed');
+    } finally {
+      setImageUploading(false);
+    }
+  };
 
   const [castingDateWarn, setCastingDateWarn] = useState('');
   const [shootingDateWarn, setShootingDateWarn] = useState('');
@@ -56,6 +74,7 @@ const AdminJobEdit = () => {
           lastDateToApply: job.lastDateToApply || '',
           castingDates: job.castingDates ? (typeof job.castingDates === 'string' ? JSON.parse(job.castingDates) : job.castingDates) : [],
           shootingDates: job.shootingDates ? (typeof job.shootingDates === 'string' ? JSON.parse(job.shootingDates) : job.shootingDates) : [],
+          image: job.image || '',
         });
         setCompanyId(job.company?.userId || '');
         setRoles(job.roles || []);
@@ -219,6 +238,25 @@ const AdminJobEdit = () => {
           <div>
             <label className="block text-[10px] font-bold text-stone-500 uppercase mb-1">Description</label>
             <HtmlEditor value={form.description || ''} onChange={(v: string) => handleChange('description', v)} />
+          </div>
+
+          <div>
+            <label className="block text-[10px] font-bold text-stone-500 uppercase mb-1">Job Image</label>
+            <div className="flex items-center gap-4">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="w-full border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:border-[#3835A4] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-[#3835A4]/10 file:text-[#3835A4]"
+              />
+              {imageUploading && <span className="text-xs text-[#C6007E] font-bold whitespace-nowrap animate-pulse">Uploading...</span>}
+            </div>
+            {form.image && (
+              <div className="mt-2">
+                <img src={form.image} alt="Job" className="h-28 w-auto object-contain border border-stone-200 rounded-lg" />
+                <button type="button" onClick={() => setForm((prev: any) => ({ ...prev, image: '' }))} className="mt-1 text-[10px] font-bold text-red-500 hover:underline">Remove</button>
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

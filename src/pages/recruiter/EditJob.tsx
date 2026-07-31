@@ -44,6 +44,7 @@ export default function EditJob() {
     shootingCityId: '',
     shootingCountryId: '',
     shootingDates: [] as string[],
+    image: '',
   });
 
   const [rolesData, setRolesData] = useState<any[]>([]);
@@ -70,6 +71,7 @@ export default function EditJob() {
           shootingCityId: job.shootingCityId || '',
           shootingCountryId: job.shootingCity?.countryId || '',
           shootingDates: parseDates(job.shootingDates),
+          image: job.image || '',
         });
         setRolesData(job.roles?.map((r: any) => {
           const parseArr = (v: any) => {

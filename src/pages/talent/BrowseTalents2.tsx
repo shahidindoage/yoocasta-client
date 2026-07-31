@@ -15,7 +15,7 @@ import {
 } from 'react-icons/fa';
 import { FaPersonWalkingLuggage, FaPersonDress } from 'react-icons/fa6'; // hostess, dancer
 import { GiWalk } from 'react-icons/gi'; // models
-import { MapPin, X, Send, ChevronDown, ChevronUp, ChevronRight, Heart, Search, RotateCcw, Filter } from 'lucide-react';
+import { MapPin, X, Send, ChevronDown, ChevronUp, Heart } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { getCastBags, addTalentsToBag, createCastBag } from '../../api/castBag.api';
 import { getFavouriteIds, addFavourite, removeFavourite } from '../../api/favourites.api';
@@ -35,8 +35,6 @@ const MultiSelectDropdown = ({
   onToggle: (id: string) => void;
 }) => {
   const [open, setOpen] = useState(false);
-  const [openUp, setOpenUp] = useState(false);
-  const [menuPos, setMenuPos] = useState<{ top: number; left: number; width: number } | null>(null);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -47,16 +45,6 @@ const MultiSelectDropdown = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const toggleOpen = () => {
-    if (!open && ref.current) {
-      const rect = ref.current.getBoundingClientRect();
-      const spaceBelow = window.innerHeight - rect.bottom;
-      setOpenUp(spaceBelow < 240);
-      setMenuPos({ top: rect.bottom, left: rect.left, width: rect.width });
-    }
-    setOpen(!open);
-  };
-
   const summary = selected.length === 0 ? `All ${label}` : `${selected.length} selected`;
 
   return (
@@ -66,7 +54,7 @@ const MultiSelectDropdown = ({
       </span>
       <button
         type="button"
-        onClick={toggleOpen}
+        onClick={() => setOpen(!open)}
         style={{
           width: '100%', textAlign: 'left', background: '#fff', color: selected.length ? '#C6007E' : '#333',
           border: '1px solid #f5d0e3', padding: '10px 14px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer',
@@ -77,10 +65,9 @@ const MultiSelectDropdown = ({
         <span style={{ fontSize: '10px', color: '#C6007E' }}>{open ? <ChevronUp style={{ width: '15px', height: '15px' }} /> : <ChevronDown style={{ width: '15px', height: '15px' }} />}</span>
       </button>
 
-      {open && menuPos && (
+      {open && (
         <div style={{
-          position: 'fixed', top: openUp ? menuPos.top - 224 : menuPos.top + 4, left: menuPos.left, width: menuPos.width,
-          zIndex: 9999,
+          position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, zIndex: 20,
           background: '#fff', border: '1px solid #f5d0e3', borderRadius: '8px',
           maxHeight: '220px', overflowY: 'auto', padding: '8px', boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
         }}>
@@ -97,18 +84,6 @@ const MultiSelectDropdown = ({
 };
 
 const DEFAULT_FILTERS = { sort: 'newest' };
-
-const STATIC_CATEGORIES = [
-  'Actors & Extras', 'Cinematographers / Videographers', 'Dancers',
-  'Directors', 'Hostesses', 'MC/RJ/VJ/Voice Over', 'Makeup & Hairstylists',
-  'Models', 'Photographers', 'Promoters', 'Singers',
-];
-
-const STATIC_LOCATIONS = [
-  'Sharjah, United Arab Emirates', 'Dubai, United Arab Emirates',
-  'Abu Dhabi, United Arab Emirates', 'Al Ayn, United Arab Emirates',
-  '`Ajman, United Arab Emirates', 'Al Fujayrah, United Arab Emirates',
-];
 
 const CATEGORY_ICONS: Record<string, IconType> = {
   'Actors & Extras': FaTheaterMasks,
@@ -195,9 +170,39 @@ const TalentCardSkeleton = () => (
 
 const BrowseTalents = () => {
   // const [options, setOptions] = useState<any>(null);
-  const [talents, setTalents] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [pagination, setPagination] = useState({ total: 0, page: 1, totalPages: 1 });
+  const [talents, setTalents] = useState<any[]>(() => {
+    try {
+      const cacheRaw = sessionStorage.getItem('bt_cache');
+      if (cacheRaw) {
+        const parsed = JSON.parse(cacheRaw);
+        const key = JSON.stringify({ filters: appliedFilters, page: 1 });
+        if (parsed.key === key) return parsed.talents;
+      }
+    } catch {}
+    return [];
+  });
+  const [loading, setLoading] = useState(() => {
+    try {
+      const cacheRaw = sessionStorage.getItem('bt_cache');
+      if (cacheRaw) {
+        const parsed = JSON.parse(cacheRaw);
+        const key = JSON.stringify({ filters: appliedFilters, page: 1 });
+        if (parsed.key === key) return false;
+      }
+    } catch {}
+    return true;
+  });
+  const [pagination, setPagination] = useState(() => {
+    try {
+      const cacheRaw = sessionStorage.getItem('bt_cache');
+      if (cacheRaw) {
+        const parsed = JSON.parse(cacheRaw);
+        const key = JSON.stringify({ filters: appliedFilters, page: 1 });
+        if (parsed.key === key) return parsed.pagination;
+      }
+    } catch {}
+    return { total: 0, page: 1, totalPages: 1 };
+  });
 
   const [draftFilters, setDraftFilters] = useState<any>(DEFAULT_FILTERS);
   const [searchParams] = useSearchParams();
@@ -211,8 +216,6 @@ const BrowseTalents = () => {
 
   const [showFilters, setShowFilters] = useState(false); // now: Professional Attributes only
 const [showPhysicalFilters, setShowPhysicalFilters] = useState(false); // new: Physical Filters tab
-const [drawerOpen, setDrawerOpen] = useState(false);
-const [drawerMounted, setDrawerMounted] = useState(false);
 
 
 const [dynamicOptions, setDynamicOptions] = useState<any>(null);
@@ -292,7 +295,7 @@ useEffect(() => {
 
   if (categoryName && filterData) {
     const match = filterData.categories.find((c: any) => c.name === categoryName);
-    if (match) { initial.categories = [match.id]; initial.categoryName = categoryName; hasParam = true; }
+    if (match) { initial.categories = [match.id]; hasParam = true; }
   }
 
   if (cityName && filterData) {
@@ -300,8 +303,6 @@ useEffect(() => {
     if (match) {
       initial.cityId = match.id;
       initial.countryId = match.countryId;
-      const country = filterData.countries.find((c: any) => c.id === match.countryId);
-      initial.location = country ? `${cityName}, ${country.name}` : cityName;
       hasParam = true;
     }
   }
@@ -311,16 +312,6 @@ useEffect(() => {
   }
   setAppliedFilters(initial);
 }, [filterData, searchParams]);
-
-useEffect(() => {
-  if (searchParams.toString()) {
-    const t = setTimeout(() => {
-      const el = document.getElementById('talents-section');
-      if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 16, behavior: 'smooth' });
-    }, 50);
-    return () => clearTimeout(t);
-  }
-}, [searchParams]);
 
 useEffect(() => {
   if ((showFilters || showPhysicalFilters) && !dynamicOptions) {
@@ -423,7 +414,7 @@ const setProfessionalText = (key: string, val: string) => {
 
 
 
-<div style={{ position: 'relative', color: '#333', padding: '100px 40px', borderBottom: '1px solid #ffffffff' }}>
+<div style={{ position: 'relative', color: '#333', padding: '24px 40px', borderBottom: '1px solid #ffffffff' }}>
 
   <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0 }}>
     <video
@@ -439,440 +430,355 @@ const setProfessionalText = (key: string, val: string) => {
   {/* ⬇️ NEW WRAPPER — everything below must go INSIDE this div */}
   <div style={{ position: 'relative', zIndex: 2 }}>
 
-    <style>{`
-      @keyframes tp-shimmer {
-        0% { background-position: -200% 0; filter: drop-shadow(0 0 3px rgba(255,237,36,0.2)); }
-        40% { background-position: 0% 0; filter: drop-shadow(0 0 25px rgba(255,255,255,1)) drop-shadow(0 0 50px rgba(255,237,36,0.6)) drop-shadow(0 0 80px rgba(198,0,126,0.3)); }
-        60% { background-position: 0% 0; filter: drop-shadow(0 0 25px rgba(255,255,255,1)) drop-shadow(0 0 50px rgba(255,237,36,0.6)) drop-shadow(0 0 80px rgba(198,0,126,0.3)); }
-        100% { background-position: 200% 0; filter: drop-shadow(0 0 3px rgba(255,237,36,0.2)); }
-      }
-      .tp-shimmer-char {
-        display: inline-block;
-        color: transparent;
-        background: linear-gradient(120deg, #FFED24 0%, #FFED24 30%, #ffffff 50%, #FFED24 70%, #FFED24 100%);
-        background-size: 200% auto;
-        -webkit-background-clip: text;
-        background-clip: text;
-        animation: tp-shimmer 2.2s ease-in-out infinite;
-      }
-    `}</style>
-    <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-      <p className="font-display text-sm sm:text-base font-bold text-white tracking-wide" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
-        Discover the region&apos;s finest acting, modeling &amp; creative talent
-      </p>
-      <h2 className="font-display text-3xl sm:text-5xl lg:text-[56px]  font-black tracking-[0.08em] leading-none mt-3">
-        {"Talent Pool".split("").map((char, i) => (
-          <span key={i} className="tp-shimmer-char" style={{ animationDelay: `${i * 0.12}s` }}>
-            {char === " " ? "\u00A0" : char}
-          </span>
-        ))}
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+      <h2 style={{ margin: 0, fontSize: '22px', fontWeight: 900, letterSpacing: '-0.02em',color:"#ffed24" }}>
+        Talents Pool
       </h2>
-      <p className="text-[10px] text-white/80 font-medium tracking-[0.2em] mt-3" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
-        Search, filter &amp; shortlist the perfect fit in minutes
-      </p>
+      <button onClick={resetFilters} style={{ fontSize: '12px', color: '#cdcdcdff', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>
+        Reset All
+      </button>
     </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      {filterData ? <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            
+          {/* CATEGORY ICON GRID — MULTI-SELECT */}
+<svg width="0" height="0" style={{ position: 'absolute' }}>
+  <defs>
+    <linearGradient id="categoryIconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#C6007E" />
+      <stop offset="100%" stopColor="#3835A4" />
+    </linearGradient>
+  </defs>
+</svg>
 
-            {/* PRIMARY CORE ROW — STATIC FILTERS (home hero style) */}
-            <div className="max-w-4xl w-full mx-auto bg-white/80 backdrop-blur-xl rounded-2xl border border-[#f5d0e3] p-3 shadow-lg shadow-[#C6007E]/5">
-              <div className="flex flex-wrap lg:flex-nowrap items-center gap-2">
-                <div className="flex-1 min-w-[120px] bg-[#fef1f5] rounded-xl border border-[#f5d0e3] focus-within:border-[#C6007E] transition-colors px-3 py-2">
-                  <select
-                    value={draftFilters.categoryName || ''}
-                    onChange={e => {
-                      const val = e.target.value;
-                      handleFilterChange('categoryName', val);
-                      if (val && filterData) {
-                        const match = filterData.categories.find((c: any) => c.name === val);
-                        handleFilterChange('categories', match ? [match.id] : undefined);
-                      } else {
-                        handleFilterChange('categories', undefined);
-                      }
-                    }}
-                    className="w-full bg-transparent text-xs text-stone-900 font-black focus:outline-none cursor-pointer"
-                  >
-                    <option value="" className="bg-white">All Categories</option>
-                    {STATIC_CATEGORIES.map((cat) => (
-                      <option key={cat} value={cat} className="bg-white">{cat}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="flex-1 min-w-[120px] bg-[#fef1f5] rounded-xl border border-[#f5d0e3] focus-within:border-[#C6007E] transition-colors px-3 py-2">
-                  <select
-                    value={draftFilters.location || ''}
-                    onChange={e => {
-                      const val = e.target.value;
-                      handleFilterChange('location', val);
-                      const cityName = val ? val.split(',')[0].trim() : '';
-                      if (val && filterData) {
-                        const match = filterData.cities.find((c: any) => c.name === cityName);
-                        handleFilterChange('cityId', match ? match.id : null);
-                        handleFilterChange('countryId', match ? match.countryId : null);
-                      } else {
-                        handleFilterChange('cityId', null);
-                        handleFilterChange('countryId', null);
-                      }
-                    }}
-                    className="w-full bg-transparent text-xs text-stone-900 font-black focus:outline-none cursor-pointer"
-                  >
-                    <option value="" className="bg-white">All Locations</option>
-                    {STATIC_LOCATIONS.map((loc) => (
-                      <option key={loc} value={loc} className="bg-white">{loc}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="flex-1 min-w-[100px] bg-[#fef1f5] rounded-xl border border-[#f5d0e3] focus-within:border-[#C6007E] transition-colors px-3 py-2">
-                  <select
-                    value={draftFilters.gender || ''}
-                    onChange={e => handleFilterChange('gender', e.target.value)}
-                    className="w-full bg-transparent text-xs text-stone-900 font-black focus:outline-none cursor-pointer"
-                  >
-                    <option value="" className="bg-white">All Genders</option>
-                    <option value="male" className="bg-white">Male</option>
-                    <option value="female" className="bg-white">Female</option>
-                  </select>
-                </div>
-                <div className="flex-[2] min-w-[150px] bg-[#fef1f5] rounded-xl border border-[#f5d0e3] focus-within:border-[#C6007E] transition-colors px-3 py-2 flex items-center gap-2">
-                  <Search className="h-4 w-4 text-[#C6007E] shrink-0" />
-                  <input
-                    type="text"
-                    placeholder="Search talents..."
-                    value={draftFilters.search || ''}
-                    onChange={e => handleFilterChange('search', e.target.value)}
-                    className="w-full bg-transparent text-xs text-stone-900 font-bold focus:outline-none placeholder-stone-400"
-                  />
-                </div>
-                <button
-                  onClick={applyFilters}
-                  className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#C6007E] to-[#3835A4] hover:opacity-90 text-white transition-all duration-300 px-5 py-2.5 shadow-lg shadow-[#C6007E]/20"
-                >
-                  <Search className="h-4 w-4" />
-                </button>
-                <button
-                  onClick={resetFilters}
-                  title="Reset Filters"
-                  className="flex items-center justify-center rounded-xl bg-[#fef1f5] border border-[#f5d0e3] text-[#C6007E] hover:bg-[#f5d0e3] transition-colors duration-300 px-3 py-2.5"
-                >
-                  <RotateCcw className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '10px' }}>
+  {filterData.categories
+    .filter((c: any) => c.name !== 'Additional Category')
+    .map((c: any) => {
+      const isSelected = (draftFilters.categories || []).includes(c.id);
+      const Icon = CATEGORY_ICONS[c.name] || DEFAULT_CATEGORY_ICON;
+      return (
+        <button
+          key={c.id}
+          type="button"
+          onClick={() => handleMultiChange('categories', c.id)}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px',
+            padding: '14px 8px',
+            borderRadius: '12px',
+            cursor: 'pointer',
+            background: isSelected ? 'linear-gradient(135deg, #C6007E 0%, #3835A4 100%)' : '#fff',
+            border: isSelected ? '1.5px solid #C6007E' : '1.5px solid #f5d0e3',
+            color: isSelected ? '#fff' : '#C6007E',
+            transition: 'all 0.2s',
+          }}
+        >
+          <Icon size={24} style={isSelected ? { fill: '#fff' } : { fill: 'url(#categoryIconGradient)' }} />
+          <span style={{ fontSize: '11px', fontWeight: 'bold', textAlign: 'center', lineHeight: 1.2 }}>{c.name}</span>
+        </button>
+      );
+    })}
+</div>
+           
+           
+            {/* Primary Core Row */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
+              <input 
+                type="text" 
+                placeholder="Search name or bio..." 
+                value={draftFilters.search || ''} 
+                onChange={e => handleFilterChange('search', e.target.value)} 
+                style={{ background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px 14px', borderRadius: '8px', fontSize: '13px', outline: 'none' }} 
+              />
 
-            {/* MORE FILTERS — OPENS FULL-SCREEN DRAWER */}
-            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '8px' }}>
-              <button
-                onClick={() => { setDrawerMounted(true); setDrawerOpen(true); }}
-                className="group flex items-center gap-3 rounded-full bg-white/10 backdrop-blur-md border border-white/30 text-white hover:border-[#C6007E] hover:text-[#FFED24] transition-all duration-300 px-8 py-3 shadow-lg shadow-black/20 cursor-pointer"
+              {/* <select value={draftFilters.sort} onChange={e => handleFilterChange('sort', e.target.value)} style={{ background: '#1c1c24', color: '#fff', border: '1px solid #333', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
+                <option value="newest">Newest Members</option>
+                <option value="most_viewed">Most Viewed</option>
+                <option value="a-z">Name (A-Z)</option>
+                <option value="z-a">Name (Z-A)</option>
+              </select> */}
+
+              <select value={draftFilters.gender || ''} onChange={e => handleFilterChange('gender', e.target.value)} style={{ background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
+                <option value="">All Genders</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                {/* <option value="other">Other</option> */}
+              </select>
+
+              <select value={draftFilters.countryId || ''} onChange={e => { handleFilterChange('countryId', e.target.value); handleFilterChange('cityId', null); }} style={{ background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
+                <option value="">All Countries</option>
+                {filterData.countries.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+
+              <select value={draftFilters.cityId || ''} onChange={e => handleFilterChange('cityId', e.target.value)} style={{ background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
+                <option value="">All Cities</option>
+                {filterData.cities.filter((c: any) => !draftFilters.countryId || c.countryId === draftFilters.countryId).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+
+              <button 
+                onClick={applyFilters}
+                style={{ background: '#3835A4', color: '#fff', border: 'none', borderRadius: '8px', padding: '10px 20px', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px', transition: 'background 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.background = '#C6007E'}
+                onMouseLeave={(e) => e.currentTarget.style.background = '#3835A4'}
               >
-                <Filter className="h-4 w-4 text-[#fff] group-hover:text-[#FFED24] transition-colors" />
-                <span className="text-xs font-black uppercase tracking-[0.2em]">More Filters</span>
-                <ChevronRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform duration-300" />
+                Apply Filters
               </button>
             </div>
+
+            {/* ALWAYS-VISIBLE FILTERS: AGE, ETHNICITY, NATIONALITY, LANGUAGES, DIALECTS */}
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', padding: '20px', background: '#fff', borderRadius: '12px', border: '1px solid #f5d0e3' }}>
+
+  <div>
+    <span style={{ fontSize: '11px', color: '#C6007E', fontWeight: 'bold', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>AGE PARAMETERS</span>
+    <div style={{ display: 'flex', gap: '8px' }}>
+      <select value={draftFilters.ageFrom || ''} onChange={e => handleFilterChange('ageFrom', e.target.value ? parseInt(e.target.value) : null)} style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '12px', borderRadius: '6px', fontSize: '12px' }}>
+        <option value="">Min Age</option>
+        {Array.from({ length: 101 }, (_, i) => <option key={i} value={i}>{i}</option>)}
+      </select>
+      <select value={draftFilters.ageTo || ''} onChange={e => handleFilterChange('ageTo', e.target.value ? parseInt(e.target.value) : null)} style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '8px', borderRadius: '6px', fontSize: '12px' }}>
+        <option value="">Max Age</option>
+        {Array.from({ length: 101 }, (_, i) => <option key={i} value={i}>{i}</option>)}
+      </select>
+    </div>
+  </div>
+
+  <MultiSelectDropdown
+  label="Ethnicity"
+  options={filterData.ethnicities}
+  selected={draftFilters.ethnicities || []}
+  onToggle={(id) => handleMultiChange('ethnicities', id)}
+/>
+  <MultiSelectDropdown
+  label="Nationality"
+  options={filterData.nationalities}
+  selected={draftFilters.nationalities || []}
+  onToggle={(id) => handleMultiChange('nationalities', id)}
+/>
+
+<MultiSelectDropdown
+  label="Languages"
+  options={filterData.languages}
+  selected={draftFilters.languages || []}
+  onToggle={(id) => handleMultiChange('languages', id)}
+/>
+
+<MultiSelectDropdown
+  label="Dialects"
+  options={filterData.dialects}
+  selected={draftFilters.dialects || []}
+  onToggle={(id) => handleMultiChange('dialects', id)}
+/>
+
+</div>
+
+            {/* Toggle Show Advanced Matrices Row */}
+           <div style={{ display: 'flex', gap: '10px',justifyContent:'center' }}>
+  <button onClick={() => setShowFilters(!showFilters)} style={{ background: showFilters ? '#3835A4' : '#fff', color: showFilters ? '#fff' : '#C6007E', border: '1px solid #f5d0e3', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>
+    {showFilters ? 'Hide Advanced Filters ▲' : 'Show Advanced / Professional Filters ▼'}
+  </button>
+  <button onClick={() => setShowPhysicalFilters(!showPhysicalFilters)} style={{ background: showPhysicalFilters ? '#C6007E' : '#fff', color: showPhysicalFilters ? '#fff' : '#C6007E', border: '1px solid #f5d0e3', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>
+    {showPhysicalFilters ? 'Hide Physical Filters ▲' : 'Show Physical Filters ▼'}
+  </button>
+</div>
+
+            {/* Expanded Advanced Sub-Filters Array Panel Container */}
+            {showFilters && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '24px', padding: '24px', background: '#fff', borderRadius: '12px', border: '1px solid #f5d0e3' }}>
+             
+              {dynamicLoading ? (
+                <div style={{ padding: '40px', textAlign: 'center', color: '#999', fontSize: '13px', gridColumn: '1 / -1' }}>
+                  <div style={{ ...shimmerStyle, height: '16px', width: '180px', margin: '0 auto' }} />
+                </div>
+              ) : dynamicOptions.attributes && dynamicOptions.attributes.length > 0 && (
+  <div style={{ gridColumn: '1 / -1', borderTop: '1px solid #f5d0e3', paddingTop: '20px', marginTop: '4px' }}>
+    <span style={{ fontSize: '11px', color: '#C6007E', fontWeight: 'bold', display: 'block', marginBottom: '16px', letterSpacing: '0.5px' }}>
+      PROFESSIONAL ATTRIBUTES
+    </span>
+
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      {Object.entries(EAV_CONFIG).map(([category, fields]) => {
+        const fieldKeys = Object.keys(fields).filter(k => dynamicOptions.attributes.includes(k));
+        if (fieldKeys.length === 0) return null;
+        // const currentEav = draftFilters.professional || [];
+
+        const setValue = (key: string, val: string) => {
+          setDraftFilters((prev: any) => {
+            const pro = (prev.professional || []).filter((p: any) => p.key !== key);
+            if (val) pro.push({ key, value: val });
+            return { ...prev, professional: pro };
+          });
+        };
+
+        return (
+          <div key={category} style={{ display: 'flex', alignItems: 'center', background: '#fef1f5', borderRadius: '8px' }}>
+            <div style={{ background: '#3835A4', color: '#fcfcfcff', fontWeight: 900, fontSize: '13px', padding: '12px 20px', minWidth: '180px', clipPath: 'polygon(0 0, 100% 0, 92% 100%, 0% 100%)' }}>
+              {category}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', padding: '10px 20px', flex: 1 }}>
+             {fieldKeys.map(key => {
+  const field = fields[key];
+  const currentValues: string[] = (draftFilters.professional || []).find((p: any) => p.key === key)?.values || [];
+  const values = field.staticOptions ?? (dynamicOptions.attributeValues?.[key] || []);
+
+  if (field.type === 'multiSelect') {
+    return (
+      <div key={key} style={{ minWidth: '220px' }}>
+        <MultiSelectDropdown
+          label={field.label}
+          options={values.map((v: string) => ({ id: v, name: v }))}
+          selected={currentValues}
+          onToggle={(v) => toggleProfessionalValue(key, v)}
+        />
+      </div>
+    );
+  }
+
+  const textVal = currentValues[0] || '';
+  return (
+    <input
+      key={key}
+      type="text"
+      placeholder={field.label}
+      value={textVal}
+      onChange={e => setProfessionalText(key, e.target.value)}
+      style={{ background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px 14px', borderRadius: '6px', fontSize: '13px', minWidth: '160px',marginTop:'25px' }}
+    />
+  );
+})}
+            </div>
           </div>
+        );
+      })}
+
+      {/* Additional Category — categories with NO custom EAV fields, plain checkboxes tied to categories filter */}
+      {/* {options.categories.filter((c: any) => !Object.keys(EAV_CONFIG).includes(c.name)).length > 0 && (
+        <div style={{ display: 'flex', alignItems: 'center', background: '#1c1c24', borderRadius: '8px', overflow: 'hidden' }}>
+          <div style={{ background: '#E8B923', color: '#1c1c24', fontWeight: 900, fontSize: '13px', padding: '12px 20px', minWidth: '180px', clipPath: 'polygon(0 0, 100% 0, 92% 100%, 0% 100%)' }}>
+            Additional Category
+          </div>
+          <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', padding: '10px 20px', flex: 1 }}>
+            {options.categories
+              .filter((c: any) => !Object.keys(EAV_CONFIG).includes(c.name))
+              .map((c: any) => (
+                <label key={c.id} style={{ fontSize: '13px', color: '#ddd', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={(draftFilters.categories || []).includes(c.id)}
+                    onChange={() => handleMultiChange('categories', c.id)}
+                  />
+                  {c.name}
+                </label>
+              ))}
+          </div>
+        </div>
+      )} */}
+    </div>
+  </div>
+)}
+
+              </div>
+            )}
+
+
+
+            {/* NEW SEPARATE PANEL — PHYSICAL FILTERS TAB */}
+{showPhysicalFilters && (
+  <div style={{ padding: '24px', background: '#fff', borderRadius: '12px', border: '1px solid #f5d0e3' }}>
+    <span style={{ fontSize: '11px', color: '#C6007E', fontWeight: 'bold', display: 'block', marginBottom: '16px', letterSpacing: '0.5px' }}>PHYSICAL SPECIFICATIONS</span>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
+    {dynamicLoading ? (
+      <div style={{ padding: '40px', textAlign: 'center', color: '#999', fontSize: '13px', gridColumn: '1 / -1' }}>
+        <div style={{ ...shimmerStyle, height: '16px', width: '140px', margin: '0 auto' }} />
+      </div>
+    ) : (<>
+      {([
+        ['height', 'Height'], ['weight', 'Weight'], ['chest', 'Chest'], ['waist', 'Waist'], ['shoeSize', 'Shoe Size'],
+      ] as const).map(([field, label]) => (
+        <div key={field} style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+          <span style={{ fontSize: '11px', color: '#C6007E', width: '70px' }}>{label}</span>
+          <select
+            value={draftFilters.physical?.[`${field}From`] || ''}
+            onChange={e => setDraftFilters((p: any) => ({ ...p, physical: { ...p.physical, [`${field}From`]: e.target.value ? Number(e.target.value) : undefined } }))}
+            style={{ flex: 1, background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '6px', borderRadius: '6px', fontSize: '12px' }}
+          >
+            <option value="">From</option>
+            {(dynamicOptions.physicalNumeric?.[field] || []).map((v: number) => <option key={v} value={v}>{v}</option>)}
+          </select>
+          <select
+            value={draftFilters.physical?.[`${field}To`] || ''}
+            onChange={e => setDraftFilters((p: any) => ({ ...p, physical: { ...p.physical, [`${field}To`]: e.target.value ? Number(e.target.value) : undefined } }))}
+            style={{ flex: 1, background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '6px', borderRadius: '6px', fontSize: '12px' }}
+          >
+            <option value="">To</option>
+            {(dynamicOptions.physicalNumeric?.[field] || []).map((v: number) => <option key={v} value={v}>{v}</option>)}
+          </select>
+        </div>
+      ))}
+
+      {([
+        ['hairColor', 'Hair Color'], ['hairType', 'Hair Type'], ['hairLength', 'Hair Length'],
+        ['eyeColor', 'Eye Color'], ['bodyStructure', 'Body Structure'], ['tattoo', 'Tattoo'],
+      ] as const).map(([field, label]) => (
+        <select
+          key={field}
+          value={draftFilters.physical?.[field] || ''}
+          onChange={e => setDraftFilters((p: any) => ({ ...p, physical: { ...p.physical, [field]: e.target.value || undefined } }))}
+          style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '8px', borderRadius: '6px', fontSize: '12px' }}
+        >
+          <option value="">All {label}</option>
+          {(dynamicOptions.physicalCategorical?.[field] || []).map((v: string) => <option key={v} value={v}>{v}</option>)}
+        </select>
+      ))}
+    </>)}
+    </div>
+  </div>
+)}
+          </div> : <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+  {/* Category icon grid skeleton */}
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '10px' }}>
+    {Array.from({ length: 10 }).map((_, i) => (
+      <div key={i} style={{ ...shimmerStyle, height: '80px', borderRadius: '12px' }} />
+    ))}
+  </div>
+  {/* Primary core row skeleton */}
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
+    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '8px' }} />
+    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '8px' }} />
+    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '8px' }} />
+    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '8px' }} />
+    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '8px', width: '120px' }} />
+  </div>
+  {/* Always-visible filters skeleton */}
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', padding: '20px', background: '#fff', borderRadius: '12px', border: '1px solid #f5d0e3' }}>
+    <div>
+      <div style={{ ...shimmerStyle, height: '12px', width: '100px', marginBottom: '8px', borderRadius: '4px' }} />
+      <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ ...shimmerStyle, flex: 1, height: '42px', borderRadius: '6px' }} />
+        <div style={{ ...shimmerStyle, flex: 1, height: '42px', borderRadius: '6px' }} />
+      </div>
+    </div>
+    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '6px' }} />
+    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '6px' }} />
+    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '6px' }} />
+    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '6px' }} />
+  </div>
+  {/* Toggle buttons skeleton */}
+  <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+    <div style={{ ...shimmerStyle, height: '36px', width: '220px', borderRadius: '6px' }} />
+    <div style={{ ...shimmerStyle, height: '36px', width: '180px', borderRadius: '6px' }} />
+  </div>
+</div>}
   </div>
   {/* ⬆️ END NEW WRAPPER */}
 
 </div>
 
-      {/* ALL FILTERS DRAWER */}
-      {drawerMounted && (
-      <div className="fixed inset-0 z-50 flex justify-end" style={{ background: 'rgba(0,0,0,0.5)', opacity: drawerOpen ? 1 : 0, pointerEvents: drawerOpen ? 'auto' : 'none', transition: 'opacity 0.12s ease-in-out' }} onClick={() => setDrawerOpen(false)}>
-        <div className="bg-white w-full max-w-md h-full shadow-2xl" style={{ overflowY: 'auto', overflowX: 'hidden', transform: drawerOpen ? 'translateX(0)' : 'translateX(100%)', transition: 'transform 0.12s ease-in-out', willChange: 'transform' }} onClick={(e) => e.stopPropagation()}>
-            {/* Drawer header */}
-            <div style={{ position: 'sticky', top: 0, zIndex: 10, background: '#3835A4', color: '#fff', padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ margin: 0, fontSize: '16px', fontWeight: 900 }}>All Filters</h2>
-              <button onClick={() => setDrawerOpen(false)} style={{ background: 'none', border: 'none', color: '#fff', fontSize: '22px', cursor: 'pointer', lineHeight: 1 }}>&times;</button>
-            </div>
-            <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-
-              {/* PRIMARY CONTROLS — SEARCH, COUNTRY, CITY, GENDER */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <input
-                  type="text"
-                  placeholder="Search name or bio..."
-                  value={draftFilters.search || ''}
-                  onChange={e => handleFilterChange('search', e.target.value)}
-                  style={{ background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px 14px', borderRadius: '8px', fontSize: '13px', outline: 'none' }}
-                />
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
-                  <select
-                    value={draftFilters.countryId || ''}
-                    onChange={e => { handleFilterChange('countryId', e.target.value); handleFilterChange('cityId', null); }}
-                    style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px', borderRadius: '8px', fontSize: '13px' }}
-                  >
-                    <option value="">All Countries</option>
-                    {filterData?.countries.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                  </select>
-                  <select
-                    value={draftFilters.cityId || ''}
-                    onChange={e => handleFilterChange('cityId', e.target.value)}
-                    style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px', borderRadius: '8px', fontSize: '13px' }}
-                  >
-                    <option value="">All Cities</option>
-                    {filterData?.cities.filter((c: any) => !draftFilters.countryId || c.countryId === draftFilters.countryId).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                  </select>
-                </div>
-                <select
-                  value={draftFilters.gender || ''}
-                  onChange={e => handleFilterChange('gender', e.target.value)}
-                  style={{ background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px', borderRadius: '8px', fontSize: '13px' }}
-                >
-                  <option value="">All Genders</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                </select>
-              </div>
-
-              {/* CATEGORIES DROPDOWN — SINGLE SELECT */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <span style={{ fontSize: '11px', color: '#C6007E', fontWeight: 'bold', letterSpacing: '0.5px' }}>CATEGORIES</span>
-                <select
-                  value={draftFilters.categoryId || ''}
-                  onChange={e => { const val = e.target.value; handleFilterChange('categoryId', val); handleFilterChange('categories', val ? [val] : undefined); }}
-                  style={{ background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px', borderRadius: '8px', fontSize: '13px' }}
-                >
-                  <option value="">All Categories</option>
-                  {filterData?.categories.filter((c: any) => c.name !== 'Additional Category').map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                </select>
-              </div>
-
-              {/* ALWAYS-VISIBLE FILTERS: AGE, ETHNICITY, NATIONALITY, LANGUAGES, DIALECTS */}
-              {filterData && (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '16px', padding: '16px', background: '#fff', borderRadius: '12px', border: '1px solid #f5d0e3', width: '100%', minWidth: 0 }}>
-
-                <div>
-                  <span style={{ fontSize: '11px', color: '#C6007E', fontWeight: 'bold', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>AGE PARAMETERS</span>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <select value={draftFilters.ageFrom || ''} onChange={e => handleFilterChange('ageFrom', e.target.value ? parseInt(e.target.value) : null)} style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '12px', borderRadius: '6px', fontSize: '12px' }}>
-                      <option value="">Min Age</option>
-                      {Array.from({ length: 101 }, (_, i) => <option key={i} value={i}>{i}</option>)}
-                    </select>
-                    <select value={draftFilters.ageTo || ''} onChange={e => handleFilterChange('ageTo', e.target.value ? parseInt(e.target.value) : null)} style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '8px', borderRadius: '6px', fontSize: '12px' }}>
-                      <option value="">Max Age</option>
-                      {Array.from({ length: 101 }, (_, i) => <option key={i} value={i}>{i}</option>)}
-                    </select>
-                  </div>
-                </div>
-
-                <MultiSelectDropdown
-                  label="Ethnicity"
-                  options={filterData.ethnicities}
-                  selected={draftFilters.ethnicities || []}
-                  onToggle={(id) => handleMultiChange('ethnicities', id)}
-                />
-                <MultiSelectDropdown
-                  label="Nationality"
-                  options={filterData.nationalities}
-                  selected={draftFilters.nationalities || []}
-                  onToggle={(id) => handleMultiChange('nationalities', id)}
-                />
-
-                <MultiSelectDropdown
-                  label="Languages"
-                  options={filterData.languages}
-                  selected={draftFilters.languages || []}
-                  onToggle={(id) => handleMultiChange('languages', id)}
-                />
-
-                <MultiSelectDropdown
-                  label="Dialects"
-                  options={filterData.dialects}
-                  selected={draftFilters.dialects || []}
-                  onToggle={(id) => handleMultiChange('dialects', id)}
-                />
-
-              </div>
-              )}
-
-              {/* Toggle Show Advanced Matrices Row */}
-              <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-                <button onClick={() => setShowFilters(!showFilters)} style={{ background: showFilters ? '#3835A4' : '#fff', color: showFilters ? '#fff' : '#C6007E', border: '1px solid #f5d0e3', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>
-                  {showFilters ? 'Hide Advanced Filters ▲' : 'Show Advanced / Professional Filters ▼'}
-                </button>
-                <button onClick={() => setShowPhysicalFilters(!showPhysicalFilters)} style={{ background: showPhysicalFilters ? '#C6007E' : '#fff', color: showPhysicalFilters ? '#fff' : '#C6007E', border: '1px solid #f5d0e3', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>
-                  {showPhysicalFilters ? 'Hide Physical Filters ▲' : 'Show Physical Filters ▼'}
-                </button>
-              </div>
-
-              {/* Expanded Advanced Sub-Filters Array Panel Container */}
-              {showFilters && (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px', padding: '16px', background: '#fff', borderRadius: '12px', border: '1px solid #f5d0e3', width: '100%', minWidth: 0 }}>
-
-                  {dynamicLoading ? (
-                    <div style={{ padding: '40px', textAlign: 'center', color: '#999', fontSize: '13px', gridColumn: '1 / -1' }}>
-                      <div style={{ ...shimmerStyle, height: '16px', width: '180px', margin: '0 auto' }} />
-                    </div>
-                  ) : dynamicOptions.attributes && dynamicOptions.attributes.length > 0 && (
-                    <div style={{ gridColumn: '1 / -1', borderTop: '1px solid #f5d0e3', paddingTop: '20px', marginTop: '4px' }}>
-                      <span style={{ fontSize: '11px', color: '#C6007E', fontWeight: 'bold', display: 'block', marginBottom: '16px', letterSpacing: '0.5px' }}>
-                        PROFESSIONAL ATTRIBUTES
-                      </span>
-
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                        {Object.entries(EAV_CONFIG).map(([category, fields]) => {
-                          const fieldKeys = Object.keys(fields).filter(k => dynamicOptions.attributes.includes(k));
-                          if (fieldKeys.length === 0) return null;
-                          // const currentEav = draftFilters.professional || [];
-
-                          const setValue = (key: string, val: string) => {
-                            setDraftFilters((prev: any) => {
-                              const pro = (prev.professional || []).filter((p: any) => p.key !== key);
-                              if (val) pro.push({ key, value: val });
-                              return { ...prev, professional: pro };
-                            });
-                          };
-
-                          return (
-                            <div key={category} style={{ display: 'flex', flexDirection: 'column', background: '#fef1f5', borderRadius: '8px', overflow: 'hidden', width: '100%' }}>
-                              <div style={{ background: '#3835A4', color: '#fcfcfcff', fontWeight: 900, fontSize: '13px', padding: '10px 20px', width: '100%' }}>
-                                {category}
-                              </div>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', padding: '12px' }}>
-                                {fieldKeys.map(key => {
-                                  const field = fields[key];
-                                  const currentValues: string[] = (draftFilters.professional || []).find((p: any) => p.key === key)?.values || [];
-                                  const values = field.staticOptions ?? (dynamicOptions.attributeValues?.[key] || []);
-
-                                  if (field.type === 'multiSelect') {
-                                    return (
-                                      <div key={key} style={{ width: '200px', maxWidth: '100%' }}>
-                                        <MultiSelectDropdown
-                                          label={field.label}
-                                          options={values.map((v: string) => ({ id: v, name: v }))}
-                                          selected={currentValues}
-                                          onToggle={(v) => toggleProfessionalValue(key, v)}
-                                        />
-                                      </div>
-                                    );
-                                  }
-
-                                  const textVal = currentValues[0] || '';
-                                  return (
-                                    <input
-                                      key={key}
-                                      type="text"
-                                      placeholder={field.label}
-                                      value={textVal}
-                                      onChange={e => setProfessionalText(key, e.target.value)}
-                                      style={{ background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px 14px', borderRadius: '6px', fontSize: '13px', width: '200px', maxWidth: '100%' }}
-                                    />
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          );
-                        })}
-
-                        {/* Additional Category — categories with NO custom EAV fields, plain checkboxes tied to categories filter */}
-                        {/* {options.categories.filter((c: any) => !Object.keys(EAV_CONFIG).includes(c.name)).length > 0 && (
-                          <div style={{ display: 'flex', alignItems: 'center', background: '#1c1c24', borderRadius: '8px', overflow: 'hidden' }}>
-                            <div style={{ background: '#E8B923', color: '#1c1c24', fontWeight: 900, fontSize: '13px', padding: '12px 20px', minWidth: '180px', clipPath: 'polygon(0 0, 100% 0, 92% 100%, 0% 100%)' }}>
-                              Additional Category
-                            </div>
-                            <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', padding: '10px 20px', flex: 1 }}>
-                              {options.categories
-                                .filter((c: any) => !Object.keys(EAV_CONFIG).includes(c.name))
-                                .map((c: any) => (
-                                  <label key={c.id} style={{ fontSize: '13px', color: '#ddd', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
-                                    <input
-                                      type="checkbox"
-                                      checked={(draftFilters.categories || []).includes(c.id)}
-                                      onChange={() => handleMultiChange('categories', c.id)}
-                                    />
-                                    {c.name}
-                                  </label>
-                                ))}
-                            </div>
-                          </div>
-                        )} */}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* NEW SEPARATE PANEL — PHYSICAL FILTERS TAB */}
-              {showPhysicalFilters && (
-                <div style={{ padding: '16px', background: '#fff', borderRadius: '12px', border: '1px solid #f5d0e3', width: '100%', minWidth: 0 }}>
-                  <span style={{ fontSize: '11px', color: '#C6007E', fontWeight: 'bold', display: 'block', marginBottom: '16px', letterSpacing: '0.5px' }}>PHYSICAL SPECIFICATIONS</span>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', minWidth: 0 }}>
-                    {dynamicLoading ? (
-                      <div style={{ padding: '40px', textAlign: 'center', color: '#999', fontSize: '13px', gridColumn: '1 / -1' }}>
-                        <div style={{ ...shimmerStyle, height: '16px', width: '140px', margin: '0 auto' }} />
-                      </div>
-                    ) : (<>
-                      {([
-                        ['height', 'Height'], ['weight', 'Weight'], ['chest', 'Chest'], ['waist', 'Waist'], ['shoeSize', 'Shoe Size'],
-                      ] as const).map(([field, label]) => (
-                        <div key={field} style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                          <span style={{ fontSize: '11px', color: '#C6007E', width: '70px' }}>{label}</span>
-                          <select
-                            value={draftFilters.physical?.[`${field}From`] || ''}
-                            onChange={e => setDraftFilters((p: any) => ({ ...p, physical: { ...p.physical, [`${field}From`]: e.target.value ? Number(e.target.value) : undefined } }))}
-                            style={{ flex: 1, background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '6px', borderRadius: '6px', fontSize: '12px' }}
-                          >
-                            <option value="">From</option>
-                            {(dynamicOptions.physicalNumeric?.[field] || []).map((v: number) => <option key={v} value={v}>{v}</option>)}
-                          </select>
-                          <select
-                            value={draftFilters.physical?.[`${field}To`] || ''}
-                            onChange={e => setDraftFilters((p: any) => ({ ...p, physical: { ...p.physical, [`${field}To`]: e.target.value ? Number(e.target.value) : undefined } }))}
-                            style={{ flex: 1, background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '6px', borderRadius: '6px', fontSize: '12px' }}
-                          >
-                            <option value="">To</option>
-                            {(dynamicOptions.physicalNumeric?.[field] || []).map((v: number) => <option key={v} value={v}>{v}</option>)}
-                          </select>
-                        </div>
-                      ))}
-
-                      {([
-                        ['hairColor', 'Hair Color'], ['hairType', 'Hair Type'], ['hairLength', 'Hair Length'],
-                        ['eyeColor', 'Eye Color'], ['bodyStructure', 'Body Structure'], ['tattoo', 'Tattoo'],
-                      ] as const).map(([field, label]) => (
-                        <select
-                          key={field}
-                          value={draftFilters.physical?.[field] || ''}
-                          onChange={e => setDraftFilters((p: any) => ({ ...p, physical: { ...p.physical, [field]: e.target.value || undefined } }))}
-                          style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '8px', borderRadius: '6px', fontSize: '12px' }}
-                        >
-                          <option value="">All {label}</option>
-                          {(dynamicOptions.physicalCategorical?.[field] || []).map((v: string) => <option key={v} value={v}>{v}</option>)}
-                        </select>
-                      ))}
-                    </>)}
-                  </div>
-                </div>
-              )}
-
-              {/* Drawer bottom: reset + apply buttons */}
-              <div style={{ borderTop: '1px solid #f5d0e3', paddingTop: '16px', display: 'flex', gap: '12px' }}>
-                <button
-                  onClick={() => { resetFilters(); setDrawerOpen(false); }}
-                  style={{ flex: 1, background: '#fff', color: '#C6007E', border: '1px solid #f5d0e3', borderRadius: '8px', padding: '12px 20px', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px', transition: 'background 0.2s' }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = '#f5d0e3'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = '#fff'}
-                >
-                  Reset Filters
-                </button>
-                <button
-                  onClick={() => { applyFilters(); setDrawerOpen(false); }}
-                  style={{ flex: 2, background: '#3835A4', color: '#fff', border: 'none', borderRadius: '8px', padding: '12px 20px', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px', transition: 'background 0.2s' }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = '#C6007E'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = '#3835A4'}
-                >
-                  Apply Filters
-                </button>
-              </div>
-
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* COUNT + SORT ROW */}
-      <div id="talents-section" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 40px 0' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 40px 0' }}>
         <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 900, letterSpacing: '-0.02em', color: '#000' }}>
           {pagination.total > 0 && <span style={{ color: '#3835A4', marginRight: '3px' }}>{pagination.total}</span>} Matching Talents Found
         </h2>
@@ -1030,7 +936,7 @@ const setProfessionalText = (key: string, val: string) => {
                     className="p-1.5 rounded-full transition-all duration-300 cursor-pointer opacity-0 group-hover:opacity-100 text-white hover:text-[#C6007E]"
                     title="Download Z Card"
                   >
-                    <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v4a1 1 0 001 1h4" />
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9 14h6" />
@@ -1058,11 +964,11 @@ const setProfessionalText = (key: string, val: string) => {
                     ) : (
                       <div className="relative flex items-center">
                         <div className="flex items-center gap-1 bg-[#C6007E] text-white px-2 py-0.5 rounded-lg opacity-100 group-hover:opacity-0 transition-opacity duration-300">
-                          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                             <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                           </svg>
-                          <span className="text-[12px] font-mono font-bold">{talent.views ?? 0}</span>
+                          <span className="text-xs font-mono font-bold">{talent.views ?? 0}</span>
                         </div>
                         {user?.role === 'RECRUITER' && (
                           <button
@@ -1074,7 +980,7 @@ const setProfessionalText = (key: string, val: string) => {
                             }`}
                             title={favouriteIds.includes(talent.id) ? 'Remove from favourites' : 'Add to favourites'}
                           >
-                            <Heart className={`h-7 w-7 ${favouriteIds.includes(talent.id) ? 'fill-current' : ''}`} />
+                            <Heart className={`h-4 w-4 ${favouriteIds.includes(talent.id) ? 'fill-current' : ''}`} />
                           </button>
                         )}
                       </div>

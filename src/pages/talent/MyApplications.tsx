@@ -121,7 +121,7 @@ export default function MyApplications() {
          <div className="flex items-start gap-4">
           {/* Category Image */}
           <div className="w-14 h-14 rounded-xl shrink-0 overflow-hidden border border-stone-100" style={{
-           backgroundImage: `url(${getCategoryImage(job?.category?.name)})`,
+           backgroundImage: `url(${job?.image || getCategoryImage(job?.category?.name)})`,
            backgroundSize: 'cover',
            backgroundPosition: 'center',
           }} />

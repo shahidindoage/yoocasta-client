@@ -147,6 +147,11 @@ export const updateCountry = (id: string, name: string) =>
 export const deleteCountry = (id: string) =>
   api.delete(`/admin/countries/${id}`);
 
+export const uploadAdminJobImage = (formData: FormData) =>
+  api.post('/admin/jobs/image', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+
 export const getEmailTemplates = () =>
   api.get('/admin/email-templates');
 

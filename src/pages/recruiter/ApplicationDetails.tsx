@@ -375,9 +375,9 @@ const ApplicationDetails = () => {
 
             {/* Action Buttons */}
             <div className="flex gap-3">
-              <button className="bg-[#3835A4] text-white px-6 py-3 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-[#2a2899] transition-colors">
+              {/* <button className="bg-[#3835A4] text-white px-6 py-3 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-[#2a2899] transition-colors">
                 Update Status
-              </button>
+              </button> */}
               <Link
                 to={`/talent/${user.username}`}
                 className="border-2 border-[#3835A4]/20 text-[#3835A4] px-6 py-3 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-[#3835A4]/5 transition-colors"

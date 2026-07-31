@@ -39,7 +39,7 @@ export default function PublicJobInvitation() {
   if (!data) return <div style={{ padding: '60px', textAlign: 'center', color: '#888' }}>Job not found</div>;
 
   const { job, talents } = data;
-  const bgImage = CATEGORY_IMAGES[job.category || ''] || DEFAULT_CATEGORY_IMAGE;
+  const bgImage = job.image || CATEGORY_IMAGES[job.category || ''] || DEFAULT_CATEGORY_IMAGE;
 
   return (
     <div style={{ background: '#f4f4f6', minHeight: '100vh', fontFamily: 'system-ui, sans-serif' }}>

@@ -7,7 +7,7 @@ import { getMyProfile } from '../../api/profile.api';
 import { useAuthStore } from '../../store/authStore';
 import api from '../../api/axios';
 import ApplicationPopup from '../../components/ApplicationPopup';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, Search, RotateCcw, Filter, ChevronRight } from 'lucide-react';
 
 const CATEGORY_IMAGES: Record<string, string> = {
   'Actors & Extras': 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/images/category/actors_image.jpg',
@@ -178,6 +178,8 @@ const BrowseJobs = () => {
   const [loadingApplied, setLoadingApplied] = useState(false);
   const [limitMessage, setLimitMessage] = useState<string | null>(null);
   const [filterData, setFilterData] = useState<any>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerMounted, setDrawerMounted] = useState(false);
   const draftRef = useRef(draftFilters);
   draftRef.current = draftFilters;
 
@@ -245,7 +247,7 @@ const BrowseJobs = () => {
     <div style={{ background: '#ffffffff', minHeight: '100vh', fontFamily: 'system-ui, sans-serif', margin: 0 }}>
 
       {/* TOP FILTERS PANEL */}
-      <div style={{ position: 'relative', color: '#333', padding: '24px 40px', borderBottom: '1px solid #ffffffff' }}>
+      <div style={{ position: 'relative', color: '#333', padding: '100px 40px', borderBottom: '1px solid #ffffffff' }}>
         
         <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0 }}>
           <video autoPlay loop muted playsInline className="w-full h-full object-cover opacity-70">
@@ -255,112 +257,151 @@ const BrowseJobs = () => {
         <div className="absolute inset-0 bg-black/30" /> 
 
         <div style={{ position: 'relative', zIndex: 2 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-            <h2 style={{ margin: 0, fontSize: '22px', fontWeight: 900, letterSpacing: '-0.02em',color:"#ffed24" }}>
-              Browse Jobs
+          <style>{`
+            @keyframes bj-shimmer {
+              0% { background-position: -200% 0; filter: drop-shadow(0 0 3px rgba(255,237,36,0.2)); }
+              40% { background-position: 0% 0; filter: drop-shadow(0 0 25px rgba(255,255,255,1)) drop-shadow(0 0 50px rgba(255,237,36,0.6)) drop-shadow(0 0 80px rgba(198,0,126,0.3)); }
+              60% { background-position: 0% 0; filter: drop-shadow(0 0 25px rgba(255,255,255,1)) drop-shadow(0 0 50px rgba(255,237,36,0.6)) drop-shadow(0 0 80px rgba(198,0,126,0.3)); }
+              100% { background-position: 200% 0; filter: drop-shadow(0 0 3px rgba(255,237,36,0.2)); }
+            }
+            .bj-shimmer-char {
+              display: inline-block;
+              color: transparent;
+              background: linear-gradient(120deg, #FFED24 0%, #FFED24 30%, #ffffff 50%, #FFED24 70%, #FFED24 100%);
+              background-size: 200% auto;
+              -webkit-background-clip: text;
+              background-clip: text;
+              animation: bj-shimmer 2.2s ease-in-out infinite;
+            }
+          `}</style>
+          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+            <p className="font-display text-sm sm:text-base font-bold text-white tracking-wide" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
+              Explore casting calls across film, TV &amp; events
+            </p>
+            <h2 className="font-display text-3xl sm:text-5xl lg:text-[56px] font-black tracking-[0.08em] leading-none mt-3">
+              {"Casting & Jobs".split("").map((char, i) => (
+                <span key={i} className="bj-shimmer-char" style={{ animationDelay: `${i * 0.12}s` }}>
+                  {char === " " ? "\u00A0" : char}
+                </span>
+              ))}
             </h2>
-            <button onClick={resetFilters} style={{ fontSize: '12px', color: '#cdcdcdff', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'bold', letterSpacing: '1px' }}>
-              Reset All
-            </button>
+            <p className="text-[10px] text-white/80 font-medium tracking-[0.2em] mt-3" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
+              Find &amp; apply to the perfect role in minutes
+            </p>
           </div>
 
-          {filterData ? <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div className="max-w-4xl w-full mx-auto bg-white/80 backdrop-blur-xl rounded-2xl border border-[#f5d0e3] p-3 shadow-lg shadow-[#C6007E]/5">
+                <div className="flex flex-wrap lg:flex-nowrap items-center gap-2">
+                  {/* Category */}
+                  <div className="flex-1 min-w-[120px] bg-[#fef1f5] rounded-xl border border-[#f5d0e3] focus-within:border-[#C6007E] transition-colors px-3 py-2">
+                    <select value={draftFilters.categoryIds || ''} onChange={e => handleFilterChange('categoryIds', e.target.value)} className="w-full bg-transparent text-xs text-stone-900 font-black focus:outline-none cursor-pointer">
+                      <option value="" className="bg-white">All Categories</option>
+                      {fd.categories?.filter((c: any) => c.name !== 'Additional Category').map((c: any) => <option key={c.id} value={c.id} className="bg-white">{c.name}</option>)}
+                    </select>
+                  </div>
+                  {/* Gender */}
+                  <div className="flex-1 min-w-[100px] bg-[#fef1f5] rounded-xl border border-[#f5d0e3] focus-within:border-[#C6007E] transition-colors px-3 py-2">
+                    <select value={draftFilters.gender || ''} onChange={e => handleFilterChange('gender', e.target.value)} className="w-full bg-transparent text-xs text-stone-900 font-black focus:outline-none cursor-pointer">
+                      <option value="" className="bg-white">All Genders</option>
+                      <option value="male" className="bg-white">Male</option>
+                      <option value="female" className="bg-white">Female</option>
+                      <option value="both" className="bg-white">Both</option>
+                    </select>
+                  </div>
+                  {/* Payment */}
+                  <div className="flex-1 min-w-[100px] bg-[#fef1f5] rounded-xl border border-[#f5d0e3] focus-within:border-[#C6007E] transition-colors px-3 py-2">
+                    <select value={draftFilters.paymentType || ''} onChange={e => handleFilterChange('paymentType', e.target.value)} className="w-full bg-transparent text-xs text-stone-900 font-black focus:outline-none cursor-pointer">
+                      <option value="" className="bg-white">All Payment</option>
+                      <option value="paid" className="bg-white">Paid</option>
+                      <option value="unpaid" className="bg-white">Unpaid</option>
+                    </select>
+                  </div>
+                  {/* Search */}
+                  <div className="flex-[2] min-w-[150px] bg-[#fef1f5] rounded-xl border border-[#f5d0e3] focus-within:border-[#C6007E] transition-colors px-3 py-2 flex items-center gap-2">
+                    <Search className="h-4 w-4 text-[#C6007E] shrink-0" />
+                    <input type="text" placeholder="Search jobs..." value={draftFilters.search || ''} onChange={e => handleFilterChange('search', e.target.value)} className="w-full bg-transparent text-xs text-stone-900 font-bold focus:outline-none placeholder-stone-400" />
+                  </div>
+                  {/* Apply button */}
+                  <button onClick={applyFilters} className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#C6007E] to-[#3835A4] hover:opacity-90 text-white transition-all duration-300 px-5 py-2.5 shadow-lg shadow-[#C6007E]/20">
+                    <Search className="h-4 w-4" />
+                  </button>
+                  {/* Reset icon */}
+                  <button onClick={resetFilters} title="Reset Filters" className="flex items-center justify-center rounded-xl bg-[#fef1f5] border border-[#f5d0e3] text-[#C6007E] hover:bg-[#f5d0e3] transition-colors duration-300 px-3 py-2.5">
+                    <RotateCcw className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
 
-              {/* Primary Core Row */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
-                <div>
-                  {/* <span style={{ fontSize: '11px', color: '#888', fontWeight: 'bold', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>CATEGORY</span> */}
+              {/* More Filters button */}
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: '8px' }}>
+                <button onClick={() => { setDrawerMounted(true); setDrawerOpen(true); }} className="group flex items-center gap-3 rounded-full bg-white/10 backdrop-blur-md border border-white/30 text-white hover:border-[#C6007E] hover:text-[#FFED24] transition-all duration-300 px-8 py-3 shadow-lg shadow-black/20 cursor-pointer">
+                  <Filter className="h-4 w-4 text-[#fff] group-hover:text-[#FFED24] transition-colors" />
+                  <span className="text-xs font-black uppercase tracking-[0.2em]">More Filters</span>
+                  <ChevronRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform duration-300" />
+                </button>
+              </div>
+          </div>
+
+        </div>
+      </div>
+
+      {drawerMounted && (
+        <div className="fixed inset-0 z-50 flex justify-end" style={{ background: 'rgba(0,0,0,0.5)', opacity: drawerOpen ? 1 : 0, pointerEvents: drawerOpen ? 'auto' : 'none', transition: 'opacity 0.12s ease-in-out' }} onClick={() => setDrawerOpen(false)}>
+          <div className="bg-white w-full max-w-md h-full shadow-2xl" style={{ overflowY: 'auto', overflowX: 'hidden', transform: drawerOpen ? 'translateX(0)' : 'translateX(100%)', transition: 'transform 0.12s ease-in-out', willChange: 'transform' }} onClick={(e) => e.stopPropagation()}>
+            {/* header */}
+            <div style={{ position: 'sticky', top: 0, zIndex: 10, background: '#3835A4', color: '#fff', padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ margin: 0, fontSize: '16px', fontWeight: 900 }}>All Filters</h2>
+              <button onClick={() => setDrawerOpen(false)} style={{ background: 'none', border: 'none', color: '#fff', fontSize: '22px', cursor: 'pointer', lineHeight: 1 }}>&times;</button>
+            </div>
+            <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {/* Primary controls: search, gender, payment */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <input type="text" placeholder="Search jobs..." value={draftFilters.search || ''} onChange={e => handleFilterChange('search', e.target.value)} style={{ background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px 14px', borderRadius: '8px', fontSize: '13px', outline: 'none' }} />
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
                   <select value={draftFilters.categoryIds || ''} onChange={e => handleFilterChange('categoryIds', e.target.value)} style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
                     <option value="">All Categories</option>
                     {fd.categories?.filter((c: any) => c.name !== 'Additional Category').map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
                   </select>
-                </div>
-
-                <div>
-                  {/* <span style={{ fontSize: '11px', color: '#888', fontWeight: 'bold', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>GENDER</span> */}
                   <select value={draftFilters.gender || ''} onChange={e => handleFilterChange('gender', e.target.value)} style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
                     <option value="">All Genders</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="both">Both</option>
+                    <option value="male">Male</option><option value="female">Female</option><option value="both">Both</option>
                   </select>
-                </div>
-
-                <div>
-                  {/* <span style={{ fontSize: '11px', color: '#888', fontWeight: 'bold', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>PAYMENT</span> */}
                   <select value={draftFilters.paymentType || ''} onChange={e => handleFilterChange('paymentType', e.target.value)} style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
-                    <option value="">All Payment</option>
-                    <option value="paid">Paid</option>
-                    <option value="unpaid">Unpaid</option>
+                    <option value="">All Payment</option><option value="paid">Paid</option><option value="unpaid">Unpaid</option>
                   </select>
-                </div>
-
-                <div>
-                  {/* <span style={{ fontSize: '11px', color: '#888', fontWeight: 'bold', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>PROJECT TYPE</span> */}
                   <select value={draftFilters.projectTypeId || ''} onChange={e => handleFilterChange('projectTypeId', e.target.value)} style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
                     <option value="">All Project Types</option>
                     {fd.projectTypes?.map((pt: any) => <option key={pt.id} value={pt.id}>{pt.name}</option>)}
                   </select>
                 </div>
               </div>
-
-              {/* Age + Multi-select Filters */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', padding: '20px', background: '#fff', borderRadius: '12px', border: '1px solid #f5d0e3' }}>
+              {/* Age + multi-select filters */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '16px', padding: '16px', background: '#fff', borderRadius: '12px', border: '1px solid #f5d0e3', width: '100%', minWidth: 0 }}>
                 <div>
-                  <span style={{ fontSize: '11px', color: '#C6007E', fontWeight: 'bold', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>Age Parameters</span>
+                  <span style={{ fontSize: '11px', color: '#C6007E', fontWeight: 'bold', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>AGE PARAMETERS</span>
                   <div style={{ display: 'flex', gap: '8px' }}>
-                    <select value={draftFilters.ageFrom || ''} onChange={e => handleFilterChange('ageFrom', e.target.value)} style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '12px', borderRadius: '6px', fontSize: '12px' }}>
-                      <option value="">Min Age</option>
-                      {Array.from({ length: 101 }, (_, i) => <option key={i} value={i}>{i}</option>)}
+                    <select value={draftFilters.ageFrom || ''} onChange={e => handleFilterChange('ageFrom', e.target.value)} style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '8px', borderRadius: '6px', fontSize: '12px' }}>
+                      <option value="">Min Age</option>{Array.from({ length: 101 }, (_, i) => <option key={i} value={i}>{i}</option>)}
                     </select>
                     <select value={draftFilters.ageTo || ''} onChange={e => handleFilterChange('ageTo', e.target.value)} style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '8px', borderRadius: '6px', fontSize: '12px' }}>
-                      <option value="">Max Age</option>
-                      {Array.from({ length: 101 }, (_, i) => <option key={i} value={i}>{i}</option>)}
+                      <option value="">Max Age</option>{Array.from({ length: 101 }, (_, i) => <option key={i} value={i}>{i}</option>)}
                     </select>
                   </div>
                 </div>
-
                 <MultiSelectDropdown label="Country" options={fd.countries || []} selected={draftFilters.countryIds || []} onToggle={(id) => handleMultiChange('countryIds', id)} />
                 <MultiSelectDropdown label="Language" options={fd.languages || []} selected={draftFilters.languageIds || []} onToggle={(id) => handleMultiChange('languageIds', id)} />
                 <MultiSelectDropdown label="Nationality" options={fd.nationalities || []} selected={draftFilters.nationalityIds || []} onToggle={(id) => handleMultiChange('nationalityIds', id)} />
               </div>
-
-              <button
-                onClick={applyFilters}
-                style={{ background: '#3835A4', color: '#fff', border: 'none', borderRadius: '8px', padding: '12px 24px', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px', alignSelf: 'flex-start' }}
-                onMouseEnter={(e) => e.currentTarget.style.background = '#C6007E'}
-                onMouseLeave={(e) => e.currentTarget.style.background = '#3835A4'}
-              >
-                Apply Filters
-              </button>
-
-            </div> : <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-  {/* Primary core row skeleton */}
-  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
-    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '8px' }} />
-    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '8px' }} />
-    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '8px' }} />
-    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '8px' }} />
-  </div>
-  {/* Age + multi-select skeleton */}
-  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', padding: '20px', background: '#fff', borderRadius: '12px', border: '1px solid #f5d0e3' }}>
-    <div>
-      <div style={{ ...shimmerStyle, height: '12px', width: '100px', marginBottom: '8px', borderRadius: '4px' }} />
-      <div style={{ display: 'flex', gap: '8px' }}>
-        <div style={{ ...shimmerStyle, flex: 1, height: '42px', borderRadius: '6px' }} />
-        <div style={{ ...shimmerStyle, flex: 1, height: '42px', borderRadius: '6px' }} />
-      </div>
-    </div>
-    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '6px' }} />
-    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '6px' }} />
-    <div style={{ ...shimmerStyle, height: '42px', borderRadius: '6px' }} />
-  </div>
-  {/* Apply button skeleton */}
-  <div style={{ ...shimmerStyle, height: '42px', width: '140px', borderRadius: '8px' }} />
-</div>}
-
+              {/* bottom buttons */}
+              <div style={{ borderTop: '1px solid #f5d0e3', paddingTop: '16px', display: 'flex', gap: '12px' }}>
+                <button onClick={() => { resetFilters(); setDrawerOpen(false); }} style={{ flex: 1, background: '#fff', color: '#C6007E', border: '1px solid #f5d0e3', borderRadius: '8px', padding: '12px 20px', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>Reset Filters</button>
+                <button onClick={() => { applyFilters(); setDrawerOpen(false); }} style={{ flex: 2, background: '#3835A4', color: '#fff', border: 'none', borderRadius: '8px', padding: '12px 20px', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>Apply Filters</button>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Count + Status Filter + Sort Row */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 40px 0', flexWrap: 'wrap', gap: '12px' }}>
@@ -414,8 +455,9 @@ const BrowseJobs = () => {
                     >
                       <div className="relative h-56 w-full overflow-hidden bg-neutral-100 shrink-0">
                         <img
-                          src={getCategoryImage(job.category?.name)}
+                          src={job.image || getCategoryImage(job.category?.name)}
                           alt={job.title}
+                          onError={(e) => { const fallback = getCategoryImage(job.category?.name); if (e.currentTarget.src !== fallback) e.currentTarget.src = fallback; }}
                           className="h-full w-full object-cover transition-transform duration-[1000ms] ease-out group-hover:scale-105 filter brightness-95 group-hover:brightness-90"
                           referrerPolicy="no-referrer"
                           loading="lazy"
@@ -613,7 +655,12 @@ const BrowseJobs = () => {
                   </div>
                   <h3 className="text-lg font-black text-[#C6007E] mb-2">{limitMessage.includes('application limit') ? 'Application Limit Reached' : 'Notice'}</h3>
                   <p className="text-sm text-stone-600 leading-relaxed max-w-sm">{limitMessage}</p>
-                  {limitMessage.includes('application limit') && <p className="text-xs text-stone-400 mt-4">Upgrade to Premium for unlimited applications.</p>}
+                  {limitMessage.includes('application limit') && (
+                    <Link to="/subscription-plans" className="mt-5 inline-flex items-center gap-2 bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white px-6 py-3 rounded-xl font-black text-xs tracking-wider uppercase hover:opacity-90 transition-all">
+                      Upgrade Plan
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                    </Link>
+                  )}
                 </div>
               ) : (
                 <>

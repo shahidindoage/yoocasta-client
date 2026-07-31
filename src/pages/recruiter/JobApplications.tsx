@@ -228,7 +228,7 @@ const JobApplications = () => {
         {/* Job Header Card with Category Image */}
         <div className="bg-white border-2 border-[#3835A4]/10 rounded-2xl overflow-hidden shadow-sm">
           {(() => {
-            const img = getCategoryImage(job.category?.name);
+            const img = job.image || getCategoryImage(job.category?.name);
             return (
               <div
                 className="h-40 md:h-48 bg-cover bg-center relative"

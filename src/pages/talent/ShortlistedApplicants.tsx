@@ -69,7 +69,7 @@ export default function ShortlistedApplicants() {
         <div className="bg-white border-2 border-stone-100 rounded-2xl p-6 shadow-sm">
           <div className="flex items-center gap-5">
             <div className="w-20 h-20 rounded-2xl shrink-0 overflow-hidden border border-stone-100" style={{
-              backgroundImage: `url(${getCategoryImage(job?.category?.name)})`,
+              backgroundImage: `url(${job?.image || getCategoryImage(job?.category?.name)})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
             }} />

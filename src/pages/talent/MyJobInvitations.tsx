@@ -333,8 +333,9 @@ const MyJobInvitations = () => {
                     {/* Image Section */}
                     <div className="relative h-56 w-full overflow-hidden bg-neutral-100 shrink-0">
                       <img
-                        src={getCategoryImage(job.category?.name)}
+                        src={job.image || getCategoryImage(job.category?.name)}
                         alt={job.title}
+                        onError={(e) => { const fallback = getCategoryImage(job.category?.name); if (e.currentTarget.src !== fallback) e.currentTarget.src = fallback; }}
                         className="h-full w-full object-cover transition-transform duration-[1000ms] ease-out group-hover:scale-105 filter brightness-95 group-hover:brightness-90"
                         referrerPolicy="no-referrer"
                         loading="lazy"

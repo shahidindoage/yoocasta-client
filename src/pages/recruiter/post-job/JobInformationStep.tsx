@@ -1,9 +1,29 @@
 import React, { useState, useMemo } from 'react';
 import HtmlEditor from '../../../components/HtmlEditor';
+import { uploadJobImage } from '../../../api/job.api';
 
 export default function JobInformationStep({ data, updateData, options, onNext }: any) {
  const [castingDateWarn, setCastingDateWarn] = useState('');
  const [shootingDateWarn, setShootingDateWarn] = useState('');
+ const [imageUploading, setImageUploading] = useState(false);
+
+ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { setCastingDateWarn('Please select an image file'); return; }
+  setImageUploading(true);
+  setCastingDateWarn('');
+  try {
+   const formData = new FormData();
+   formData.append('jobImage', file);
+   const res = await uploadJobImage(formData);
+   updateData({ image: res.data.data.url });
+  } catch {
+   setCastingDateWarn('Image upload failed');
+  } finally {
+   setImageUploading(false);
+  }
+ };
 
  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
   updateData({ [e.target.name]: e.target.value });
@@ -136,6 +156,26 @@ export default function JobInformationStep({ data, updateData, options, onNext }
     <div className="space-y-1.5 md:col-span-2">
      <label className="block text-[10px] font-extrabold text-[#3835A4]/50 ">Usage *</label>
      <input name="usage" value={data.usage} onChange={handleChange} className="w-full bg-transparent border-b-2 border-[#3835A4]/20 py-3 text-sm outline-none focus:border-[#3835A4]" />
+    </div>
+
+    {/* Job Image */}
+    <div className="space-y-1.5 md:col-span-2">
+     <label className="block text-[10px] font-extrabold text-[#3835A4]/50 ">Job Image</label>
+     <div className="flex items-center gap-4">
+      <input
+       type="file"
+       accept="image/*"
+       onChange={handleImageUpload}
+       className="w-full bg-transparent border-b-2 border-[#3835A4]/20 py-3 text-sm outline-none focus:border-[#3835A4] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-[#3835A4]/10 file:text-[#3835A4]"
+      />
+      {imageUploading && <span className="text-xs text-[#C6007E] font-bold whitespace-nowrap animate-pulse">Uploading...</span>}
+     </div>
+     {data.image && (
+      <div className="mt-2">
+       <img src={data.image} alt="Job" className="h-28 w-auto object-contain border border-[#3835A4]/20 rounded-lg" />
+       <button type="button" onClick={() => updateData({ image: '' })} className="mt-1 text-[10px] font-bold text-red-500 hover:underline">Remove</button>
+      </div>
+     )}
     </div>
 
     {/* Category */}
