@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getPublicCastBag } from '../api/castBag.api';
-import { MapPin, Ruler, Plus, Check } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 
 export default function PublicCastBag() {
   const { token } = useParams<{ token: string }>();
@@ -26,15 +26,6 @@ export default function PublicCastBag() {
       else next.add(id);
       return next;
     });
-  };
-
-  const toggleSelectAll = () => {
-    if (!data) return;
-    if (selectedIds.size === data.talents.length) {
-      setSelectedIds(new Set());
-    } else {
-      setSelectedIds(new Set(data.talents.map((t: any) => t.id)));
-    }
   };
 
   const generateZCard = async () => {
@@ -108,6 +99,14 @@ export default function PublicCastBag() {
               </div>
             </div>
             <div className="flex items-center gap-2">
+              {selectedIds.size > 0 && (
+                <button
+                  onClick={() => setSelectedIds(new Set())}
+                  className="px-4 py-2 rounded-xl bg-white border-2 border-stone-200 text-stone-600 font-mono text-[10px] font-black tracking-widest uppercase hover:bg-stone-50 hover:border-stone-300 transition-all"
+                >
+                  Deselect ({selectedIds.size})
+                </button>
+              )}
               {data.talents.length > 0 && (
                 <button
                   onClick={generateZCard}
@@ -151,51 +150,46 @@ export default function PublicCastBag() {
                   <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/60 to-transparent to-20% z-10" />
                 </div>
 
-                <div className="absolute top-6 left-6 right-6 flex items-center justify-between z-30">
-                  <button
-                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleSelect(talent.id); }}
-                    className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
-                      selectedIds.has(talent.id)
-                        ? 'bg-[#C6007E] text-white shadow-lg'
-                        : 'bg-white/80 text-stone-600 hover:bg-white'
-                    }`}
-                  >
-                    {selectedIds.has(talent.id) ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-                  </button>
-                  {talent.plan === 'premium' ? (
-                    <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white text-[9px] uppercase font-mono font-black tracking-[0.2em] px-3.5 py-1.5 rounded-xl shadow-lg">
-                      <svg className="h-3 w-3 fill-current" viewBox="0 0 24 24">
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                <div className="absolute top-6 left-6 right-6 flex items-start z-30">
+                  <div className="flex items-center gap-2">
+                    <div
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleSelect(talent.id); }}
+                      className={`w-7 h-7 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer border-2 ${
+                        selectedIds.has(talent.id)
+                          ? 'bg-[#C6007E] border-[#C6007E] text-white opacity-100'
+                          : 'bg-white/20 border-white/40 text-white opacity-0 group-hover:opacity-100 hover:bg-white/30'
+                      }`}
+                    >
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        {selectedIds.has(talent.id)
+                          ? <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          : <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                        }
                       </svg>
-                      <span>PREMIUM</span>
                     </div>
-                  ) : <div />}
-                  {talent.physical?.height && (
-                    <div className="bg-neutral-950/80 backdrop-blur-md text-white/90 text-[10px] font-mono tracking-wider px-3.5 py-1.5 rounded-xl border border-white/10 flex items-center gap-1">
-                      <Ruler className="h-3 w-3 text-neutral-400" />
-                      <span>{talent.physical.height} CM</span>
-                    </div>
-                  )}
+                    {talent.plan === 'premium' || talent.plan === 'PREMIUM' ? (
+                      <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white text-[9px] uppercase font-mono font-black tracking-[0.2em] px-3.5 py-1.5 rounded-xl shadow-lg">
+                        <svg className="h-3 w-3 fill-current text-white" viewBox="0 0 24 24">
+                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                        </svg>
+                        <span>PREMIUM</span>
+                      </div>
+                    ) : <div />}
+                  </div>
                 </div>
 
                 <div className="absolute inset-x-0 bottom-0 p-7 z-30 flex flex-col justify-end">
                   <div className="flex items-end justify-between gap-4">
                     <div className="space-y-2">
-                      <div className="flex flex-wrap gap-1.5">
-                        {talent.categories?.slice(0, 2).map((cat: string, idx: number) => (
-                          <span key={idx} className="text-[9px] uppercase font-mono tracking-widest font-black text-white px-2 py-0.5 bg-[#3835A4] rounded-md group-hover:bg-[#C6007E]">
-                            {cat}
-                          </span>
-                        ))}
-                      </div>
                       <Link to={`/talent/${talent.username}`} className="block no-underline">
                         <h3 className="font-display text-2xl sm:text-3xl font-black text-white hover:text-[#C6007E] transition-colors leading-none">
-                          {talent.firstName} {talent.lastName}
+                          {talent.firstName}
                         </h3>
                       </Link>
                       <div className="flex items-center gap-1.5 text-xs text-neutral-300 font-bold">
-                        <MapPin className="h-3.5 w-3.5 text-white" />
+                        <MapPin className="h-3.5 w-3.5 text-[#FFF]" />
                         <span>{talent.city}{talent.country ? `, ${talent.country}` : ''}</span>
+                        {talent.age && <span>• {talent.age} yrs</span>}
                       </div>
                     </div>
                   </div>

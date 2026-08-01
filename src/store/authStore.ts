@@ -12,6 +12,8 @@ interface User {
   profileCompleted?: boolean;
   image?: string | null;
   name?: string | null;
+  adminRole?: string;
+  permissions?: string[];
 }
 
 interface AuthState {

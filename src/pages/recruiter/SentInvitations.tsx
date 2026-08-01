@@ -16,40 +16,64 @@ export default function SentInvitations() {
 
   return (
     <RecruiterGuard>
-    <div style={{ background: '#f4f4f6', minHeight: '100vh', fontFamily: 'system-ui, sans-serif', padding: '40px' }}>
-      <h2 style={{ fontSize: '24px', fontWeight: 900, color: '#111', marginBottom: '24px' }}>Sent Invitations</h2>
+    <div className="bg-[#fdfbf7]">
+      <div className="max-w-6xl mx-auto px-4 sm:px-8 py-10 min-h-screen">
+        <div className="space-y-8">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-black text-[#3835A4]">Sent Invitations</h1>
+              <p className="text-sm text-stone-500 font-medium mt-1">Manage the invitations you have sent to talents</p>
+            </div>
+          </div>
 
-      {loading ? (
-        <p>Loading...</p>
-      ) : jobs.length === 0 ? (
-        <p style={{ color: '#888' }}>No invitations sent yet. Browse talents and invite them to apply.</p>
-      ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse', background: '#fff', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
-          <thead>
-            <tr style={{ background: '#f9f9fb', borderBottom: '1px solid #eee' }}>
-              <th style={{ padding: '16px 20px', textAlign: 'left', fontSize: '12px', fontWeight: 800, color: '#888' }}>Job Title</th>
-              <th style={{ padding: '16px 20px', textAlign: 'center', fontSize: '12px', fontWeight: 800, color: '#888' }}>Roles</th>
-              <th style={{ padding: '16px 20px', textAlign: 'center', fontSize: '12px', fontWeight: 800, color: '#888' }}>Invitations Sent</th>
-            </tr>
-          </thead>
-          <tbody>
-            {jobs.map(job => (
-              <tr key={job.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                <td style={{ padding: '16px 20px', fontSize: '14px', fontWeight: 700, color: '#222' }}>{job.title || 'Untitled Job'}</td>
-                <td style={{ padding: '16px 20px', textAlign: 'center', fontSize: '14px', color: '#555' }}>{job.roleCount}</td>
-                <td style={{ padding: '16px 20px', textAlign: 'center' }}>
-                  <Link
-                    to={`/invitation/${job.id}`}
-                    style={{ color: '#3835A4', fontWeight: 700, fontSize: '14px', textDecoration: 'none', cursor: 'pointer' }}
-                  >
-                    {job.invitationCount}
-                  </Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+          {/* Table */}
+          {loading ? (
+            <div className="flex justify-center py-20">
+              <div className="w-10 h-10 border-4 border-[#3835A4] border-t-[#C6007E] rounded-full animate-spin" />
+            </div>
+          ) : jobs.length === 0 ? (
+            <div className="text-center py-20 space-y-4">
+              <span className="text-5xl block">📨</span>
+              <p className="text-sm font-medium text-stone-500">No invitations sent yet</p>
+              <Link
+                to="/dashboard/recruiter/jobs"
+                className="inline-block text-[10px] font-black bg-[#3835A4] text-white px-6 py-3 rounded-xl hover:bg-[#2a2899] transition-all"
+              >
+                Browse Your Jobs
+              </Link>
+            </div>
+          ) : (
+            <div className="bg-white rounded-2xl border border-stone-100 overflow-hidden shadow-sm">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="bg-stone-50 text-[9px] font-black text-stone-500">
+                    <th className="px-5 py-4">Job Title</th>
+                    <th className="px-5 py-4">Roles</th>
+                    <th className="px-5 py-4 text-right">Invitations Sent</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-stone-50">
+                  {jobs.map(job => (
+                    <tr key={job.id} className="text-sm hover:bg-stone-50/50 transition-colors">
+                      <td className="px-5 py-4 font-bold text-[#3835A4]">{job.title || 'Untitled Job'}</td>
+                      <td className="px-5 py-4 text-stone-500">{job.roleCount} role{job.roleCount !== 1 ? 's' : ''}</td>
+                      <td className="px-5 py-4 text-right">
+                        <Link
+                          to={`/invitation/${job.id}`}
+                          className="inline-block text-[9px] font-black bg-[#3835A4] text-white px-3 py-2 rounded-lg hover:bg-[#2a2899] transition-all"
+                        >
+                          {job.invitationCount} Invitation{job.invitationCount !== 1 ? 's' : ''}
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
     </RecruiterGuard>
   );
