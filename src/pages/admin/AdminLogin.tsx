@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { adminLogin } from '../../api/admin.api';
 import { useAuthStore } from '../../store/authStore';
 
+const TAB_ORDER = ['talents', 'companies', 'jobs', 'country', 'city', 'language', 'nationality', 'ethnicity', 'work', 'category', 'templates', 'report'];
+
 const AdminLogin = () => {
   const navigate = useNavigate();
   const { setAuth } = useAuthStore();
@@ -25,11 +27,18 @@ const AdminLogin = () => {
           role: 'ADMIN',
           name: user.name,
           firstName: user.name,
+          adminRole: user.adminRole,
+          permissions: user.permissions,
         },
         accessToken,
         refreshToken,
       );
-      navigate('/admin/talents');
+      if (user.adminRole === 'SUB_ADMIN') {
+        const firstPerm = TAB_ORDER.find((p) => (user.permissions || []).includes(p));
+        navigate(firstPerm ? `/admin/${firstPerm}` : '/admin/talents');
+      } else {
+        navigate('/admin/talents');
+      }
     } catch (err: any) {
       setError(err?.response?.data?.message || 'Login failed');
     } finally {

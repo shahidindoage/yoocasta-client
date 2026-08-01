@@ -35,8 +35,6 @@ const MultiSelectDropdown = ({
   onToggle: (id: string) => void;
 }) => {
   const [open, setOpen] = useState(false);
-  const [openUp, setOpenUp] = useState(false);
-  const [menuPos, setMenuPos] = useState<{ top: number; left: number; width: number } | null>(null);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -47,16 +45,6 @@ const MultiSelectDropdown = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const toggleOpen = () => {
-    if (!open && ref.current) {
-      const rect = ref.current.getBoundingClientRect();
-      const spaceBelow = window.innerHeight - rect.bottom;
-      setOpenUp(spaceBelow < 240);
-      setMenuPos({ top: rect.bottom, left: rect.left, width: rect.width });
-    }
-    setOpen(!open);
-  };
-
   const summary = selected.length === 0 ? `All ${label}` : `${selected.length} selected`;
 
   return (
@@ -66,7 +54,7 @@ const MultiSelectDropdown = ({
       </span>
       <button
         type="button"
-        onClick={toggleOpen}
+        onClick={() => setOpen(!open)}
         style={{
           width: '100%', textAlign: 'left', background: '#fff', color: selected.length ? '#C6007E' : '#333',
           border: '1px solid #f5d0e3', padding: '10px 14px', borderRadius: '8px', fontSize: '13px', cursor: 'pointer',
@@ -77,10 +65,9 @@ const MultiSelectDropdown = ({
         <span style={{ fontSize: '10px', color: '#C6007E' }}>{open ? <ChevronUp style={{ width: '15px', height: '15px' }} /> : <ChevronDown style={{ width: '15px', height: '15px' }} />}</span>
       </button>
 
-      {open && menuPos && (
+      {open && (
         <div style={{
-          position: 'fixed', top: openUp ? menuPos.top - 224 : menuPos.top + 4, left: menuPos.left, width: menuPos.width,
-          zIndex: 9999,
+          position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, zIndex: 20,
           background: '#fff', border: '1px solid #f5d0e3', borderRadius: '8px',
           maxHeight: '220px', overflowY: 'auto', padding: '8px', boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
         }}>
@@ -961,6 +948,44 @@ const setProfessionalText = (key: string, val: string) => {
                     </div>
                   </div>
     )}
+    {(!user || user?.role === 'TALENT') && (
+      <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-neutral-950/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div
+          onClick={async (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            setZCardLoading(true);
+            try {
+              const token = localStorage.getItem('accessToken');
+              const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+              if (token) headers['Authorization'] = `Bearer ${token}`;
+              const res = await fetch(`${import.meta.env.VITE_API_URL}/recruiter/z-card`, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({ talentIds: [talent.id] }),
+              });
+              if (!res.ok) throw new Error(`HTTP ${res.status}`);
+              const blob = await res.blob();
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `zcard-${talent.firstName || talent.id}.pdf`;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              setTimeout(() => URL.revokeObjectURL(url), 10000);
+            } catch (err: any) {
+              alert('Z Card failed: ' + (err?.message || 'Unknown error'));
+            } finally {
+              setZCardLoading(false);
+            }
+          }}
+          className="px-8 py-4 rounded-2xl bg-[#C6007E] text-white font-mono text-sm font-black tracking-widest uppercase shadow-xl hover:bg-[#a10065] transition-colors cursor-pointer"
+        >
+          Download Z Card
+        </div>
+      </div>
+    )}
     </div>
 
               <div className="absolute top-6 left-6 right-6 flex items-start z-30">
@@ -996,87 +1021,69 @@ const setProfessionalText = (key: string, val: string) => {
                     </div>
                   ) : <div />}
                 </div>
-                <div className="ml-auto flex items-center gap-1.5">
-                  <button
-                    onClick={async (e) => {
-                      e.stopPropagation();
-                      e.preventDefault();
-                      setZCardLoading(true);
-                      try {
-                        const token = localStorage.getItem('accessToken');
-                        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-                        if (token) headers['Authorization'] = `Bearer ${token}`;
-                        const res = await fetch(`${import.meta.env.VITE_API_URL}/recruiter/z-card`, {
-                          method: 'POST',
-                          headers,
-                          body: JSON.stringify({ talentIds: [talent.id] }),
-                        });
-                        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                        const blob = await res.blob();
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = `zcard-${talent.firstName || talent.id}.pdf`;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        setTimeout(() => URL.revokeObjectURL(url), 10000);
-                      } catch (err: any) {
-                        alert('Z Card failed: ' + (err?.message || 'Unknown error'));
-                      } finally {
-                        setZCardLoading(false);
-                      }
-                    }}
-                    className="p-1.5 rounded-full transition-all duration-300 cursor-pointer opacity-0 group-hover:opacity-100 text-white hover:text-[#C6007E]"
-                    title="Download Z Card"
-                  >
-                    <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v4a1 1 0 001 1h4" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 14h6" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 11v6" />
-                    </svg>
-                  </button>
-                  <div className="flex items-center">
-                    {user?.role === 'RECRUITER' && favouriteIds.includes(talent.id) ? (
-                      <>
+                <div className="ml-auto flex items-center">
+                  <div className="relative flex items-center">
+                    {/* Views counter — visible by default, hidden on hover */}
+                    <div className="flex items-center gap-1 bg-[#C6007E] text-white px-2 py-0.5 rounded-lg opacity-100 group-hover:opacity-0 transition-opacity duration-300">
+                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                      <span className="text-[14px] font-mono font-bold">{talent.views ?? 0}</span>
+                    </div>
+
+                    {/* Recruiter hover actions — Z Card + Heart, overlaying the views counter spot */}
+                    {user?.role === 'RECRUITER' && (
+                      <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <button
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            setZCardLoading(true);
+                            try {
+                              const token = localStorage.getItem('accessToken');
+                              const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+                              if (token) headers['Authorization'] = `Bearer ${token}`;
+                              const res = await fetch(`${import.meta.env.VITE_API_URL}/recruiter/z-card`, {
+                                method: 'POST',
+                                headers,
+                                body: JSON.stringify({ talentIds: [talent.id] }),
+                              });
+                              if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                              const blob = await res.blob();
+                              const url = URL.createObjectURL(blob);
+                              const a = document.createElement('a');
+                              a.href = url;
+                              a.download = `zcard-${talent.firstName || talent.id}.pdf`;
+                              document.body.appendChild(a);
+                              a.click();
+                              document.body.removeChild(a);
+                              setTimeout(() => URL.revokeObjectURL(url), 10000);
+                            } catch (err: any) {
+                              alert('Z Card failed: ' + (err?.message || 'Unknown error'));
+                            } finally {
+                              setZCardLoading(false);
+                            }
+                          }}
+                          className="p-1.5 rounded-full transition-all duration-300 cursor-pointer text-white hover:text-[#C6007E]"
+                          title="Download Z Card"
+                        >
+                          <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v4a1 1 0 001 1h4" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 14h6" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 11v6" />
+                          </svg>
+                        </button>
                         <button
                           onClick={(e) => { e.stopPropagation(); e.preventDefault(); toggleFavourite(talent.id); }}
-                          className="p-1 rounded-full text-red-500 transition-all duration-300 cursor-pointer"
-                          title="Remove from favourites"
+                          className={`p-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                            favouriteIds.includes(talent.id) ? 'text-red-500' : 'text-white hover:text-red-400'
+                          }`}
+                          title={favouriteIds.includes(talent.id) ? 'Remove from favourites' : 'Add to favourites'}
                         >
-                          <Heart className="h-4 w-4 fill-current" />
+                          <Heart className={`h-7 w-7 ${favouriteIds.includes(talent.id) ? 'fill-current' : ''}`} />
                         </button>
-                        <div className="flex items-center gap-1 bg-[#C6007E] text-white px-2 py-0.5 rounded-lg transition-opacity duration-300 opacity-100 group-hover:opacity-0">
-                          <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                          </svg>
-                          <span className="text-xs font-mono font-bold">{talent.views ?? 0}</span>
-                        </div>
-                      </>
-                    ) : (
-                      <div className="relative flex items-center">
-                        <div className="flex items-center gap-1 bg-[#C6007E] text-white px-2 py-0.5 rounded-lg opacity-100 group-hover:opacity-0 transition-opacity duration-300">
-                          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                          </svg>
-                          <span className="text-[12px] font-mono font-bold">{talent.views ?? 0}</span>
-                        </div>
-                        {user?.role === 'RECRUITER' && (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); e.preventDefault(); toggleFavourite(talent.id); }}
-                            className={`absolute inset-0 flex items-center justify-center p-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                              favouriteIds.includes(talent.id)
-                                ? 'opacity-100 text-red-500'
-                                : 'opacity-0 group-hover:opacity-100 text-white hover:text-red-400'
-                            }`}
-                            title={favouriteIds.includes(talent.id) ? 'Remove from favourites' : 'Add to favourites'}
-                          >
-                            <Heart className={`h-7 w-7 ${favouriteIds.includes(talent.id) ? 'fill-current' : ''}`} />
-                          </button>
-                        )}
                       </div>
                     )}
                   </div>

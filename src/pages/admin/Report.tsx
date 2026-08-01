@@ -83,7 +83,7 @@ export default function Report() {
       <h2 className="text-2xl font-black text-[#3835A4]">Report</h2>
 
       {/* Talent Report Card */}
-      <div className="bg-white border border-stone-200 rounded-2xl p-6">
+      <div className="bg-white border border-stone-200  p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center">
@@ -96,7 +96,7 @@ export default function Report() {
           </div>
           <button
             onClick={downloadTalents}
-            className="flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-xl text-xs font-bold cursor-pointer hover:bg-green-700 transition-colors"
+            className="flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 text-xs font-bold cursor-pointer hover:bg-green-700 transition-colors"
           >
             <Download className="w-4 h-4" />
             Download CSV
@@ -105,7 +105,7 @@ export default function Report() {
       </div>
 
       {/* Company Report Card */}
-      <div className="bg-white border border-stone-200 rounded-2xl p-6">
+      <div className="bg-white border border-stone-200  p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center">
@@ -118,7 +118,7 @@ export default function Report() {
           </div>
           <button
             onClick={downloadCompanies}
-            className="flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-xl text-xs font-bold cursor-pointer hover:bg-green-700 transition-colors"
+            className="flex items-center gap-2 bg-green-600 text-white px-5 py-2.5  text-xs font-bold cursor-pointer hover:bg-green-700 transition-colors"
           >
             <Download className="w-4 h-4" />
             Download CSV
@@ -127,7 +127,7 @@ export default function Report() {
       </div>
 
       {/* Job Report Card */}
-      <div className="bg-white border border-stone-200 rounded-2xl p-6">
+      <div className="bg-white border border-stone-200  p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center">
@@ -140,7 +140,7 @@ export default function Report() {
           </div>
           <button
             onClick={downloadJobs}
-            className="flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-xl text-xs font-bold cursor-pointer hover:bg-green-700 transition-colors"
+            className="flex items-center gap-2 bg-green-600 text-white px-5 py-2.5  text-xs font-bold cursor-pointer hover:bg-green-700 transition-colors"
           >
             <Download className="w-4 h-4" />
             Download CSV

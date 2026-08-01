@@ -30,6 +30,27 @@ export default function ApplicationPopup({ jobId, role, isExpired, onClose, onAp
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const plan = profile?.subscription?.plan;
+  const limits = {
+    maxPhotos: plan?.maxPhotos ?? 8,
+    maxVideos: plan?.maxVideos ?? 3,
+    maxAudios: plan?.maxAudios ?? 1,
+    maxCasting: 1,
+  };
+
+  const currentImages = media.filter(m => m.type === 'IMAGE').length;
+  const currentVideos = media.filter(m => m.type === 'ACTING_VIDEO' || m.type === 'VIDEO').length;
+  const currentCasting = media.filter(m => m.type === 'CASTING_VIDEO').length;
+  const currentAudios = media.filter(m => m.type === 'AUDIO').length;
+
+  const getUploadStatus = (type: string) => {
+    if (type === 'IMAGE') return { current: currentImages, max: limits.maxPhotos };
+    if (type === 'ACTING_VIDEO') return { current: currentVideos, max: limits.maxVideos };
+    if (type === 'CASTING_VIDEO') return { current: currentCasting, max: limits.maxCasting };
+    if (type === 'AUDIO') return { current: currentAudios, max: limits.maxAudios };
+    return { current: 0, max: Infinity };
+  };
+
   useEffect(() => {
     getMyProfile()
       .then(res => {
@@ -45,6 +66,11 @@ export default function ApplicationPopup({ jobId, role, isExpired, onClose, onAp
   }, []);
 
   const handleFileUpload = async (accept: string, type: string, callback: (id: string) => void) => {
+    const { current, max } = getUploadStatus(type);
+    if (current >= max) {
+      setError(`Upload limit reached. Your plan allows up to ${max} ${type === 'IMAGE' ? 'images' : type === 'AUDIO' ? 'audio files' : 'videos'}.`);
+      return;
+    }
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = accept;
@@ -52,6 +78,7 @@ export default function ApplicationPopup({ jobId, role, isExpired, onClose, onAp
       const file = input.files?.[0];
       if (!file) return;
       setUploading(true);
+      setError('');
       try {
         const fd = new FormData();
         fd.append('file', file);
@@ -171,6 +198,9 @@ export default function ApplicationPopup({ jobId, role, isExpired, onClose, onAp
               multiple
               onUpload={() => handleFileUpload('image/*', 'IMAGE', (id) => setSelectedImages(prev => [...prev, id]))}
               uploading={uploading}
+              currentCount={currentImages}
+              maxCount={limits.maxPhotos}
+              uploadLabel="Images"
             />
           )}
 
@@ -198,6 +228,9 @@ export default function ApplicationPopup({ jobId, role, isExpired, onClose, onAp
               onUpload={() => handleFileUpload('video/*,image/*', 'ACTING_VIDEO', (id) => setActingVideoId(id))}
               uploading={uploading}
               required={isRequired('actingVideoId')}
+              currentCount={currentVideos}
+              maxCount={limits.maxVideos}
+              uploadLabel="Acting Videos"
             />
           )}
 
@@ -213,6 +246,9 @@ export default function ApplicationPopup({ jobId, role, isExpired, onClose, onAp
               onUpload={() => handleFileUpload('video/*,image/*', 'CASTING_VIDEO', (id) => setCastingVideoId(id))}
               uploading={uploading}
               required={isRequired('castingVideoId')}
+              currentCount={currentCasting}
+              maxCount={limits.maxCasting}
+              uploadLabel="Casting Videos"
             />
           )}
 
@@ -228,6 +264,9 @@ export default function ApplicationPopup({ jobId, role, isExpired, onClose, onAp
               onUpload={() => handleFileUpload('audio/*', 'AUDIO', (id) => setAudioId(id))}
               uploading={uploading}
               required={false}
+              currentCount={currentAudios}
+              maxCount={limits.maxAudios}
+              uploadLabel="Audio Files"
             />
           )}
         </div>
@@ -277,10 +316,13 @@ export default function ApplicationPopup({ jobId, role, isExpired, onClose, onAp
 // ─── Media Selector Sub-Component ─────────────────────────────────
 function MediaSelector({
   title, subtitle, items, selected, onToggle, multiple, onUpload, uploading, required,
+  currentCount, maxCount, uploadLabel,
 }: {
   title: string; subtitle?: string; items: any[]; selected: string[]; onToggle: (id: string) => void;
   multiple: boolean; onUpload?: () => void; uploading?: boolean; required?: boolean;
+  currentCount?: number; maxCount?: number; uploadLabel?: string;
 }) {
+  const atLimit = maxCount !== undefined && currentCount !== undefined && currentCount >= maxCount;
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
@@ -291,10 +333,11 @@ function MediaSelector({
         {onUpload && (
           <button
             onClick={onUpload}
-            disabled={uploading}
-            className="text-[10px] font-black uppercase tracking-wider bg-[#3835A4] text-white px-4 py-2 rounded-lg hover:bg-[#2a2899] transition-all disabled:opacity-40"
+            disabled={uploading || atLimit}
+            title={atLimit ? `Limit reached: max ${maxCount} ${uploadLabel || ''}` : undefined}
+            className="text-[10px] font-black uppercase tracking-wider bg-[#3835A4] text-white px-4 py-2 rounded-lg hover:bg-[#2a2899] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {uploading ? 'Uploading...' : '+ Upload'}
+            {uploading ? 'Uploading...' : atLimit ? `Max ${maxCount} reached` : `+ Upload (${currentCount}/${maxCount})`}
           </button>
         )}
       </div>
@@ -341,6 +384,11 @@ function MediaSelector({
       <div className="flex items-center gap-2">
         <span className="text-[10px] font-medium text-stone-400">{selected.length} selected</span>
         {required && !selected.length && <span className="text-[10px] font-bold text-red-500">* Required</span>}
+        {maxCount !== undefined && currentCount !== undefined && (
+          <span className={`text-[10px] font-medium ${atLimit ? 'text-red-500' : 'text-stone-400'}`}>
+            ({currentCount}/{maxCount} {uploadLabel || ''})
+          </span>
+        )}
       </div>
     </div>
   );

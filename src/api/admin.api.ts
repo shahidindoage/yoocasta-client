@@ -3,6 +3,21 @@ import api from './axios';
 export const adminLogin = (email: string, password: string) =>
   api.post('/admin/login', { email, password });
 
+export const getSubAdmins = () =>
+  api.get('/admin/sub-admins');
+
+export const createSubAdmin = (data: { email: string; name: string; password: string; permissions: string[] }) =>
+  api.post('/admin/sub-admins', data);
+
+export const updateSubAdminPassword = (adminId: string, newPassword: string) =>
+  api.put(`/admin/sub-admins/${adminId}/password`, { newPassword });
+
+export const updateSubAdminPermissions = (adminId: string, permissions: string[]) =>
+  api.put(`/admin/sub-admins/${adminId}/permissions`, { permissions });
+
+export const deleteSubAdmin = (adminId: string) =>
+  api.delete(`/admin/sub-admins/${adminId}`);
+
 export const getTalents = (page: number, limit: number = 20, status?: string, search?: string) =>
   api.get('/admin/talents', { params: { page, limit, status, search } });
 
@@ -53,6 +68,12 @@ export const toggleInternalCompany = (companyId: string) =>
 
 export const getTalentSubscriptionDetails = (talentId: string) =>
   api.get(`/admin/talents/${talentId}/subscription`);
+
+export const updateTalentSubscription = (
+  talentId: string,
+  data: { planId: string | null; status: string; activatedAt: string | null; expiresAt: string | null }
+) =>
+  api.put(`/admin/talents/${talentId}/subscription`, data);
 
 export const loginAsTalent = (talentId: string) =>
   api.post(`/admin/talents/${talentId}/login`);

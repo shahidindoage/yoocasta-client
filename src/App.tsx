@@ -62,6 +62,7 @@ import ManageCategory from './pages/admin/ManageCategory';
 import ManageCity from './pages/admin/ManageCity';
 import ManageCountry from './pages/admin/ManageCountry';
 import ManageTemplates from './pages/admin/ManageTemplates';
+import ManageSubAdmins from './pages/admin/ManageSubAdmins';
 
 // Placeholder dashboard pages (we'll build these next)
 
@@ -121,6 +122,7 @@ function App() {
               <Route path="/admin/country" element={<ManageCountry />} />
               <Route path="/admin/templates" element={<ManageTemplates />} />
               <Route path="/admin/report" element={<Report />} />
+              <Route path="/admin/sub-admins" element={<ManageSubAdmins />} />
             </Route>
           </Route>
 

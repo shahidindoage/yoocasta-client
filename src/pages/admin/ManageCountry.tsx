@@ -77,7 +77,7 @@ const ManageCountry = () => {
           <p className="text-xs text-stone-400">{total} total countries</p>
         </div>
         <button onClick={openAdd}
-          className="inline-flex items-center gap-2 bg-[#C6007E] text-white px-5 py-2.5 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-[#a10065] transition-colors cursor-pointer">
+          className="inline-flex items-center gap-2 bg-[#C6007E] text-white px-5 py-2.5 font-black uppercase tracking-widest text-xs hover:bg-[#a10065] transition-colors cursor-pointer">
           <Plus className="w-4 h-4" /> Add Country
         </button>
       </div>

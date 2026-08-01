@@ -5,7 +5,7 @@ import { getMyProfile } from '../../api/profile.api';
 import { getMyApplications } from '../../api/application.api';
 import { useAuthStore } from '../../store/authStore';
 import ApplicationPopup from '../../components/ApplicationPopup';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, Search, RotateCcw, Filter, ChevronRight } from 'lucide-react';
 
 const MultiSelectDropdown = ({
   label,
@@ -86,10 +86,23 @@ const daysUntil = (dateStr: string) => {
   return Math.ceil(diff / (1000 * 60 * 60 * 24));
 };
 
+const PAYMENT_TYPE_ALIAS: Record<string, string> = {
+  per_hour: 'per_hour',
+  per_hour_pay: 'per_hour',
+  per_day: 'per_day',
+  per_day_pay: 'per_day',
+  per_week: 'per_week',
+  per_month: 'per_month',
+  per_month_pay: 'per_month',
+  package: 'package',
+  package_pay: 'package',
+};
+
 const formatBudget = (role: any): string | null => {
   if (!role?.payment) return null;
   const p = role.payment;
-  switch (role.paymentType) {
+  const t = PAYMENT_TYPE_ALIAS[role.paymentType] || role.paymentType;
+  switch (t) {
     case 'per_hour': return p.hourBudgetPerHour ? `${p.hourBudgetPerHour} AED / HOUR` : null;
     case 'per_day': {
       if (p.dayBudgetFullDay && p.dayBudgetHalfDay) return `${p.dayBudgetFullDay} AED / DAY (Full) • ${p.dayBudgetHalfDay} AED / HALF DAY`;
@@ -131,6 +144,9 @@ const MatchingJobs = () => {
   const [applyRole, setApplyRole] = useState<any>(null);
   const [appliedRoleIds, setAppliedRoleIds] = useState<Set<string>>(new Set());
   const [loadingApplied, setLoadingApplied] = useState(false);
+  const [limitMessage, setLimitMessage] = useState<string | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerMounted, setDrawerMounted] = useState(false);
   const draftRef = useRef(draftFilters);
   draftRef.current = draftFilters;
 
@@ -239,123 +255,163 @@ const MatchingJobs = () => {
     <div style={{ background: '#ffffff', minHeight: '100vh', fontFamily: 'system-ui, sans-serif', margin: 0 }}>
 
       {/* TOP FILTERS PANEL */}
-      <div style={{ position: 'relative', color: '#333', padding: '24px 40px', borderBottom: '1px solid #ffffffff' }}>
+      <div style={{ position: 'relative', color: '#333', padding: '100px 40px', borderBottom: '1px solid #ffffffff' }}>
 
         <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0 }}>
-          <video autoPlay loop muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.6 }}>
+          <video autoPlay loop muted playsInline className="w-full h-full object-cover opacity-70">
             <source src="https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/casting_video/casting_video_10107.mp4" type="video/mp4" />
           </video>
         </div>
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(254, 241, 245, 0.4)', backdropFilter: 'blur(1px)', WebkitBackdropFilter: 'blur(8px)', zIndex: 1 }} />
+        <div className="absolute inset-0 bg-black/30" />
 
         <div style={{ position: 'relative', zIndex: 2 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-            <h2 style={{ margin: 0, fontSize: '22px', fontWeight: 900, letterSpacing: '-0.02em' }}>
-              Matching Jobs
+          <style>{`
+            @keyframes bj-shimmer {
+              0% { background-position: -200% 0; filter: drop-shadow(0 0 3px rgba(255,237,36,0.2)); }
+              40% { background-position: 0% 0; filter: drop-shadow(0 0 25px rgba(255,255,255,1)) drop-shadow(0 0 50px rgba(255,237,36,0.6)) drop-shadow(0 0 80px rgba(198,0,126,0.3)); }
+              60% { background-position: 0% 0; filter: drop-shadow(0 0 25px rgba(255,255,255,1)) drop-shadow(0 0 50px rgba(255,237,36,0.6)) drop-shadow(0 0 80px rgba(198,0,126,0.3)); }
+              100% { background-position: 200% 0; filter: drop-shadow(0 0 3px rgba(255,237,36,0.2)); }
+            }
+            .bj-shimmer-char {
+              display: inline-block;
+              color: transparent;
+              background: linear-gradient(120deg, #FFED24 0%, #FFED24 30%, #ffffff 50%, #FFED24 70%, #FFED24 100%);
+              background-size: 200% auto;
+              -webkit-background-clip: text;
+              background-clip: text;
+              animation: bj-shimmer 2.2s ease-in-out infinite;
+            }
+          `}</style>
+          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+            <p className="font-display text-sm sm:text-base font-bold text-white tracking-wide" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
+              Explore casting calls across film, TV &amp; events
+            </p>
+            <h2 className="font-display text-3xl sm:text-5xl lg:text-[56px] font-black tracking-[0.08em] leading-none mt-3">
+              {"Matching Jobs".split("").map((char, i) => (
+                <span key={i} className="bj-shimmer-char" style={{ animationDelay: `${i * 0.12}s` }}>
+                  {char === " " ? "\u00A0" : char}
+                </span>
+              ))}
             </h2>
-            <button onClick={resetFilters} style={{ fontSize: '12px', color: '#C6007E', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>
-              Reset All
-            </button>
+            <p className="text-[10px] text-white/80 font-medium tracking-[0.2em] mt-3" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
+              Find &amp; apply to the perfect role in minutes
+            </p>
           </div>
 
-          {optionsLoading ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '10px' }}>
-                {Array.from({ length: 8 }).map((_, i) => <div key={i} style={{ ...shimmerStyle, height: '60px' }} />)}
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
-                {Array.from({ length: 6 }).map((_, i) => <div key={i} style={{ ...shimmerStyle, height: '40px' }} />)}
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', padding: '20px', background: '#fff', borderRadius: '12px', border: '1px solid #f5d0e3' }}>
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i}><div style={{ ...shimmerStyle, height: '12px', width: '60%' }} /><div style={{ marginTop: '8px' }}><div style={{ ...shimmerStyle, height: '40px' }} /></div></div>
-                ))}
-              </div>
-            </div>
-          ) : options && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-
-              {/* Primary Core Row */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '12px' }}>
-                <div>
-                  <select value={draftFilters.categoryIds || ''} onChange={e => handleFilterChange('categoryIds', e.target.value)} style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
-                    <option value="">All Categories</option>
-                    {options.categories?.filter((c: any) => c.name !== 'Additional Category').map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                  </select>
-                </div>
-
-                <div>
-                  <select value={draftFilters.gender || ''} onChange={e => handleFilterChange('gender', e.target.value)} style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
-                    <option value="">All Genders</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="both">Both</option>
-                  </select>
-                </div>
-
-                <div>
-                  <select value={draftFilters.paymentType || ''} onChange={e => handleFilterChange('paymentType', e.target.value)} style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
-                    <option value="">All Payment</option>
-                    <option value="paid">Paid</option>
-                    <option value="unpaid">Unpaid</option>
-                  </select>
-                </div>
-
-                <div>
-                  <select value={draftFilters.projectTypeId || ''} onChange={e => handleFilterChange('projectTypeId', e.target.value)} style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
-                    <option value="">All Project Types</option>
-                    {options.projectTypes?.map((pt: any) => <option key={pt.id} value={pt.id}>{pt.name}</option>)}
-                  </select>
-                </div>
-
-                <div>
-                  <input
-                    type="text"
-                    placeholder="Search jobs..."
-                    value={draftFilters.search || ''}
-                    onChange={e => handleFilterChange('search', e.target.value)}
-                    style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px 14px', borderRadius: '8px', fontSize: '13px', outline: 'none', boxSizing: 'border-box' }}
-                  />
-                </div>
-              </div>
-
-              {/* Age + Multi-select Filters */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', padding: '20px', background: '#fff', borderRadius: '12px', border: '1px solid #f5d0e3' }}>
-                <div>
-                  <span style={{ fontSize: '11px', color: '#C6007E', fontWeight: 'bold', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>AGE PARAMETERS</span>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <select value={draftFilters.ageFrom || ''} onChange={e => handleFilterChange('ageFrom', e.target.value)} style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '12px', borderRadius: '6px', fontSize: '12px' }}>
-                      <option value="">Min Age</option>
-                      {Array.from({ length: 101 }, (_, i) => <option key={i} value={i}>{i}</option>)}
-                    </select>
-                    <select value={draftFilters.ageTo || ''} onChange={e => handleFilterChange('ageTo', e.target.value)} style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '8px', borderRadius: '6px', fontSize: '12px' }}>
-                      <option value="">Max Age</option>
-                      {Array.from({ length: 101 }, (_, i) => <option key={i} value={i}>{i}</option>)}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div className="max-w-4xl w-full mx-auto bg-white/80 backdrop-blur-xl rounded-2xl border border-[#f5d0e3] p-3 shadow-lg shadow-[#C6007E]/5">
+                <div className="flex flex-wrap lg:flex-nowrap items-center gap-2">
+                  {/* Category */}
+                  <div className="flex-1 min-w-[120px] bg-[#fef1f5] rounded-xl border border-[#f5d0e3] focus-within:border-[#C6007E] transition-colors px-3 py-2">
+                    <select value={draftFilters.categoryIds || ''} onChange={e => handleFilterChange('categoryIds', e.target.value)} className="w-full bg-transparent text-xs text-stone-900 font-black focus:outline-none cursor-pointer">
+                      <option value="" className="bg-white">All Categories</option>
+                      {options?.categories?.filter((c: any) => c.name !== 'Additional Category').map((c: any) => <option key={c.id} value={c.id} className="bg-white">{c.name}</option>)}
                     </select>
                   </div>
+                  {/* Gender */}
+                  <div className="flex-1 min-w-[100px] bg-[#fef1f5] rounded-xl border border-[#f5d0e3] focus-within:border-[#C6007E] transition-colors px-3 py-2">
+                    <select value={draftFilters.gender || ''} onChange={e => handleFilterChange('gender', e.target.value)} className="w-full bg-transparent text-xs text-stone-900 font-black focus:outline-none cursor-pointer">
+                      <option value="" className="bg-white">All Genders</option>
+                      <option value="male" className="bg-white">Male</option>
+                      <option value="female" className="bg-white">Female</option>
+                      <option value="both" className="bg-white">Both</option>
+                    </select>
+                  </div>
+                  {/* Payment */}
+                  <div className="flex-1 min-w-[100px] bg-[#fef1f5] rounded-xl border border-[#f5d0e3] focus-within:border-[#C6007E] transition-colors px-3 py-2">
+                    <select value={draftFilters.paymentType || ''} onChange={e => handleFilterChange('paymentType', e.target.value)} className="w-full bg-transparent text-xs text-stone-900 font-black focus:outline-none cursor-pointer">
+                      <option value="" className="bg-white">All Payment</option>
+                      <option value="paid" className="bg-white">Paid</option>
+                      <option value="unpaid" className="bg-white">Unpaid</option>
+                    </select>
+                  </div>
+                  {/* Search */}
+                  <div className="flex-[2] min-w-[150px] bg-[#fef1f5] rounded-xl border border-[#f5d0e3] focus-within:border-[#C6007E] transition-colors px-3 py-2 flex items-center gap-2">
+                    <Search className="h-4 w-4 text-[#C6007E] shrink-0" />
+                    <input type="text" placeholder="Search jobs..." value={draftFilters.search || ''} onChange={e => handleFilterChange('search', e.target.value)} className="w-full bg-transparent text-xs text-stone-900 font-bold focus:outline-none placeholder-stone-400" />
+                  </div>
+                  {/* Apply button */}
+                  <button onClick={applyFilters} className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#C6007E] to-[#3835A4] hover:opacity-90 text-white transition-all duration-300 px-5 py-2.5 shadow-lg shadow-[#C6007E]/20">
+                    <Search className="h-4 w-4" />
+                  </button>
+                  {/* Reset icon */}
+                  <button onClick={resetFilters} title="Reset Filters" className="flex items-center justify-center rounded-xl bg-[#fef1f5] border border-[#f5d0e3] text-[#C6007E] hover:bg-[#f5d0e3] transition-colors duration-300 px-3 py-2.5">
+                    <RotateCcw className="h-4 w-4" />
+                  </button>
                 </div>
-
-                <MultiSelectDropdown label="Country" options={options.countries || []} selected={draftFilters.countryIds || []} onToggle={(id) => handleMultiChange('countryIds', id)} />
-                <MultiSelectDropdown label="Language" options={options.languages || []} selected={draftFilters.languageIds || []} onToggle={(id) => handleMultiChange('languageIds', id)} />
-                <MultiSelectDropdown label="Nationality" options={options.nationalities || []} selected={draftFilters.nationalityIds || []} onToggle={(id) => handleMultiChange('nationalityIds', id)} />
-                <MultiSelectDropdown label="Dialect" options={options.dialects || []} selected={draftFilters.dialectIds || []} onToggle={(id) => handleMultiChange('dialectIds', id)} />
-                <MultiSelectDropdown label="Ethnicity" options={options.ethnicities || []} selected={draftFilters.ethnicityIds || []} onToggle={(id) => handleMultiChange('ethnicityIds', id)} />
               </div>
 
-              <button
-                onClick={applyFilters}
-                style={{ background: '#3835A4', color: '#fff', border: 'none', borderRadius: '8px', padding: '12px 24px', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px', alignSelf: 'flex-start' }}
-                onMouseEnter={(e) => e.currentTarget.style.background = '#C6007E'}
-                onMouseLeave={(e) => e.currentTarget.style.background = '#3835A4'}
-              >
-                Apply Filters
-              </button>
-
-            </div>
-          )}
+              {/* More Filters button */}
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: '8px' }}>
+                <button onClick={() => { setDrawerMounted(true); setDrawerOpen(true); }} className="group flex items-center gap-3 rounded-full bg-white/10 backdrop-blur-md border border-white/30 text-white hover:border-[#C6007E] hover:text-[#FFED24] transition-all duration-300 px-8 py-3 shadow-lg shadow-black/20 cursor-pointer">
+                  <Filter className="h-4 w-4 text-[#fff] group-hover:text-[#FFED24] transition-colors" />
+                  <span className="text-xs font-black uppercase tracking-[0.2em]">More Filters</span>
+                  <ChevronRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform duration-300" />
+                </button>
+              </div>
+          </div>
 
         </div>
       </div>
+
+      {drawerMounted && (
+        <div className="fixed inset-0 z-50 flex justify-end" style={{ background: 'rgba(0,0,0,0.5)', opacity: drawerOpen ? 1 : 0, pointerEvents: drawerOpen ? 'auto' : 'none', transition: 'opacity 0.12s ease-in-out' }} onClick={() => setDrawerOpen(false)}>
+          <div className="bg-white w-full max-w-md h-full shadow-2xl" style={{ overflowY: 'auto', overflowX: 'hidden', transform: drawerOpen ? 'translateX(0)' : 'translateX(100%)', transition: 'transform 0.12s ease-in-out', willChange: 'transform' }} onClick={(e) => e.stopPropagation()}>
+            {/* header */}
+            <div style={{ position: 'sticky', top: 0, zIndex: 10, background: '#3835A4', color: '#fff', padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ margin: 0, fontSize: '16px', fontWeight: 900 }}>All Filters</h2>
+              <button onClick={() => setDrawerOpen(false)} style={{ background: 'none', border: 'none', color: '#fff', fontSize: '22px', cursor: 'pointer', lineHeight: 1 }}>&times;</button>
+            </div>
+            <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {/* Primary controls: search, gender, payment */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <input type="text" placeholder="Search jobs..." value={draftFilters.search || ''} onChange={e => handleFilterChange('search', e.target.value)} style={{ background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px 14px', borderRadius: '8px', fontSize: '13px', outline: 'none' }} />
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
+                  <select value={draftFilters.categoryIds || ''} onChange={e => handleFilterChange('categoryIds', e.target.value)} style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
+                    <option value="">All Categories</option>
+                    {options?.categories?.filter((c: any) => c.name !== 'Additional Category').map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  </select>
+                  <select value={draftFilters.gender || ''} onChange={e => handleFilterChange('gender', e.target.value)} style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
+                    <option value="">All Genders</option>
+                    <option value="male">Male</option><option value="female">Female</option><option value="both">Both</option>
+                  </select>
+                  <select value={draftFilters.paymentType || ''} onChange={e => handleFilterChange('paymentType', e.target.value)} style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
+                    <option value="">All Payment</option><option value="paid">Paid</option><option value="unpaid">Unpaid</option>
+                  </select>
+                  <select value={draftFilters.projectTypeId || ''} onChange={e => handleFilterChange('projectTypeId', e.target.value)} style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '10px', borderRadius: '8px', fontSize: '13px' }}>
+                    <option value="">All Project Types</option>
+                    {options?.projectTypes?.map((pt: any) => <option key={pt.id} value={pt.id}>{pt.name}</option>)}
+                  </select>
+                </div>
+              </div>
+              {/* Age + multi-select filters */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '16px', padding: '16px', background: '#fff', borderRadius: '12px', border: '1px solid #f5d0e3', width: '100%', minWidth: 0 }}>
+                <div>
+                  <span style={{ fontSize: '11px', color: '#C6007E', fontWeight: 'bold', display: 'block', marginBottom: '8px', letterSpacing: '0.5px' }}>AGE PARAMETERS</span>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <select value={draftFilters.ageFrom || ''} onChange={e => handleFilterChange('ageFrom', e.target.value)} style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '8px', borderRadius: '6px', fontSize: '12px' }}>
+                      <option value="">Min Age</option>{Array.from({ length: 101 }, (_, i) => <option key={i} value={i}>{i}</option>)}
+                    </select>
+                    <select value={draftFilters.ageTo || ''} onChange={e => handleFilterChange('ageTo', e.target.value)} style={{ width: '100%', background: '#fff', color: '#333', border: '1px solid #f5d0e3', padding: '8px', borderRadius: '6px', fontSize: '12px' }}>
+                      <option value="">Max Age</option>{Array.from({ length: 101 }, (_, i) => <option key={i} value={i}>{i}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <MultiSelectDropdown label="Country" options={options?.countries || []} selected={draftFilters.countryIds || []} onToggle={(id) => handleMultiChange('countryIds', id)} />
+                <MultiSelectDropdown label="Language" options={options?.languages || []} selected={draftFilters.languageIds || []} onToggle={(id) => handleMultiChange('languageIds', id)} />
+                <MultiSelectDropdown label="Nationality" options={options?.nationalities || []} selected={draftFilters.nationalityIds || []} onToggle={(id) => handleMultiChange('nationalityIds', id)} />
+                <MultiSelectDropdown label="Dialect" options={options?.dialects || []} selected={draftFilters.dialectIds || []} onToggle={(id) => handleMultiChange('dialectIds', id)} />
+                <MultiSelectDropdown label="Ethnicity" options={options?.ethnicities || []} selected={draftFilters.ethnicityIds || []} onToggle={(id) => handleMultiChange('ethnicityIds', id)} />
+              </div>
+              {/* bottom buttons */}
+              <div style={{ borderTop: '1px solid #f5d0e3', paddingTop: '16px', display: 'flex', gap: '12px' }}>
+                <button onClick={() => { resetFilters(); setDrawerOpen(false); }} style={{ flex: 1, background: '#fff', color: '#C6007E', border: '1px solid #f5d0e3', borderRadius: '8px', padding: '12px 20px', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>Reset Filters</button>
+                <button onClick={() => { applyFilters(); setDrawerOpen(false); }} style={{ flex: 2, background: '#3835A4', color: '#fff', border: 'none', borderRadius: '8px', padding: '12px 20px', fontWeight: 'bold', cursor: 'pointer', fontSize: '13px' }}>Apply Filters</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Count + Status Filter + Sort Row */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 40px 0', flexWrap: 'wrap', gap: '12px' }}>
@@ -423,7 +479,7 @@ const MatchingJobs = () => {
                           </span>
                           {job.paymentInfo && (
                             <span className="bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white text-[9px] font-mono font-black tracking-[0.15em] px-3.5 py-1.5 rounded-xl border border-white/10 shadow-lg">
-                              {job.paymentInfo === 'paid' ? 'PAID' : 'UNPAID'}
+                              {job.paymentInfo === 'paid' ? 'Paid' : 'Unpaid'}
                             </span>
                           )}
                         </div>
@@ -431,7 +487,7 @@ const MatchingJobs = () => {
                         {!isExpired && daysLeft !== null && (
                           <div className="absolute bottom-5 left-5 z-10 flex items-center gap-1.5 text-[9px] font-mono text-neutral-200 bg-neutral-950/80 backdrop-blur-md py-2 px-3.5 rounded-xl border border-white/10 shadow-sm font-bold">
                             <svg className="h-3.5 w-3.5 text-[#C6007E] animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            <span>EXPIRES IN {daysLeft} DAYS</span>
+                            <span>Expires in {daysLeft} days</span>
                           </div>
                         )}
                       </div>
@@ -478,7 +534,7 @@ const MatchingJobs = () => {
                               </div>
                               <div className="space-y-0.5">
                                 <span className="text-xs text-neutral-950 font-black font-mono tracking-wide">
-                                  {formatBudget(firstRole) || firstRole.paymentType?.replace(/_/g, ' ').toUpperCase()}
+                                  {formatBudget(firstRole) || firstRole.paymentType?.replace(/_/g, ' ')}
                                 </span>
                               </div>
                             </div>
@@ -489,7 +545,7 @@ const MatchingJobs = () => {
                           <div>
                             {isExpired ? (
                               <span className="inline-flex items-center text-[9px] font-mono font-black bg-red-50 text-red-600 border border-red-200/60 px-2.5 py-1 rounded-lg tracking-wider">
-                                EXPIRED
+                                Expired
                               </span>
                             ) : (
                               <div className="w-1" />
@@ -498,24 +554,50 @@ const MatchingJobs = () => {
 
                           {!isExpired && (
                             <div
-                              onClick={(e) => {
+                              onClick={async (e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
                                 if (!user) { alert('Please login to apply'); return; }
+                                if (user.role === 'RECRUITER') {
+                                  setQuickJob(job);
+                                  setLimitMessage('This feature is for talent only. Please register as a talent to apply for jobs.');
+                                  return;
+                                }
                                 setQuickJob(job);
                                 setLoadingApplied(true);
-                                getMyApplications().then(res => {
-                                  const apps = res.data.data || [];
+                                try {
+                                  const [appsRes, profileRes] = await Promise.all([
+                                    getMyApplications(),
+                                    getMyProfile()
+                                  ]);
+                                  const plan = profileRes.data.data?.subscription?.plan;
+                                  const maxJobsPerMonth = plan?.maxJobsPerMonth ?? 1;
+                                  if (maxJobsPerMonth < 999) {
+                                    const now = new Date();
+                                    const thisMonthCount = (appsRes.data.data || []).filter((a: any) => {
+                                      const d = new Date(a.createdAt);
+                                      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+                                    }).length;
+                                    if (thisMonthCount >= maxJobsPerMonth) {
+                                      setLimitMessage(`You've reached your application limit (${maxJobsPerMonth}/month). Upgrade to Premium for unlimited applications.`);
+                                      return;
+                                    }
+                                  }
+                                  const apps = appsRes.data.data || [];
                                   const roleIds = apps
                                     .filter((a: any) => a.role?.job?.id === job.id)
                                     .map((a: any) => a.roleId);
                                   setAppliedRoleIds(new Set(roleIds));
-                                }).catch(() => setAppliedRoleIds(new Set()))
-                                .finally(() => setLoadingApplied(false));
+                                } catch (err) {
+                                  console.error(err);
+                                  setAppliedRoleIds(new Set());
+                                } finally {
+                                  setLoadingApplied(false);
+                                }
                               }}
                               className="flex items-center gap-2 cursor-pointer"
                             >
-                              <span className="text-[10px] font-mono font-black uppercase text-neutral-500 group-hover:text-[#3835A4] transition-colors duration-300">
+                              <span className="text-[10px] font-mono font-black text-neutral-500 group-hover:text-[#3835A4] transition-colors duration-300">
                                 Quick Apply
                               </span>
                               <div className="p-1.5 rounded-xl bg-neutral-50 border border-neutral-200/60 group-hover:bg-gradient-to-br group-hover:from-[#C6007E] group-hover:to-[#3835A4] group-hover:text-white group-hover:border-transparent transition-all duration-300">
@@ -524,8 +606,8 @@ const MatchingJobs = () => {
                             </div>
                           )}
                           {isExpired && (
-                            <span className="text-[10px] font-mono font-black uppercase text-neutral-500">
-                              Application Closed
+                            <span className="text-[10px] font-mono font-black text-neutral-500">
+                              Application closed
                             </span>
                           )}
                         </div>
@@ -561,57 +643,75 @@ const MatchingJobs = () => {
 
       {/* Quick Apply Popup */}
       {quickJob && !applyRole && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={(e) => { if (e.target === e.currentTarget) setQuickJob(null); }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={(e) => { if (e.target === e.currentTarget) { setQuickJob(null); setLimitMessage(null); } }}>
           <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="sticky top-0 bg-white z-10 border-b border-stone-100 px-6 py-4 flex items-center justify-between rounded-t-3xl">
               <div>
                 <h2 className="text-lg font-black tracking-tight text-[#3835A4]">{quickJob.title || 'Untitled'}</h2>
                 <p className="text-xs text-stone-500 font-medium mt-0.5">{quickJob.company?.companyName || ''}</p>
               </div>
-              <button onClick={() => setQuickJob(null)} className="text-stone-400 hover:text-stone-600 text-xl leading-none">&times;</button>
+              <button onClick={() => { setQuickJob(null); setLimitMessage(null); }} className="text-stone-400 hover:text-stone-600 text-xl leading-none">&times;</button>
             </div>
             <div className="px-6 py-5 space-y-5">
-              {quickJob.description && (
-                <div>
-                  <p className="text-[10px] font-extrabold tracking-widest text-stone-400 uppercase mb-2">Description</p>
-                  <p className="text-sm text-stone-700 leading-relaxed">{stripHtml(quickJob.description).slice(0, 300)}</p>
+              {loadingApplied && !limitMessage ? (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <div className="w-10 h-10 border-4 border-[#C6007E] border-t-transparent rounded-full animate-spin" />
+                  <p className="text-xs text-stone-400 font-medium mt-4">Loading application info...</p>
                 </div>
-              )}
-              <div>
-                <p className="text-[10px] font-extrabold tracking-widest text-stone-400 uppercase mb-3">
-                  Roles ({quickJob.roles?.length || 0})
-                </p>
-                <div className="space-y-2">
-                  {(quickJob.roles || []).map((role: any) => (
-                    <div key={role.id} className="flex items-center justify-between bg-stone-50 rounded-xl px-4 py-3 border border-stone-100">
-                      <div>
-                        <p className="text-sm font-bold text-[#3835A4]">{role.title || 'Untitled Role'}</p>
-                        <p className="text-[10px] text-stone-500">
-                          {role.gender && `${role.gender} · `}{role.ageMin && `${role.ageMin}${role.ageMax ? `-${role.ageMax}` : '+'} yrs`}
-                          {role.noOfCast && ` · ${role.noOfCast} talent${role.noOfCast > 1 ? 's' : ''}`}
-                        </p>
-                      </div>
-                      {loadingApplied ? (
-                        <span className="bg-stone-200 text-stone-500 px-4 py-2 rounded-lg font-black uppercase tracking-widest text-[10px] whitespace-nowrap ml-3 flex items-center gap-1.5">
-                          <svg className="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-                          Loading
-                        </span>
-                      ) : appliedRoleIds.has(role.id) ? (
-                        <span className="bg-green-100 text-green-700 px-4 py-2 rounded-lg font-black uppercase tracking-widest text-[10px] whitespace-nowrap ml-3">
-                          Applied
-                        </span>
-                      ) : (
-                        <button
-                          onClick={() => setApplyRole(role)}
-                          className="bg-[#C6007E] text-white px-4 py-2 rounded-lg font-black uppercase tracking-widest text-[10px] hover:bg-[#a10065] transition-all whitespace-nowrap ml-3"
-                        >
-                          Apply
-                        </button>
-                      )}
+              ) : limitMessage ? (
+                <div className="flex flex-col items-center text-center py-8 px-4">
+                  <div className="w-16 h-16 rounded-full bg-[#C6007E]/10 flex items-center justify-center mb-4">
+                    <svg className="w-8 h-8 text-[#C6007E]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m0 0v2m0-2h2m-2 0H10m9.364-7.364A9 9 0 1112 3a9 9 0 017.364 4.636z" /></svg>
+                  </div>
+                  <h3 className="text-lg font-black text-[#C6007E] mb-2">{limitMessage.includes('application limit') ? 'Application Limit Reached' : 'Notice'}</h3>
+                  <p className="text-sm text-stone-600 leading-relaxed max-w-sm">{limitMessage}</p>
+                  {limitMessage.includes('application limit') && (
+                    <Link to="/subscription-plans" className="mt-5 inline-flex items-center gap-2 bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white px-6 py-3 rounded-xl font-black text-xs tracking-wider uppercase hover:opacity-90 transition-all">
+                      Upgrade Plan
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                    </Link>
+                  )}
+                </div>
+              ) : (
+                <>
+                  {quickJob.description && (
+                    <div>
+                      <p className="text-[10px] font-extrabold tracking-widest text-stone-400 mb-2">Description</p>
+                      <p className="text-sm text-stone-700 leading-relaxed">{stripHtml(quickJob.description).slice(0, 300)}</p>
                     </div>
-                  ))}
-                </div>
-              </div>
+                  )}
+                  <div>
+                    <p className="text-[10px] font-extrabold tracking-widest text-stone-400 mb-3">
+                      Roles ({quickJob.roles?.length || 0})
+                    </p>
+                    <div className="space-y-2">
+                      {(quickJob.roles || []).map((role: any) => (
+                        <div key={role.id} className="flex items-center justify-between bg-stone-50 rounded-xl px-4 py-3 border border-stone-100">
+                          <div>
+                            <p className="text-sm font-bold text-[#3835A4]">{role.title || 'Untitled Role'}</p>
+                            <p className="text-[10px] text-stone-500">
+                              {role.gender && `${role.gender} · `}{role.ageMin && `${role.ageMin}${role.ageMax ? `-${role.ageMax}` : '+'} yrs`}
+                              {role.noOfCast && ` · ${role.noOfCast} talent${role.noOfCast > 1 ? 's' : ''}`}
+                            </p>
+                          </div>
+                          {appliedRoleIds.has(role.id) ? (
+                            <span className="bg-green-100 text-green-700 px-4 py-2 rounded-lg font-black tracking-widest text-[10px] whitespace-nowrap ml-3">
+                              Applied
+                            </span>
+                          ) : (
+                            <button
+                              onClick={() => setApplyRole(role)}
+                              className="bg-[#C6007E] text-white px-4 py-2 rounded-lg font-black tracking-widest text-[10px] hover:bg-[#a10065] transition-all whitespace-nowrap ml-3"
+                            >
+                              Apply
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>

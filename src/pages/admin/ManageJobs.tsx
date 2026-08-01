@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { getAdminJobs, updateAdminJobStatus, getActiveCompanies, adminCreateJob, adminAddRole, uploadAdminJobImage } from '../../api/admin.api';
 import { getJobOptions } from '../../api/job.api';
-import { Search } from 'lucide-react';
+import { Search, Plus, ArrowLeft } from 'lucide-react';
 import RolesStep from '../recruiter/post-job/RolesStep';
 import HtmlEditor from '../../components/HtmlEditor';
 
@@ -17,7 +17,7 @@ interface Job {
 }
 
 const ManageJobs = () => {
-  const [activeTab, setActiveTab] = useState<'list' | 'post'>('list');
+  const [view, setView] = useState<'list' | 'post'>('list');
   const [jobs, setJobs] = useState<Job[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -139,7 +139,7 @@ const ManageJobs = () => {
   const [rolesData, setRolesData] = useState<any[]>([]);
 
   useEffect(() => {
-    if (activeTab !== 'post') return;
+    if (view !== 'post') return;
     setOptionsLoading(true);
     Promise.all([
       getActiveCompanies(),
@@ -154,7 +154,7 @@ const ManageJobs = () => {
         setPostError('Failed to load data');
         setOptionsLoading(false);
       });
-  }, [activeTab]);
+  }, [view]);
 
   const handlePostNext = () => {
     if (!jobData.title || !jobData.categoryId || !jobData.paymentInfo) {
@@ -215,7 +215,7 @@ const ManageJobs = () => {
         image: '',
       });
       setRolesData([]);
-      setActiveTab('list');
+      setView('list');
       setRefreshKey((k) => k + 1);
     } catch (err: any) {
       setPostError(err.response?.data?.message || 'Failed to post job');
@@ -266,30 +266,7 @@ const ManageJobs = () => {
 
   return (
     <div>
-      <div className="flex items-center gap-4 mb-6 border-b border-stone-200">
-        <button
-          onClick={() => setActiveTab('list')}
-          className={`pb-3 text-sm font-bold cursor-pointer transition-colors ${
-            activeTab === 'list'
-              ? 'text-[#3835A4] border-b-2 border-[#3835A4]'
-              : 'text-stone-400 hover:text-stone-600'
-          }`}
-        >
-          Job List
-        </button>
-        <button
-          onClick={() => setActiveTab('post')}
-          className={`pb-3 text-sm font-bold cursor-pointer transition-colors ${
-            activeTab === 'post'
-              ? 'text-[#3835A4] border-b-2 border-[#3835A4]'
-              : 'text-stone-400 hover:text-stone-600'
-          }`}
-        >
-          Post Job
-        </button>
-      </div>
-
-      {activeTab === 'list' ? (
+      {view === 'list' ? (
         <>
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -317,6 +294,12 @@ const ManageJobs = () => {
                 <option value="inactive">Inactive</option>
                 <option value="rejected">Rejected</option>
               </select>
+              <button
+                onClick={() => setView('post')}
+                className="inline-flex items-center gap-2 bg-[#C6007E] text-white px-5 py-2.5  font-black uppercase tracking-widest text-xs hover:bg-[#a10065] transition-colors cursor-pointer"
+              >
+                <Plus className="w-4 h-4" /> Post Job
+              </button>
             </div>
           </div>
 
@@ -371,11 +354,11 @@ const ManageJobs = () => {
                             </Link>
                             <Link
                               to={`/admin/jobs/${j.id}/edit`}
-                              className="px-3 py-1 text-xs font-bold text-white bg-stone-500 cursor-pointer hover:bg-stone-600 transition-colors inline-block"
+                              className="px-3 py-1 text-xs font-bold text-blue-500 bg-blue-50 hover:bg-blue-100 cursor-pointer transition-colors inline-block"
                             >
                               Edit
                             </Link>
-                          </div>
+                          </div> 
                         </td>
                         <td className="px-4 py-3 text-center">
                           <button
@@ -487,9 +470,17 @@ const ManageJobs = () => {
       ) : (
         <div>
           <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-black text-[#3835A4]">Post a New Job</h2>
-              <p className="text-xs text-stone-400">Admin creates job under a company</p>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setView('list')}
+                className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-[#3835A4] bg-[#3835A4]/10 hover:bg-[#3835A4]/20 transition-colors cursor-pointer"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" /> 
+              </button>
+              <div>
+                <h2 className="text-2xl font-black text-[#3835A4]">Post a New Job</h2>
+                {/* <p className="text-xs text-stone-400">Admin creates job under a company</p> */}
+              </div>
             </div>
             <div className="text-xs font-bold text-stone-500 px-3 py-1.5 border border-stone-200">
               Step {postStep} of {jobData.castingService === 'manual' ? 1 : 2}
