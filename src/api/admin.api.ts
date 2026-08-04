@@ -181,3 +181,18 @@ export const getEmailTemplateByKey = (key: string) =>
 
 export const updateEmailTemplate = (key: string, data: { subject: string; body: string }) =>
   api.put(`/admin/email-templates/${key}`, data);
+
+export const getCmsPages = () =>
+  api.get('/admin/cms');
+
+export const getCmsPageByKey = (key: string) =>
+  api.get(`/admin/cms/${key}`);
+
+export const createCmsPage = (data: { pageKey: string; metaTitle: string; metaDescription: string; pageHeading: string; subHeading: string; pageDescription: string; address: string; phone: string; email: string; videoUrl?: string; bottomHeading?: string; bottomDescription?: string; talentFaqs?: string; companyFaqs?: string; body: string }) =>
+  api.post('/admin/cms', data);
+
+export const updateCmsPage = (key: string, data: { metaTitle: string; metaDescription: string; pageHeading: string; subHeading: string; pageDescription: string; address: string; phone: string; email: string; videoUrl?: string; bottomHeading?: string; bottomDescription?: string; talentFaqs?: string; companyFaqs?: string; body: string }) =>
+  api.put(`/admin/cms/${key}`, data);
+
+export const deleteCmsPage = (key: string) =>
+  api.delete(`/admin/cms/${key}`);

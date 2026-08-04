@@ -1,4 +1,19 @@
+import { useState, useEffect } from 'react';
+import api from '../api/axios';
+
+interface CmsContent {
+  metaTitle?: string;
+  metaDescription?: string;
+  pageHeading?: string;
+  subHeading?: string;
+  body?: string;
+}
+
+const DEFAULT_HEADING = 'Terms of Service';
+const DEFAULT_SUB_HEADING = 'Please read these terms carefully before using our platform.';
+
 export default function TermsOfService() {
+  const [cms, setCms] = useState<CmsContent>({});
   const sections = [
     {
       title: 'EFFECTIVE AS OF 10th Jan 2019',
@@ -178,6 +193,44 @@ export default function TermsOfService() {
     },
   ];
 
+  const buildDefaultBody = () =>
+    sections.map((s) => {
+      if (s.content === null) return `<h3>${s.title}</h3>`;
+      if (Array.isArray(s.content)) {
+        return `<h3>${s.title}</h3><ul>${s.content
+          .filter((item): item is string => item !== null)
+          .map((item) => `<li>${item}</li>`)
+          .join('')}</ul>`;
+      }
+      return `<h3>${s.title}</h3><p>${s.content}</p>`;
+    }).join('');
+
+  useEffect(() => {
+    let active = true;
+    api.get('/cms/terms-of-service')
+      .then((res) => {
+        if (!active || !res.data?.success || !res.data?.data) return;
+        const d = res.data.data;
+        setCms(d);
+        if (d.metaTitle) document.title = d.metaTitle;
+        if (d.metaDescription) {
+          let meta = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
+          if (!meta) {
+            meta = document.createElement('meta');
+            meta.name = 'description';
+            document.head.appendChild(meta);
+          }
+          meta.content = d.metaDescription;
+        }
+      })
+      .catch(() => {});
+    return () => { active = false; };
+  }, []);
+
+  const heading = cms.pageHeading || DEFAULT_HEADING;
+  const subHeading = cms.subHeading || DEFAULT_SUB_HEADING;
+  const body = cms.body || buildDefaultBody();
+
   return (
     <div className="w-full bg-white py-16 min-h-screen relative overflow-hidden">
       <div className="absolute right-0 top-0 h-96 w-96 rounded-full bg-[#3835A4]/[0.03] filter blur-[120px] pointer-events-none" />
@@ -186,41 +239,16 @@ export default function TermsOfService() {
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-12">
           <h2 className="font-display text-4xl sm:text-5xl font-black text-neutral-900 tracking-tight leading-none mb-4">
-            Terms of Service
+            {heading}
           </h2>
-          <p className="text-sm text-neutral-400 font-medium max-w-xl mx-auto">
-            Please read these terms carefully before using our platform.
-          </p>
+          {subHeading && (
+            <p className="text-sm text-neutral-400 font-medium max-w-xl mx-auto">
+              {subHeading}
+            </p>
+          )}
         </div>
 
-        <div className="space-y-8">
-          {sections.map((section) => (
-            <div key={section.title}>
-              <h3 className="text-sm font-black text-[#3835A4] tracking-wider mb-2">
-                {section.title}
-              </h3>
-              {section.content === null ? null : Array.isArray(section.content) ? (
-                <ul className="space-y-2">
-                  {section.content.map((item, i) => (
-                    item === null ? null : (
-                      <li key={i} className={`text-sm leading-relaxed font-medium ${
-                        item.startsWith('BASIC') || item.startsWith('PREMIUM') || item.startsWith('UPGRADING')
-                          ? 'text-[#3835A4] font-black mt-3'
-                          : 'text-neutral-600'
-                      }`}>
-                        {item}
-                      </li>
-                    )
-                  ))}
-                </ul>
-              ) : (
-                <div className="text-sm text-neutral-600 leading-relaxed font-medium whitespace-pre-line">
-                  {section.content}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+        <div className="cms-body" dangerouslySetInnerHTML={{ __html: body }} />
       </div>
     </div>
   );

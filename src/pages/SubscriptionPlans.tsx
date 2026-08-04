@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getPlans } from '../api/plans.api';
 import { getMyProfile } from '../api/profile.api';
+import api from '../api/axios';
 import { useAuthStore } from '../store/authStore';
 
 interface Plan {
@@ -15,12 +16,44 @@ interface Plan {
   maxJobsPerMonth: number;
 }
 
+interface CmsContent {
+  metaTitle?: string;
+  metaDescription?: string;
+  pageHeading?: string;
+  subHeading?: string;
+}
+
+const DEFAULT_HEADING = 'Choose Your Plan';
+const DEFAULT_SUB_HEADING = 'Pick the plan that fits your career goals. Upgrade anytime to unlock more features.';
+
 export default function SubscriptionPlans() {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuthStore();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [userPlanSlug, setUserPlanSlug] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [cms, setCms] = useState<CmsContent>({});
+
+  useEffect(() => {
+    api.get('/cms/subscription-plans')
+      .then((res) => {
+        if (res.data?.success && res.data?.data) {
+          const d = res.data.data;
+          setCms(d);
+          if (d.metaTitle) document.title = d.metaTitle;
+          if (d.metaDescription) {
+            let meta = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
+            if (!meta) {
+              meta = document.createElement('meta');
+              meta.name = 'description';
+              document.head.appendChild(meta);
+            }
+            meta.content = d.metaDescription;
+          }
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     Promise.all([
@@ -74,10 +107,10 @@ export default function SubscriptionPlans() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="max-w-2xl mx-auto text-center mb-14">
           <h2 className="font-display text-3xl font-black text-neutral-900 sm:text-5xl tracking-tight leading-none mb-4">
-            Choose Your Plan
+            {cms.pageHeading || DEFAULT_HEADING}
           </h2>
           <p className="text-sm text-neutral-500 leading-relaxed font-medium">
-            Pick the plan that fits your career goals. Upgrade anytime to unlock more features.
+            {cms.subHeading || DEFAULT_SUB_HEADING}
           </p>
         </div>
 

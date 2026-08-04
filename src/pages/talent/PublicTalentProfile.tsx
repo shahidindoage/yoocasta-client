@@ -192,10 +192,10 @@ const PublicTalentProfile = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#fdfbf7]">
         <div className="relative">
-          <div className="w-16 h-16 border-4 border-[#0500ca] border-t-[#ff24b0] rounded-full animate-spin" />
-          <div className="absolute inset-0 flex items-center justify-center text-[10px] font-black font-mono text-[#0500ca]">GO</div>
+          <div className="w-16 h-16 border-4 border-[#008dc9] border-t-[#ff24b0] rounded-full animate-spin" />
+          <div className="absolute inset-0 flex items-center justify-center text-[10px] font-black font-mono text-[#008dc9]">GO</div>
         </div>
-        <span className="mt-4 text-[9px] font-black  text-[#0500ca]/60  font-mono animate-pulse">
+        <span className="mt-4 text-[9px] font-black  text-[#008dc9]/60  font-mono animate-pulse">
           Rendering Creative Ecosystem...
         </span>
       </div>
@@ -205,12 +205,12 @@ const PublicTalentProfile = () => {
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#fdfbf7] p-4">
-        <div className="bg-white border-4 border-[#0500ca] p-8 rotate-1 max-w-md text-center space-y-4 shadow-[8px_8px_0px_0px_#ff24b0]">
+        <div className="bg-white border-4 border-[#008dc9] p-8 rotate-1 max-w-md text-center space-y-4 shadow-[8px_8px_0px_0px_#ff24b0]">
           <span className="text-4xl block animate-bounce">⚡</span>
-          <p className="text-sm font-black text-[#0500ca] tracking-wider  font-mono bg-red-100 px-2 py-1 inline-block">
+          <p className="text-sm font-black text-[#008dc9] tracking-wider  font-mono bg-red-100 px-2 py-1 inline-block">
             {error}
           </p>
-          <Link to="/browse-talents" className="block text-[10px] font-black   bg-[#0500ca] text-white px-6 py-3 transition-transform active:scale-95 hover:-translate-y-0.5">
+          <Link to="/browse-talents" className="block text-[10px] font-black   bg-[#008dc9] text-white px-6 py-3 transition-transform active:scale-95 hover:-translate-y-0.5">
             ← Return to Hub
           </Link>
         </div>
@@ -227,11 +227,11 @@ const PublicTalentProfile = () => {
     <div className="min-h-screen bg-[#fdfbf7] text-stone-900 selection:bg-[#ff24b0]/30 selection:text-stone-900 pb-32 relative overflow-hidden font-sans">
       
       {/* ABSTRACT AVANT-GARDE GRAPHIC LAYERS */}
-      <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-tr from-[#0500ca]/10 to-[#ff24b0]/10 blur-[120px] pointer-events-none -z-10" />
+      <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-tr from-[#008dc9]/10 to-[#ff24b0]/10 blur-[120px] pointer-events-none -z-10" />
       <div className="absolute bottom-[10%] right-[-5%] w-[40vw] h-[40vw] rounded-full bg-gradient-to-br from-[#ff24b0]/10 to-cyan-200/40 blur-[100px] pointer-events-none -z-10" />
       
       {/* BACKGROUND GRID PATTERN TO EMULATE A DESIGNER'S CANVAS */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0500ca05_1px,transparent_1px),linear-gradient(to_bottom,#0500ca05_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none -z-10" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#008dc905_1px,transparent_1px),linear-gradient(to_bottom,#008dc905_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none -z-10" />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-8 pt-16 space-y-16 relative z-10">
         
@@ -242,9 +242,9 @@ const PublicTalentProfile = () => {
           <div className="lg:col-span-5 flex justify-center lg:justify-start lg:sticky lg:top-8">
             <div className="relative group w-full max-w-[340px]">
               {/* Brutalist Shadow Offset */}
-              <div className="absolute inset-0 bg-[#0500ca] rounded-[32px] translate-x-3 translate-y-3 transition-transform group-hover:translate-x-4 group-hover:translate-y-4 duration-300" />
+              <div className="absolute inset-0 bg-[#008dc9] rounded-[32px] translate-x-3 translate-y-3 transition-transform group-hover:translate-x-4 group-hover:translate-y-4 duration-300" />
               
-              <div className="relative bg-white border-2 border-[#0500ca] rounded-[32px] p-3 shadow-sm overflow-hidden z-10">
+              <div className="relative bg-white border-2 border-[#008dc9] rounded-[32px] p-3 shadow-sm overflow-hidden z-10">
                 {profile.image ? (
                   <img 
                     src={profile.image} 
@@ -259,7 +259,7 @@ const PublicTalentProfile = () => {
                 
                 {/* Float Badge */}
                 {profile.isVerified && (
-                  <div className="absolute bottom-6 right-6 bg-[#ff24b0] text-white font-mono text-[10px] font-black  px-3 py-1.5 rounded-full border-2 border-[#0500ca] shadow-md transform rotate-3">
+                  <div className="absolute bottom-6 right-6 bg-[#ff24b0] text-white font-mono text-[10px] font-black  px-3 py-1.5 rounded-full border-2 border-[#008dc9] shadow-md transform rotate-3">
                     Verified ✓
                   </div>
                 )}
@@ -278,7 +278,7 @@ const PublicTalentProfile = () => {
               </div>
               
               <h1 className="text-4xl sm:text-6xl font-black tracking-tight  leading-[0.95] font-display text-stone-900">
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0500ca] via-[#ff24b0] to-amber-500">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#008dc9] via-[#ff24b0] to-amber-500">
                   {profile.firstName}
                 </span>
               </h1>
@@ -286,15 +286,15 @@ const PublicTalentProfile = () => {
 
             {/* QUICK STATS AS A KINETIC GRID */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              <div className="bg-white border-2 border-[#0500ca] p-4 rounded-2xl shadow-[4px_4px_0px_0px_#0500ca] flex flex-col justify-between h-18 text-left transform -rotate-1">
+              <div className="bg-white border-2 border-[#008dc9] p-4 rounded-2xl shadow-[4px_4px_0px_0px_#008dc9] flex flex-col justify-between h-18 text-left transform -rotate-1">
                 <span className="text-[8px] font-black  text-stone-400  font-sans">Profile ID</span>
-                <span className="text-sm font-black font-display text-[#0500ca]">{formatTalentId(profile.id)}</span>
+                <span className="text-sm font-black font-display text-[#008dc9]">{formatTalentId(profile.id)}</span>
               </div>
-              <div className="bg-[#ff24b0]/10 border-2 border-[#0500ca] p-4 rounded-2xl shadow-[4px_4px_0px_0px_#0500ca] flex flex-col justify-between h-18 text-left transform rotate-1">
+              <div className="bg-[#ff24b0]/10 border-2 border-[#008dc9] p-4 rounded-2xl shadow-[4px_4px_0px_0px_#008dc9] flex flex-col justify-between h-18 text-left transform rotate-1">
                 <span className="text-[8px] font-black  text-[#ff24b0]  font-sans">Profile Views</span>
-                <span className="text-xl font-black font-display text-[#0500ca]">👁 {tp?.views ?? 0}</span>
+                <span className="text-xl font-black font-display text-[#008dc9]">👁 {tp?.views ?? 0}</span>
               </div>
-              <div className="col-span-2 sm:col-span-1 bg-white border-2 border-[#0500ca] p-4 rounded-2xl shadow-[4px_4px_0px_0px_#0500ca] flex flex-col justify-between h-18 text-left transform -rotate-1">
+              <div className="col-span-2 sm:col-span-1 bg-white border-2 border-[#008dc9] p-4 rounded-2xl shadow-[4px_4px_0px_0px_#008dc9] flex flex-col justify-between h-18 text-left transform -rotate-1">
                 <span className="text-[8px] font-black  text-stone-400  font-sans">Location</span>
                 <span className="text-xs font-display text-stone-900 truncate block">
                   {tp?.city?.name ? `${tp.city.name}, ${tp.city.country?.name || ''}` : 'Global Hub'}
@@ -319,7 +319,7 @@ const PublicTalentProfile = () => {
               <span className="block text-[9px] font-black  text-stone-400  font-sans">Categories</span>
               <div className="flex flex-wrap gap-2">
                 {tp?.categories?.map((c: any) => (
-                  <span key={c.category.id} className="px-4 py-2 bg-[#0500ca] text-white rounded-xl text-[10px] font-display   border border-[#0500ca] hover:bg-transparent hover:text-[#0500ca] transition-all duration-300">
+                  <span key={c.category.id} className="px-4 py-2 bg-[#008dc9] text-white rounded-xl text-[10px] font-display   border border-[#008dc9] hover:bg-transparent hover:text-[#008dc9] transition-all duration-300">
                      {c.category.name}
                   </span>
                 )) || <span className="text-xs italic font-display text-stone-400">Uncategorized Vector</span>}
@@ -345,9 +345,9 @@ const PublicTalentProfile = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
           
           {/* IDENTITY MATRIX GRID */}
-        <div className="lg:col-span-7 bg-white border-2 border-[#0500ca] rounded-[32px] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#0500ca] flex flex-col justify-between space-y-6">
-  <div className="flex items-center justify-between border-b-2 border-[#0500ca] pb-4">
-    <h3 className="text-xs font-black  text-[#0500ca]  font-sans">              Identity</h3>
+        <div className="lg:col-span-7 bg-white border-2 border-[#008dc9] rounded-[32px] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#008dc9] flex flex-col justify-between space-y-6">
+  <div className="flex items-center justify-between border-b-2 border-[#008dc9] pb-4">
+    <h3 className="text-xs font-black  text-[#008dc9]  font-sans">              Identity</h3>
   </div>
 
   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -381,8 +381,8 @@ const PublicTalentProfile = () => {
 </div>
 
           {/* PHYSICAL ARCHITECTURE FRAMEWORK */}
-          <div className="lg:col-span-5 bg-[#0500ca] text-stone-100 rounded-[32px] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#ff24b0] flex flex-col justify-between space-y-6">
-            <div className="flex items-center justify-between border-b border-[#0500ca]/30 pb-4">
+          <div className="lg:col-span-5 bg-[#008dc9] text-stone-100 rounded-[32px] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#ff24b0] flex flex-col justify-between space-y-6">
+            <div className="flex items-center justify-between border-b border-[#008dc9]/30 pb-4">
               <h3 className="text-xs font-black  text-[#FFF]  font-sans">Physical</h3>
               {/* <span className="text-white/40 font-mono text-[10px]">SPEC_02</span> */}
             </div>
@@ -408,31 +408,31 @@ const PublicTalentProfile = () => {
             {tp?.tattoo && (
               <div className="pt-2 text-left">
                 <span className="block text-[8px] font-black  text-white/40 font-sans tracking-wider">Tattoos</span>
-                <p className="text-xs text-[#ff24b0] font-display mt-0.5 bg-white px-2 py-0.5 rounded inline-block">{tp.tattoo}</p>
+                <p className="text-xs font-display text-white mt-0.5 block">{tp.tattoo}</p>
               </div>
             )}
           </div>
         </div>
 
         {/* HIGH-END SPECTRUM PORTFOLIO FRAMEWORK */}
-        <div className="bg-white border-2 border-[#0500ca] rounded-[40px] p-6 sm:p-10 shadow-[12px_12px_0px_0px_#ff24b0] space-y-8">
+        <div className="bg-white border-2 border-[#008dc9] rounded-[40px] p-6 sm:p-10 shadow-[12px_12px_0px_0px_#ff24b0] space-y-8">
           
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between border-b-2 border-[#0500ca] pb-6 gap-6">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between border-b-2 border-[#008dc9] pb-6 gap-6">
             <div className="space-y-1">
               <h3 className="text-lg font-black tracking-tight  font-sans text-stone-900">Portfolio</h3>
               <p className="text-[10px] font-display text-stone-400">Photos / Videos / Casting / Audio</p>
             </div>
             
             {/* Neo-Brutalist Segment Controller */}
-            <div className="flex flex-wrap bg-stone-100 p-1.5 rounded-2xl border-2 border-[#0500ca] w-full md:w-auto">
+            <div className="flex flex-wrap bg-stone-100 p-1.5 rounded-2xl border-2 border-[#008dc9] w-full md:w-auto">
               {['Photos', 'Videos', 'Casting', 'Audio'].map(tab => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={`flex-1 md:flex-none px-6 py-2.5 text-[10px] font-bold   rounded-xl transition-all font-display ${
                     activeTab === tab
-                      ? 'bg-[#0500ca] text-white shadow-md'
-                      : 'text-stone-400 hover:text-[#0500ca]'
+                      ? 'bg-[#008dc9] text-white shadow-md'
+                      : 'text-stone-400 hover:text-[#008dc9]'
                   }`}
                 >
                   {tab}
@@ -459,7 +459,7 @@ const PublicTalentProfile = () => {
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
                   {visible.map((item: any) => (
-                    <div key={item.id} className="group relative aspect-[3/4] bg-stone-50 border-2 border-[#0500ca] rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                    <div key={item.id} className="group relative aspect-[3/4] bg-stone-50 border-2 border-[#008dc9] rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                   
                   {item.type === 'IMAGE' && (
                     <button onClick={() => setLightboxImage(item.url)} className="w-full h-full block text-left">
@@ -496,7 +496,7 @@ const PublicTalentProfile = () => {
                           );
                         }
                         return (
-                          <div className="w-full h-full flex flex-col justify-between p-6 bg-[#0500ca] text-white font-mono">
+                          <div className="w-full h-full flex flex-col justify-between p-6 bg-[#008dc9] text-white font-mono">
                             <span className="text-3xl">💎</span>
                             <div className="space-y-3">
                               <p className="text-[10px] font-bold leading-relaxed text-white/70">{item.caption || 'External Link'}</p>
@@ -504,7 +504,7 @@ const PublicTalentProfile = () => {
                                 href={url}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="inline-block text-[9px] font-black bg-[#ff24b0] text-white px-3 py-2 rounded-lg border border-[#0500ca] shadow-[2px_2px_0px_0px_#0500ca]"
+                                className="inline-block text-[9px] font-black bg-[#ff24b0] text-white px-3 py-2 rounded-lg border border-[#008dc9] shadow-[2px_2px_0px_0px_#008dc9]"
                               >
                                 Open Link →
                               </a>
@@ -518,14 +518,14 @@ const PublicTalentProfile = () => {
                   {item.type === 'CASTING_VIDEO' && (
                     <div className="w-full h-full relative bg-stone-950">
                       <video src={item.url} controls className="w-full h-full object-cover" />
-                      <span className="absolute top-4 left-4 bg-[#ff24b0] text-white text-[8px] font-black   px-2.5 py-1 rounded-md border border-[#0500ca] shadow-md">
+                      <span className="absolute top-4 left-4 bg-[#ff24b0] text-white text-[8px] font-black   px-2.5 py-1 rounded-md border border-[#008dc9] shadow-md">
                         Casting Video
                       </span>
                     </div>
                   )}
                   
                   {item.type === 'AUDIO' && (
-                    <div className="w-full h-full flex flex-col justify-between p-5 bg-amber-50 border-2 border-[#0500ca] rounded-xl">
+                    <div className="w-full h-full flex flex-col justify-between p-5 bg-amber-50 border-2 border-[#008dc9] rounded-xl">
                       <div className="flex justify-between items-start">
                         <span className="text-3xl">🔊</span>
                         <span className="text-[8px] font-black  text-amber-700 bg-amber-200/60 px-2 py-0.5 rounded  font-mono">Audio</span>
@@ -543,7 +543,7 @@ const PublicTalentProfile = () => {
                 {items.length > 4 && (
                   <button
                     onClick={() => setShowAllPortfolio(!showAllPortfolio)}
-                    className="mt-6 w-full text-[10px] font-black bg-[#0500ca] text-white px-6 py-3 rounded-xl border-2 border-[#0500ca] shadow-[4px_4px_0px_0px_#ff24b0] transition-transform active:scale-95 hover:-translate-y-0.5"
+                    className="mt-6 w-full text-[10px] font-black bg-[#008dc9] text-white px-6 py-3 rounded-xl border-2 border-[#008dc9] shadow-[4px_4px_0px_0px_#ff24b0] transition-transform active:scale-95 hover:-translate-y-0.5"
                   >
                     {showAllPortfolio ? 'Show Less ↑' : `Show More (${items.length}) ↓`}
                   </button>
@@ -557,15 +557,15 @@ const PublicTalentProfile = () => {
 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
   {/* Historical Placement */}
-  <div className="bg-white border-2 border-[#0500ca] rounded-[32px] p-6 sm:p-10 shadow-[8px_8px_0px_0px_#0500ca] space-y-8">
-    <div className="flex items-center justify-between border-b-2 border-[#0500ca] pb-4">
-      <h3 className="text-xs font-black  text-[#0500ca]  font-sans">Career History</h3>
+  <div className="bg-white border-2 border-[#008dc9] rounded-[32px] p-6 sm:p-10 shadow-[8px_8px_0px_0px_#008dc9] space-y-8">
+    <div className="flex items-center justify-between border-b-2 border-[#008dc9] pb-4">
+      <h3 className="text-xs font-black  text-[#008dc9]  font-sans">Career History</h3>
     </div>
 
     {tp?.careerHistory && tp.careerHistory.length > 0 ? (
       <div className="grid grid-cols-1 gap-6 relative">
         {(showAllHistory ? tp.careerHistory : tp.careerHistory.slice(0, 1)).map((ch: any) => (
-          <div key={ch.id} className="bg-[#fdfbf7] border-2 border-[#0500ca] p-6 rounded-2xl relative space-y-2 group transition-transform hover:-translate-y-0.5 hover:bg-white shadow-[4px_4px_0px_0px_#0500ca]">
+          <div key={ch.id} className="bg-[#fdfbf7] border-2 border-[#008dc9] p-6 rounded-2xl relative space-y-2 group transition-transform hover:-translate-y-0.5 hover:bg-white shadow-[4px_4px_0px_0px_#008dc9]">
             <div className="flex justify-between items-start gap-4">
               <h4 className="text-sm font-black tracking-tight text-stone-900  font-display">{ch.title}</h4>
               <span className="text-[8px] font-sans font-black text-[#ff24b0] bg-[#ff24b0]/5 border border-[#ff24b0]/20 px-2 py-0.5 rounded whitespace-nowrap">
@@ -581,7 +581,7 @@ const PublicTalentProfile = () => {
         {tp.careerHistory.length > 1 && (
           <button
             onClick={() => setShowAllHistory(!showAllHistory)}
-            className="w-full text-[10px] font-black   bg-[#0500ca] text-white px-6 py-3 rounded-xl border-2 border-[#0500ca] shadow-[4px_4px_0px_0px_#ff24b0] transition-transform active:scale-95 hover:-translate-y-0.5"
+            className="w-full text-[10px] font-black   bg-[#008dc9] text-white px-6 py-3 rounded-xl border-2 border-[#008dc9] shadow-[4px_4px_0px_0px_#ff24b0] transition-transform active:scale-95 hover:-translate-y-0.5"
           >
             {showAllHistory ? 'Show Less ↑' : `Show More (${tp.careerHistory.length}) ↓`}
           </button>
@@ -596,27 +596,27 @@ const PublicTalentProfile = () => {
   </div>
 
   {/* Academic Matrix & Training */}
-  <div className="bg-white border-2 border-[#0500ca] rounded-[32px] p-6 sm:p-8 space-y-4 shadow-[6px_6px_0px_0px_#0500ca]">
-    <div className="flex items-center gap-2 border-b border-[#0500ca] pb-3">
+  <div className="bg-white border-2 border-[#008dc9] rounded-[32px] p-6 sm:p-8 space-y-4 shadow-[6px_6px_0px_0px_#008dc9]">
+    <div className="flex items-center gap-2 border-b border-[#008dc9] pb-3">
       {/* <span className="text-xl">🎓</span> */}
-      <h3 className="text-xs font-black  text-[#0500ca]  font-sans">Education & Training</h3>
+      <h3 className="text-xs font-black  text-[#008dc9]  font-sans">Education & Training</h3>
     </div>
 
     {tp?.courses && tp.courses.length > 0 ? (
       <div className="space-y-3">
         {(showAllCourses ? tp.courses : tp.courses.slice(0, 1)).map((c: any) => (
-          <div key={c.id} className="bg-stone-50 border border-stone-200 p-4 rounded-xl flex justify-between items-center gap-4 hover:border-[#0500ca] transition-colors">
+          <div key={c.id} className="bg-stone-50 border border-stone-200 p-4 rounded-xl flex justify-between items-center gap-4 hover:border-[#008dc9] transition-colors">
             <div className="space-y-0.5">
               <strong className="block text-xs font-display text-stone-900  tracking-wide">{c.title}</strong>
               {c.institution && <span className="block text-[10px] font-sans font-bold text-stone-400">{c.institution}</span>}
             </div>
-            {c.year && <span className="text-xs font-sans font-black bg-[#0500ca] text-white px-2.5 py-1 rounded-md">{c.year}</span>}
+            {c.year && <span className="text-xs font-sans font-black bg-[#008dc9] text-white px-2.5 py-1 rounded-md">{c.year}</span>}
           </div>
         ))}
         {tp.courses.length > 1 && (
           <button
             onClick={() => setShowAllCourses(!showAllCourses)}
-            className="w-full text-[10px] font-black   bg-[#0500ca] text-white px-6 py-3 rounded-xl border-2 border-[#0500ca] shadow-[4px_4px_0px_0px_#ff24b0] transition-transform active:scale-95 hover:-translate-y-0.5"
+            className="w-full text-[10px] font-black   bg-[#008dc9] text-white px-6 py-3 rounded-xl border-2 border-[#008dc9] shadow-[4px_4px_0px_0px_#ff24b0] transition-transform active:scale-95 hover:-translate-y-0.5"
           >
             {showAllCourses ? 'Show Less ↑' : `Show More (${tp.courses.length}) ↓`}
           </button>
@@ -633,10 +633,10 @@ const PublicTalentProfile = () => {
 </div>
 
 {/* ROW 2: ATTRIBUTES, FULL WIDTH */}
-<div className="bg-white border-2 border-[#0500ca] rounded-[32px] p-6 sm:p-8 space-y-6 shadow-[6px_6px_0px_0px_#ff24b0]">
-  <div className="flex items-center gap-2 border-b border-[#0500ca] pb-3">
+<div className="bg-white border-2 border-[#008dc9] rounded-[32px] p-6 sm:p-8 space-y-6 shadow-[6px_6px_0px_0px_#ff24b0]">
+  <div className="flex items-center gap-2 border-b border-[#008dc9] pb-3">
     {/* <span className="text-xl">📋</span> */}
-    <h3 className="text-xs font-black  text-[#0500ca]  font-sans">Professional Details</h3>
+    <h3 className="text-xs font-black  text-[#008dc9]  font-sans">Professional Details</h3>
   </div>
 
   {tp?.attributes && tp.attributes.filter((a: any) => formatAttributeValue(a.key, a.value) !== null).length > 0 ? (
@@ -645,15 +645,15 @@ const PublicTalentProfile = () => {
       return (
         <div key={category} className="space-y-4">
           <div className="flex items-center  gap-2">
-            <Icon size={16} color="#0500ca" />
-            <h4 className="text-xs font-black  text-[#0500ca]  font-sans">{category}</h4>
+            <Icon size={16} color="#008dc9" />
+            <h4 className="text-xs font-black  text-[#008dc9]  font-sans">{category}</h4>
           </div>
 
           {direct.length > 0 && (
             <div className="flex flex-wrap gap-2 pl-6">
               {direct.map((f, idx) => (
-                <span key={`${f.key}-${idx}`} className="flex items-center gap-1.5 text-xs font-black font-display text-[#0500ca] bg-stone-50 border border-stone-200 rounded-lg px-3 py-1.5">
-                  <Icon size={12} color="#0500ca" />
+                <span key={`${f.key}-${idx}`} className="flex items-center gap-1.5 text-xs font-black font-display text-[#008dc9] bg-stone-50 border border-stone-200 rounded-lg px-3 py-1.5">
+                  <Icon size={12} color="#008dc9" />
                   {f.value}
                 </span>
               ))}
@@ -665,8 +665,8 @@ const PublicTalentProfile = () => {
               <span className="block text-[10px] font-bold text-stone-400  tracking-wider">{subGroupLabel}</span>
               <div className="flex flex-wrap gap-2">
                 {features.map((f, idx) => (
-                  <span key={`${f.key}-${idx}`} className="flex items-center gap-1.5 text-xs font-black font-display text-[#0500ca] bg-stone-50 border border-stone-200 rounded-lg px-3 py-1.5">
-                    <Icon size={12} color="#0500ca" />
+                  <span key={`${f.key}-${idx}`} className="flex items-center gap-1.5 text-xs font-black font-display text-[#008dc9] bg-stone-50 border border-stone-200 rounded-lg px-3 py-1.5">
+                    <Icon size={12} color="#008dc9" />
                     {f.value}
                   </span>
                 ))}

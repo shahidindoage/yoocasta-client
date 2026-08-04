@@ -4,7 +4,7 @@ import { useAuthStore } from '../../store/authStore';
 import {
   Users, Building2, Briefcase, Globe, MapPin,
   Languages, IdCard, Dna, Settings, Folder, BarChart3,
-  LogOut, UserCircle, Mail, UserCog,
+  LogOut, UserCircle, Mail, UserCog, FileText,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -19,6 +19,7 @@ const NAV_ITEMS = [
   { label: 'Manage Work', path: '/admin/work', key: 'work', icon: Settings },
   { label: 'Manage Category', path: '/admin/category', key: 'category', icon: Folder },
   { label: 'Manage Templates', path: '/admin/templates', key: 'templates', icon: Mail },
+  { label: 'CMS', path: '/admin/cms', key: 'cms', icon: FileText },
   { label: 'Report', path: '/admin/report', key: 'report', icon: BarChart3 },
 ];
 

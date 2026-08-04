@@ -14,6 +14,7 @@ const PERMISSION_OPTIONS = [
   { key: 'work', label: 'Manage Work' },
   { key: 'category', label: 'Manage Category' },
   { key: 'templates', label: 'Manage Templates' },
+  { key: 'cms', label: 'CMS' },
   { key: 'report', label: 'Report' },
 ];
 

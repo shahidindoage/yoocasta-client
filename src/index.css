@@ -152,3 +152,18 @@ body {
 .blog-content blockquote { border-left: 3px solid #C6007E; padding-left: 1rem; margin: 1rem 0; color: #737373; font-style: italic; }
 .blog-content img { max-width: 100%; border-radius: 0.75rem; margin: 1rem 0; }
 .blog-content iframe { width: 100%; aspect-ratio: 16/9; border-radius: 0.75rem; border: none; margin: 1rem 0; }
+
+.cms-body p { margin-bottom: 1rem; color: #525252; font-size: 0.875rem; line-height: 1.7; }
+.cms-body h1, .cms-body h2, .cms-body h3, .cms-body h4, .cms-body h5, .cms-body h6 { font-weight: 900; color: #3835A4; margin-top: 1.5rem; margin-bottom: 0.5rem; letter-spacing: 0.02em; }
+.cms-body h2 { font-size: 1.125rem; }
+.cms-body h3 { font-size: 0.875rem; }
+.cms-body h4 { font-size: 0.8125rem; }
+.cms-body ul, .cms-body ol { padding-left: 1.5rem; margin-bottom: 1rem; color: #525252; }
+.cms-body ul { list-style: disc; }
+.cms-body li { margin-bottom: 0.4rem; font-size: 0.875rem; line-height: 1.7; }
+.cms-body strong, .cms-body b { font-weight: 700; color: #171717; }
+.cms-body a { color: #C6007E; font-weight: 600; text-decoration: underline; }
+.cms-body a:hover { color: #3835A4; }
+.cms-body blockquote { border-left: 3px solid #C6007E; padding-left: 1rem; margin: 1rem 0; color: #737373; font-style: italic; }
+.cms-body img { max-width: 100%; border-radius: 0.75rem; margin: 1rem 0; }
+.cms-body iframe { width: 100%; aspect-ratio: 16/9; border-radius: 0.75rem; border: none; margin: 1rem 0; }

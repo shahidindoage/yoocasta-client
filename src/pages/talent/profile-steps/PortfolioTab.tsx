@@ -1,3 +1,5 @@
+
+
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
@@ -18,6 +20,7 @@ const PortfolioTab = ({ existingProfile }: Props) => {
  const [media, setMedia] = useState<any[]>(existingProfile?.talentProfile?.media || []);
  const [activeFilter, setActiveFilter] = useState('All');
  const [uploading, setUploading] = useState(false);
+ const [uploadProgress, setUploadProgress] = useState('');
  const [error, setError] = useState('');
  const [success, setSuccess] = useState('');
  
@@ -104,6 +107,7 @@ const PortfolioTab = ({ existingProfile }: Props) => {
    setUploading(true); setError(''); setSuccess('');
    
    for (let i = 0; i < files.length; i++) {
+    setUploadProgress(`Uploading ${i + 1} of ${files.length}...`);
     const formData = new FormData();
     formData.append('file', files[i]);
     formData.append('type', type);
@@ -111,10 +115,12 @@ const PortfolioTab = ({ existingProfile }: Props) => {
     setMedia(prev => [...prev, res.data?.data || res.data]);
    }
    
-   setSuccess(`${files.length} file(s) uploaded.`);
+   setUploadProgress('');
+   setSuccess(`${files.length} file(s) uploaded successfully.`);
    setTimeout(() => setSuccess(''), 3000);
   } catch (err: any) {
    setError(err.response?.data?.message || 'Upload failed.');
+   setUploadProgress('');
   } finally { 
    setUploading(false); 
   }
@@ -147,6 +153,7 @@ const PortfolioTab = ({ existingProfile }: Props) => {
   if (pendingLinks.length === 0) return;
   try {
    setUploading(true); setError('');
+   setUploadProgress(`Uploading ${pendingLinks.length} link(s)...`);
    for (const link of pendingLinks) {
     const res = await addPortfolioLink({ 
      videoLink: link.url, 
@@ -155,12 +162,14 @@ const PortfolioTab = ({ existingProfile }: Props) => {
     });
     setMedia(prev => [...prev, res.data?.data || res.data]);
    }
+   setUploadProgress('');
    setSuccess(`${pendingLinks.length} link(s) added.`);
    setPendingLinks([]);
    setShowLinkForm(false);
    setTimeout(() => setSuccess(''), 3000);
   } catch (err: any) {
    const msg = err.response?.data?.message || err.message || '';
+   setUploadProgress('');
    if (msg.includes('Missing URL')) {
     setError('A valid URL is required.');
    } else {
@@ -192,18 +201,22 @@ const PortfolioTab = ({ existingProfile }: Props) => {
   if (pendingAudios.length === 0) return;
   try {
    setUploading(true); setError('');
-   for (const item of pendingAudios) {
+   for (let i = 0; i < pendingAudios.length; i++) {
+    setUploadProgress(`Uploading audio ${i + 1} of ${pendingAudios.length}...`);
+    const item = pendingAudios[i];
     const formData = new FormData();
     formData.append('file', item.file);
     formData.append('type', 'AUDIO');
     const res = await uploadPortfolioMedia(formData);
     setMedia(prev => [...prev, res.data?.data || res.data]);
    }
+   setUploadProgress('');
    setSuccess(`${pendingAudios.length} audio file(s) uploaded.`);
    setPendingAudios([]);
    setShowAudioForm(false);
    setTimeout(() => setSuccess(''), 3000);
   } catch (err: any) {
+   setUploadProgress('');
    setError(err.response?.data?.message || 'Upload failed.');
   } finally { setUploading(false); }
  };
@@ -217,8 +230,9 @@ const PortfolioTab = ({ existingProfile }: Props) => {
     <p className="text-xs text-[#3835A4]/40 mt-1">Upload and manage your portfolio media.</p>
    </div>
 
-      {/* Messages */}
-   {(error || success || uploading) && (
+
+   {/* Messages */}
+   {(error || success) && (
     <div className="space-y-3">
      {error && (
       <p className="text-xs font-bold text-[#C6007E] bg-[#C6007E]/5 border border-[#C6007E]/20 px-4 py-3.5 rounded-xl">
@@ -230,11 +244,20 @@ const PortfolioTab = ({ existingProfile }: Props) => {
        ✓ {success}
       </p>
      )}
-     {uploading && (
-      <p className="text-[10px] font-black text-[#3835A4]/40 animate-pulse">
-       Uploading...
-      </p>
-     )}
+    </div>
+   )}
+
+   {/* Full-screen upload overlay */}
+   {uploading && (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+     <div className="bg-white rounded-2xl shadow-2xl px-10 py-8 flex flex-col items-center gap-4 min-w-[240px]">
+      <div className="relative w-14 h-14">
+       <div className="absolute inset-0 rounded-full border-4 border-[#3835A4]/10"></div>
+       <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#C6007E] animate-spin"></div>
+      </div>
+      <p className="text-sm font-black text-[#3835A4]">{uploadProgress || 'Uploading...'}</p>
+      <p className="text-[10px] text-[#3835A4]/40 font-medium">Please wait, do not close this tab</p>
+     </div>
     </div>
    )}
 
@@ -252,6 +275,7 @@ const PortfolioTab = ({ existingProfile }: Props) => {
      </Link>
     </div>
    )}
+
 
       {/* File inputs */}
    <input type="file" ref={imageRef} accept="image/*" multiple className="hidden" onChange={(e) => handleMultipleFileUpload(e.target.files, 'IMAGE')} />

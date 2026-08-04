@@ -21,6 +21,9 @@ import { getCastBags, addTalentsToBag, createCastBag } from '../../api/castBag.a
 import { getFavouriteIds, addFavourite, removeFavourite } from '../../api/favourites.api';
 import { getMyJobs } from '../../api/job.api';
 import { sendInvitation } from '../../api/invitations.api';
+import api from '../../api/axios';
+import { getCachedVideoUrl, getCachedVideoUrlSync } from '../../utils/videoCache';
+import { getCachedCms, setCachedCms } from '../../utils/cmsCache';
 
 
 const MultiSelectDropdown = ({
@@ -206,6 +209,14 @@ const [dynamicOptions, setDynamicOptions] = useState<any>(null);
 const [dynamicLoading, setDynamicLoading] = useState(true);
 const [filterData, setFilterData] = useState<any>(null);
 
+const [cms, setCms] = useState<any>(() => getCachedCms('browse-talents'));
+const [videoSrc, setVideoSrc] = useState<string | null>(() => {
+  const cached = getCachedCms('browse-talents');
+  const url = cached?.videoUrl || 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/casting_video/casting_video_10107.mp4';
+  return getCachedVideoUrlSync(url);
+});
+const videoRef = useRef<HTMLVideoElement>(null);
+
 const { user } = useAuthStore();
 const [favouriteIds, setFavouriteIds] = useState<string[]>([]);
 const [castBagTalent, setCastBagTalent] = useState<any>(null);
@@ -266,6 +277,42 @@ useEffect(() => {
 }, []);
 
 useEffect(() => {
+  const applyMeta = (d: any) => {
+    if (d.metaTitle) document.title = d.metaTitle;
+    if (d.metaDescription) {
+      let meta = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
+      if (!meta) {
+        meta = document.createElement('meta');
+        meta.name = 'description';
+        document.head.appendChild(meta);
+      }
+      meta.content = d.metaDescription;
+    }
+  };
+
+  const cached = getCachedCms('browse-talents');
+  if (cached) applyMeta(cached);
+
+  let active = true;
+  api.get('/cms/browse-talents')
+    .then((res) => {
+      if (!active || !res.data?.success || !res.data?.data) return;
+      const d = res.data.data;
+      setCms(d);
+      setCachedCms('browse-talents', d);
+      applyMeta(d);
+    })
+    .catch(() => { if (!cached) setCms({}); });
+  return () => { active = false; };
+}, []);
+
+useEffect(() => {
+  const url = cms?.videoUrl || 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/casting_video/casting_video_10107.mp4';
+  if (getCachedVideoUrlSync(url)) return;
+  getCachedVideoUrl(url);
+}, [cms?.videoUrl]);
+
+useEffect(() => {
   const initial: any = { ...DEFAULT_FILTERS };
   let hasParam = false;
 
@@ -321,7 +368,7 @@ useEffect(() => {
   useEffect(() => {
     if (!appliedFilters) return;
     const fetchTalents = async () => {
-      const cacheKey = JSON.stringify({ filters: appliedFilters, page: pagination.page });
+      const cacheKey = JSON.stringify({ v: 2, filters: appliedFilters, page: pagination.page });
       let hasCached = false;
 
       try {
@@ -402,6 +449,13 @@ const setProfessionalText = (key: string, val: string) => {
 
 
 
+  const heroHeading = cms?.pageHeading || 'Talent Pool';
+  const heroSubHeading = cms?.subHeading || "Discover the region's finest acting, modeling & creative talent";
+  const heroDescription = cms?.pageDescription || 'Search, filter & shortlist the perfect fit in minutes';
+  const rawVideoUrl = cms?.videoUrl || 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/casting_video/casting_video_10107.mp4';
+  const heroVideo = videoSrc || rawVideoUrl;
+  const cmsLoaded = cms !== null;
+
   return (
     <div style={{ background: '#ffffffff', minHeight: '100vh', fontFamily: 'system-ui, sans-serif', margin: 0 }}>
       
@@ -412,13 +466,17 @@ const setProfessionalText = (key: string, val: string) => {
 
 <div style={{ position: 'relative', color: '#333', padding: '100px 40px', borderBottom: '1px solid #ffffffff' }}>
 
-  <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0 }}>
-    <video
-      autoPlay loop muted playsInline
-      className="w-full h-full object-cover opacity-70"
-    >
-      <source src="https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/casting_video/casting_video_10107.mp4" type="video/mp4" />
-    </video>
+  <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0, background: 'linear-gradient(135deg, #FDEFF6 0%, #F8DFEF 100%)' }}>
+    {cmsLoaded && heroVideo && (
+      <video
+        ref={videoRef}
+        key={rawVideoUrl}
+        autoPlay loop muted playsInline
+        src={heroVideo}
+        className="w-full h-full object-cover opacity-70"
+      >
+      </video>
+    )}
   </div>
 
   <div className="absolute inset-0 bg-black/30" /> 
@@ -444,19 +502,23 @@ const setProfessionalText = (key: string, val: string) => {
       }
     `}</style>
     <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-      <p className="font-display text-sm sm:text-base font-bold text-white tracking-wide" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
-        Discover the region&apos;s finest acting, modeling &amp; creative talent
-      </p>
+      {heroSubHeading && (
+        <p className="font-display text-sm sm:text-base font-bold text-white tracking-wide" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
+          {heroSubHeading}
+        </p>
+      )}
       <h2 className="font-display text-3xl sm:text-5xl lg:text-[56px]  font-black tracking-[0.08em] leading-none mt-3">
-        {"Talent Pool".split("").map((char, i) => (
+        {heroHeading.split("").map((char, i) => (
           <span key={i} className="tp-shimmer-char" style={{ animationDelay: `${i * 0.12}s` }}>
             {char === " " ? "\u00A0" : char}
           </span>
         ))}
       </h2>
-      <p className="text-[10px] text-white/80 font-medium tracking-[0.2em] mt-3" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
-        Search, filter &amp; shortlist the perfect fit in minutes
-      </p>
+      {heroDescription && (
+        <p className="text-[10px] text-white/80 font-medium tracking-[0.2em] mt-3" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
+          {heroDescription}
+        </p>
+      )}
     </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>

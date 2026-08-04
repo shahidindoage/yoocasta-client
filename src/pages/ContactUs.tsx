@@ -1,12 +1,58 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Phone, Mail, MapPin } from 'lucide-react';
 import api from '../api/axios';
 
+interface CmsContent {
+  metaTitle?: string;
+  metaDescription?: string;
+  pageHeading?: string;
+  subHeading?: string;
+  pageDescription?: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+}
+
+const DEFAULT_HEADING = 'Contact Us';
+const DEFAULT_SUB_HEADING = "Get in touch with us. We'd love to hear from you.";
+const DEFAULT_ADDRESS = 'Yoocasta FZE LLC\nSharjah Publishing City, UAE';
+const DEFAULT_PHONE = '+971582224178 | 048848938';
+const DEFAULT_EMAIL = 'casting@yoocasta.com\nmanagement@yoocasta.com';
+
 export default function ContactUs() {
+  const [cms, setCms] = useState<CmsContent>({});
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    api.get('/cms/contact-us')
+      .then((res) => {
+        if (!active || !res.data?.success || !res.data?.data) return;
+        const d = res.data.data;
+        setCms(d);
+        if (d.metaTitle) document.title = d.metaTitle;
+        if (d.metaDescription) {
+          let meta = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
+          if (!meta) {
+            meta = document.createElement('meta');
+            meta.name = 'description';
+            document.head.appendChild(meta);
+          }
+          meta.content = d.metaDescription;
+        }
+      })
+      .catch(() => {});
+    return () => { active = false; };
+  }, []);
+
+  const heading = cms.pageHeading || DEFAULT_HEADING;
+  const subHeading = cms.subHeading || DEFAULT_SUB_HEADING;
+  const address = cms.address || DEFAULT_ADDRESS;
+  const phone = cms.phone || DEFAULT_PHONE;
+  const email = cms.email || DEFAULT_EMAIL;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -35,11 +81,13 @@ export default function ContactUs() {
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-12">
           <h2 className="font-display text-4xl sm:text-5xl font-black text-neutral-900 tracking-tight leading-none mb-4">
-            Contact Us
+            {heading}
           </h2>
-          <p className="text-sm text-neutral-400 font-medium max-w-xl mx-auto">
-            Get in touch with us. We'd love to hear from you.
-          </p>
+          {subHeading && (
+            <p className="text-sm text-neutral-400 font-medium max-w-xl mx-auto">
+              {subHeading}
+            </p>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
@@ -94,7 +142,7 @@ export default function ContactUs() {
                 </div>
                 <div>
                   <p className="text-[10px] font-black tracking-widest text-neutral-400 uppercase mb-0.5">Address</p>
-                  <p className="text-sm font-medium text-neutral-700">Yoocasta FZE LLC<br />Sharjah Publishing City, UAE</p>
+                  <p className="text-sm font-medium text-neutral-700 whitespace-pre-line">{address}</p>
                 </div>
               </div>
 
@@ -104,7 +152,7 @@ export default function ContactUs() {
                 </div>
                 <div>
                   <p className="text-[10px] font-black tracking-widest text-neutral-400 uppercase mb-0.5">Phone</p>
-                  <p className="text-sm font-medium text-neutral-700">+971582224178 | 048848938</p>
+                  <p className="text-sm font-medium text-neutral-700 whitespace-pre-line">{phone}</p>
                 </div>
               </div>
 
@@ -114,8 +162,7 @@ export default function ContactUs() {
                 </div>
                 <div>
                   <p className="text-[10px] font-black tracking-widest text-neutral-400 uppercase mb-0.5">Email</p>
-                  <p className="text-sm font-medium text-neutral-700">casting@yoocasta.com</p>
-                  <p className="text-sm font-medium text-neutral-700">management@yoocasta.com</p>
+                  <p className="text-sm font-medium text-neutral-700 whitespace-pre-line">{email}</p>
                 </div>
               </div>
             </div>

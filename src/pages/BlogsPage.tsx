@@ -28,6 +28,7 @@ const CATEGORIES: Record<number, string> = {
 export default function BlogsPage() {
   const navigate = useNavigate();
   const blogsCacheKey = (cat: number | null, pg: number) => `blogs_page_${cat ?? 'all'}_${pg}`;
+  const [cms, setCms] = useState<{ metaTitle?: string; metaDescription?: string; pageHeading?: string; pageDescription?: string }>({});
   const [blogs, setBlogs] = useState<BlogPost[]>(() => {
     try {
       const cached = sessionStorage.getItem(blogsCacheKey(null, 1));
@@ -55,6 +56,28 @@ export default function BlogsPage() {
   useEffect(() => {
     fetchBlogs();
   }, [selectedCategory, page]);
+
+  useEffect(() => {
+    let active = true;
+    api.get('/cms/blogs')
+      .then((res) => {
+        if (!active || !res.data?.success || !res.data?.data) return;
+        const d = res.data.data;
+        setCms(d);
+        if (d.metaTitle) document.title = d.metaTitle;
+        if (d.metaDescription) {
+          let meta = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
+          if (!meta) {
+            meta = document.createElement('meta');
+            meta.name = 'description';
+            document.head.appendChild(meta);
+          }
+          meta.content = d.metaDescription;
+        }
+      })
+      .catch(() => {});
+    return () => { active = false; };
+  }, []);
 
   const fetchBlogs = async () => {
     if (!sessionStorage.getItem(blogsCacheKey(selectedCategory, page))) setLoading(true);
@@ -109,10 +132,10 @@ export default function BlogsPage() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="max-w-2xl mb-12">
           <h2 className="font-display text-3xl font-black text-neutral-900 sm:text-5xl tracking-tight leading-none mb-4">
-            Our Work
+            {cms.pageHeading || 'Our Work'}
           </h2>
           <p className="text-sm text-neutral-500 leading-relaxed font-medium">
-            Browse our portfolio of casting projects, talent spotlights, and industry insights from the Yoocasta team.
+            {cms.pageDescription || 'Browse our portfolio of casting projects, talent spotlights, and industry insights from the Yoocasta team.'}
           </p>
         </div>
 

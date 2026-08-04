@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import api from '../api/axios';
+import { getCachedVideoUrl, getCachedVideoUrlSync } from '../utils/videoCache';
+import { getCachedCms, setCachedCms } from '../utils/cmsCache';
 
 const CATEGORIES = [
   'Actors & Extras', 'Cinematographers / Videographers', 'Dancers',
@@ -20,6 +23,59 @@ export default function Hero() {
   const [selectedLocation, setSelectedLocation] = useState('');
   const [selectedGender, setSelectedGender] = useState('');
   const [keyword, setKeyword] = useState('');
+
+  const DEFAULT_VIDEO = 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/casting_video/casting_video_10107.mp4';
+  const [cms, setCms] = useState<any>(() => getCachedCms('home'));
+  const [videoSrc, setVideoSrc] = useState<string | null>(() => {
+    const cached = getCachedCms('home');
+    return getCachedVideoUrlSync(cached?.videoUrl || DEFAULT_VIDEO);
+  });
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const applyMeta = (d: any) => {
+      if (d.metaTitle) document.title = d.metaTitle;
+      if (d.metaDescription) {
+        let meta = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
+        if (!meta) {
+          meta = document.createElement('meta');
+          meta.name = 'description';
+          document.head.appendChild(meta);
+        }
+        meta.content = d.metaDescription;
+      }
+    };
+
+    const cached = getCachedCms('home');
+    if (cached) applyMeta(cached);
+
+    let active = true;
+    api.get('/cms/home')
+      .then((res) => {
+        if (!active || !res.data?.success || !res.data?.data) return;
+        const d = res.data.data;
+        setCms(d);
+        setCachedCms('home', d);
+        applyMeta(d);
+      })
+      .catch(() => { if (!cached) setCms({}); });
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
+    const url = cms?.videoUrl || DEFAULT_VIDEO;
+    if (getCachedVideoUrlSync(url)) return;
+    getCachedVideoUrl(url);
+  }, [cms?.videoUrl]);
+
+  const subHeading = cms?.subHeading || 'Apply to unlimited jobs at';
+  const heading = cms?.pageHeading || 'AED 20 ONLY';
+  const description = cms?.pageDescription || 'Register or Login to become Premium!';
+  const bottomHeading = cms?.bottomHeading || 'Connecting Talents & Opportunities';
+  const bottomDescription = cms?.bottomDescription || 'Your own online casting agency';
+  const rawVideoUrl = cms?.videoUrl || DEFAULT_VIDEO;
+  const heroVideo = videoSrc || rawVideoUrl;
+  const cmsLoaded = cms !== null;
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,15 +113,19 @@ export default function Hero() {
 `}</style>
 
       {/* Full Screen Background Video with very subtle pink overlay */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="w-full h-full object-cover opacity-70"
-          src="https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/casting_video/casting_video_10107.mp4" 
-        />
+      <div className="absolute inset-0 z-0 overflow-hidden" style={{ background: 'linear-gradient(135deg, #FDEFF6 0%, #F8DFEF 100%)' }}>
+        {cmsLoaded && heroVideo && (
+          <video
+            ref={videoRef}
+            key={rawVideoUrl}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover opacity-70"
+            src={heroVideo}
+          />
+        )}
         <div className="absolute inset-0 bg-black/30" /> 
       </div>
 
@@ -74,27 +134,31 @@ export default function Hero() {
         
         {/* Typography */}
         <div className="space-y-4 max-w-4xl">
-          <p className="font-display text-sm sm:text-base font-bold text-white tracking-wide" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
-            Apply to unlimited jobs at
-          </p>
+          {subHeading && (
+            <p className="font-display text-sm sm:text-base font-bold text-white tracking-wide" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
+              {subHeading}
+            </p>
+          )}
           <h1 className="font-display text-3xl sm:text-5xl lg:text-[56px] font-black tracking-[0.08em] leading-none" style={{ filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.4))' }}>
             <span className="inline-block">
-              {"AED 20 ONLY".split("").map((char, i) => (
+              {heading.split("").map((char, i) => (
                 <span key={i} className="shimmer-char" style={{ animationDelay: `${i * 0.12}s` }}>
                   {char === " " ? "\u00A0" : char}
                 </span>
               ))}
             </span>
           </h1>
-          <p className="font-display text-sm sm:text-base font-bold text-white tracking-wide" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
-            Register or Login to become Premium!
-          </p>
+          {description && (
+            <p className="font-display text-sm sm:text-base font-bold text-white tracking-wide" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
+              {description}
+            </p>
+          )}
           <div className="pt-4 space-y-1">
             <p className="font-display text-3xl sm:text-4xl font-black text-[#FFED24] tracking-wider capitalize" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.4)' }}>
-              Connecting Talents & Opportunities
+              {bottomHeading}
             </p>
             <p className="text-[10px] text-white/80 font-medium tracking-[0.2em]" style={{ textShadow: '0 1px 6px rgba(0,0,0,0.5)' }}>
-              Your own online casting agency
+              {bottomDescription}
             </p>
           </div>
         </div>

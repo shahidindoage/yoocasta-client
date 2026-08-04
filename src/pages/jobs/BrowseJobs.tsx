@@ -6,6 +6,8 @@ import { getMyApplications } from '../../api/application.api';
 import { getMyProfile } from '../../api/profile.api';
 import { useAuthStore } from '../../store/authStore';
 import api from '../../api/axios';
+import { getCachedVideoUrl, getCachedVideoUrlSync } from '../../utils/videoCache';
+import { getCachedCms, setCachedCms } from '../../utils/cmsCache';
 import ApplicationPopup from '../../components/ApplicationPopup';
 import { ChevronDown, ChevronUp, Search, RotateCcw, Filter, ChevronRight } from 'lucide-react';
 
@@ -147,6 +149,13 @@ const JobCardSkeleton = () => (
 
 const BrowseJobs = () => {
   const { user } = useAuthStore();
+  const [cms, setCms] = useState<any>(() => getCachedCms('browse-jobs'));
+  const [videoSrc, setVideoSrc] = useState<string | null>(() => {
+    const cached = getCachedCms('browse-jobs');
+    const url = cached?.videoUrl || 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/casting_video/casting_video_10107.mp4';
+    return getCachedVideoUrlSync(url);
+  });
+  const videoRef = useRef<HTMLVideoElement>(null);
   const cacheKey = () => `browse_jobs_${JSON.stringify(appliedFilters)}_page_${pagination.page}`;
   const [jobs, setJobs] = useState<any[]>(() => {
     try {
@@ -189,6 +198,42 @@ const BrowseJobs = () => {
       .then(setFilterData)
       .catch(() => fetch('/static/filterOptions.json').then(r => r.json()).then(setFilterData));
   }, []);
+
+  useEffect(() => {
+    const applyMeta = (d: any) => {
+      if (d.metaTitle) document.title = d.metaTitle;
+      if (d.metaDescription) {
+        let meta = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
+        if (!meta) {
+          meta = document.createElement('meta');
+          meta.name = 'description';
+          document.head.appendChild(meta);
+        }
+        meta.content = d.metaDescription;
+      }
+    };
+
+    const cached = getCachedCms('browse-jobs');
+    if (cached) applyMeta(cached);
+
+    let active = true;
+    api.get('/cms/browse-jobs')
+      .then((res) => {
+        if (!active || !res.data?.success || !res.data?.data) return;
+        const d = res.data.data;
+        setCms(d);
+        setCachedCms('browse-jobs', d);
+        applyMeta(d);
+      })
+      .catch(() => { if (!cached) setCms({}); });
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
+    const url = cms?.videoUrl || 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/casting_video/casting_video_10107.mp4';
+    if (getCachedVideoUrlSync(url)) return;
+    getCachedVideoUrl(url);
+  }, [cms?.videoUrl]);
 
   useEffect(() => {
     const fetch = async () => {
@@ -242,6 +287,12 @@ const BrowseJobs = () => {
   };
 
   const fd = filterData ?? { categories: [], projectTypes: [], countries: [], languages: [], nationalities: [] };
+  const heroHeading = cms?.pageHeading || 'Casting & Jobs';
+  const heroSubHeading = cms?.subHeading || 'Explore casting calls across film, TV & events';
+  const heroDescription = cms?.pageDescription || 'Find & apply to the perfect role in minutes';
+  const rawVideoUrl = cms?.videoUrl || 'https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/casting_video/casting_video_10107.mp4';
+  const heroVideo = videoSrc || rawVideoUrl;
+  const cmsLoaded = cms !== null;
 
   return (
     <div style={{ background: '#ffffffff', minHeight: '100vh', fontFamily: 'system-ui, sans-serif', margin: 0 }}>
@@ -249,10 +300,11 @@ const BrowseJobs = () => {
       {/* TOP FILTERS PANEL */}
       <div style={{ position: 'relative', color: '#333', padding: '100px 40px', borderBottom: '1px solid #ffffffff' }}>
         
-        <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0 }}>
-          <video autoPlay loop muted playsInline className="w-full h-full object-cover opacity-70">
-            <source src="https://pub-9a6daccdd56649a4bb690162026e4c5d.r2.dev/casting_video/casting_video_10107.mp4" type="video/mp4" />
-          </video>
+        <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0, background: 'linear-gradient(135deg, #FDEFF6 0%, #F8DFEF 100%)' }}>
+          {cmsLoaded && heroVideo && (
+            <video ref={videoRef} key={rawVideoUrl} autoPlay loop muted playsInline preload="auto" src={heroVideo}
+              className="w-full h-full object-cover opacity-70" />
+          )}
         </div>
         <div className="absolute inset-0 bg-black/30" /> 
 
@@ -275,19 +327,23 @@ const BrowseJobs = () => {
             }
           `}</style>
           <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-            <p className="font-display text-sm sm:text-base font-bold text-white tracking-wide" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
-              Explore casting calls across film, TV &amp; events
-            </p>
+            {heroSubHeading && (
+              <p className="font-display text-sm sm:text-base font-bold text-white tracking-wide" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
+                {heroSubHeading}
+              </p>
+            )}
             <h2 className="font-display text-3xl sm:text-5xl lg:text-[56px] font-black tracking-[0.08em] leading-none mt-3">
-              {"Casting & Jobs".split("").map((char, i) => (
+              {heroHeading.split("").map((char, i) => (
                 <span key={i} className="bj-shimmer-char" style={{ animationDelay: `${i * 0.12}s` }}>
                   {char === " " ? "\u00A0" : char}
                 </span>
               ))}
             </h2>
-            <p className="text-[10px] text-white/80 font-medium tracking-[0.2em] mt-3" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
-              Find &amp; apply to the perfect role in minutes
-            </p>
+            {heroDescription && (
+              <p className="text-[10px] text-white/80 font-medium tracking-[0.2em] mt-3" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
+                {heroDescription}
+              </p>
+            )}
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

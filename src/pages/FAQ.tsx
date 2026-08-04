@@ -1,5 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
+import api from '../api/axios';
+
+interface CmsContent {
+  metaTitle?: string;
+  metaDescription?: string;
+  pageHeading?: string;
+  subHeading?: string;
+  talentFaqs?: string;
+  companyFaqs?: string;
+}
+
+interface Faq {
+  q: string;
+  a: string;
+}
 
 const talentFaqs = [
   { q: 'What is Yoocasta?', a: 'Yoocasta is Your Own Online Casting Agency which acts as a platform to connect you with various production houses or event companies or casting professionals by applying to the opportunities posted by them with its Best Feature - Next Day Payment!' },
@@ -55,6 +70,44 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 
 export default function FAQ() {
   const [tab, setTab] = useState<'talents' | 'company'>('talents');
+  const [cms, setCms] = useState<CmsContent>({});
+
+  const parseFaqs = (raw?: string): Faq[] => {
+    if (!raw) return [];
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed;
+    } catch {}
+    return [];
+  };
+
+  useEffect(() => {
+    let active = true;
+    api.get('/cms/faq')
+      .then((res) => {
+        if (!active || !res.data?.success || !res.data?.data) return;
+        const d = res.data.data;
+        setCms(d);
+        if (d.metaTitle) document.title = d.metaTitle;
+        if (d.metaDescription) {
+          let meta = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
+          if (!meta) {
+            meta = document.createElement('meta');
+            meta.name = 'description';
+            document.head.appendChild(meta);
+          }
+          meta.content = d.metaDescription;
+        }
+      })
+      .catch(() => {});
+    return () => { active = false; };
+  }, []);
+
+  const heading = cms.pageHeading || 'Frequently Asked Questions';
+  const subHeading = cms.subHeading || 'Find answers to common questions about Yoocasta.';
+  const effectiveTalentFaqs = parseFaqs(cms.talentFaqs);
+  const effectiveCompanyFaqs = parseFaqs(cms.companyFaqs);
+  const faqs = (tab === 'talents' ? (effectiveTalentFaqs.length > 0 ? effectiveTalentFaqs : talentFaqs) : (effectiveCompanyFaqs.length > 0 ? effectiveCompanyFaqs : companyFaqs));
 
   return (
     <div className="w-full bg-white py-16 min-h-screen relative overflow-hidden">
@@ -64,11 +117,13 @@ export default function FAQ() {
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-12">
           <h2 className="font-display text-4xl sm:text-5xl font-black text-neutral-900 tracking-tight leading-none mb-4">
-            Frequently Asked Questions
+            {heading}
           </h2>
-          <p className="text-sm text-neutral-400 font-medium max-w-xl mx-auto">
-            Find answers to common questions about Yoocasta.
-          </p>
+          {subHeading && (
+            <p className="text-sm text-neutral-400 font-medium max-w-xl mx-auto">
+              {subHeading}
+            </p>
+          )}
         </div>
 
         {/* Tabs */}
@@ -96,7 +151,7 @@ export default function FAQ() {
         </div>
 
         <div className="space-y-3">
-          {(tab === 'talents' ? talentFaqs : companyFaqs).map((faq, i) => (
+          {faqs.map((faq, i) => (
             <FaqItem key={i} q={faq.q} a={faq.a} />
           ))}
         </div>
