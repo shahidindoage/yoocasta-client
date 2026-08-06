@@ -207,6 +207,7 @@ const PortfolioTab = ({ existingProfile }: Props) => {
     const formData = new FormData();
     formData.append('file', item.file);
     formData.append('type', 'AUDIO');
+    formData.append('title', item.title);
     const res = await uploadPortfolioMedia(formData);
     setMedia(prev => [...prev, res.data?.data || res.data]);
    }

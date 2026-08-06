@@ -1,10 +1,12 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Talent } from '../types';
 import { Star, MapPin, Eye, ChevronDown, RefreshCw, Layers, ArrowLeft, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface FeaturedTalentProps {
   talents: Talent[];
+  loading?: boolean;
   onTalentClick: (talent: Talent) => void;
   selectedCategory: string;
   selectedGender: string;
@@ -16,6 +18,7 @@ interface FeaturedTalentProps {
 
 export default function FeaturedTalent({
   talents,
+  loading = false,
   onTalentClick,
   selectedCategory,
   selectedGender,
@@ -26,16 +29,27 @@ export default function FeaturedTalent({
 }: FeaturedTalentProps) {
   const [isLocationOpen, setIsLocationOpen] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (scrollContainerRef.current) scrollContainerRef.current.scrollLeft = 0;
+  }, [loading]);
 
   const locationOptions = [
     { value: 'All Locations', label: 'All Gulf Regions' },
-    { value: 'Dubai, UAE', label: 'Dubai, UAE' },
-    { value: 'Sharjah, UAE', label: 'Sharjah, UAE' },
-    { value: 'Abu Dhabi, UAE', label: 'Abu Dhabi, UAE' },
-    { value: 'Riyadh, Saudi Arabia', label: 'Riyadh, Saudi' },
+    ...Array.from(new Set(talents.map(t => t.location).filter(Boolean))).map(loc => ({ value: loc, label: loc })),
   ];
 
+  const genderOptions = ['All', 'Female', 'Male'];
+
   const currentLocationLabel = locationOptions.find(opt => opt.value === selectedLocation)?.label || selectedLocation;
+
+  const filteredTalents = talents.filter(t => {
+    if (selectedGender !== 'All' && t.gender !== selectedGender) return false;
+    if (selectedLocation !== 'All Locations' && t.location !== selectedLocation) return false;
+    if (selectedCategory !== 'all' && !t.categories.some(c => c.toLowerCase() === selectedCategory.toLowerCase())) return false;
+    return true;
+  });
 
   const handleScroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
@@ -77,16 +91,19 @@ export default function FeaturedTalent({
     
     {/* Segmented Gender Controller */}
     <div className="flex items-center gap-2">
-      {['All', 'Female', 'Male'].map((genderOption) => {
+      {genderOptions.map((genderOption) => {
         const isSelected = selectedGender === genderOption;
         return (
           <button
             key={genderOption}
             onClick={() => onGenderChange(genderOption)}
-            className={`relative px-4 py-3 text-xs font-black tracking-wider capitalize transition-all duration-300 z-10 cursor-pointer rounded-xl border min-w-[80px] text-center ${
-              isSelected
-                ? 'text-white border-transparent bg-gradient-to-r from-[#C6007E] to-[#3835A4] shadow-sm'
-                : 'text-neutral-700 bg-white border-neutral-200 hover:border-neutral-300 hover:text-neutral-900 shadow-xs'
+            disabled={loading}
+            className={`relative px-4 py-3 text-xs font-black tracking-wider capitalize transition-all duration-300 z-10 rounded-xl border min-w-[80px] text-center ${
+              loading
+                ? 'text-neutral-400 bg-neutral-50 border-neutral-200 cursor-not-allowed opacity-70'
+                : isSelected
+                ? 'text-white border-transparent bg-gradient-to-r from-[#C6007E] to-[#3835A4] shadow-sm cursor-pointer'
+                : 'text-neutral-700 bg-white border-neutral-200 hover:border-neutral-300 hover:text-neutral-900 shadow-xs cursor-pointer'
             }`}
           >
             {genderOption}
@@ -163,7 +180,7 @@ export default function FeaturedTalent({
   </div>
 
   {/* Standalone Circular Navigation Elements (Forced to the last position on the right side) */}
-  {talents.length > 0 && (
+  {filteredTalents.length > 0 && (
     <div className="flex items-center gap-2 self-center md:self-stretch justify-end pl-2 ml-auto">
       <button
         onClick={() => handleScroll('left')}
@@ -185,7 +202,27 @@ export default function FeaturedTalent({
 
         {/* Talent Grid Track */}
         <AnimatePresence mode="wait">
-          {talents.length === 0 ? (
+          {loading ? (
+            <div className="relative w-full group/carousel">
+              <div className="flex gap-6 sm:gap-8 pb-6 overflow-x-auto scrollbar-none px-2">
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <div
+                    key={index}
+                    className="snap-start relative h-[520px] w-[290px] sm:w-[350px] md:w-[360px] shrink-0 rounded-[2.25rem] overflow-hidden bg-gradient-to-b from-[#FDEFF6] to-[#F8DFEF] animate-pulse"
+                  >
+                    <div className="absolute inset-3 border border-white/60 rounded-[1.75rem] pointer-events-none z-20" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#F3C7DE]/40 to-transparent to-20%" />
+                    <div className="absolute top-6 left-6 h-6 w-24 rounded-xl bg-[#F3C7DE]/70" />
+                    <div className="absolute inset-x-0 bottom-0 p-7 space-y-3">
+                      <div className="h-4 w-20 rounded-md bg-[#F3C7DE]/70" />
+                      <div className="h-7 w-32 rounded-lg bg-[#F3C7DE]/70" />
+                      <div className="h-3 w-24 rounded-md bg-[#F3C7DE]/50" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : filteredTalents.length === 0 ? (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -218,7 +255,7 @@ export default function FeaturedTalent({
                 ref={scrollContainerRef}
                 className="flex gap-6 sm:gap-8 pb-6 overflow-x-auto scrollbar-none snap-x snap-mandatory scroll-smooth relative px-2"
               >
-                {talents.map((talent, index) => {
+                {filteredTalents.map((talent, index) => {
                   const sortedCategories = [...talent.categories].sort((a, b) => {
                     if (a.toLowerCase() === selectedCategory.toLowerCase()) return -1;
                     if (b.toLowerCase() === selectedCategory.toLowerCase()) return 1;
@@ -261,14 +298,20 @@ export default function FeaturedTalent({
                       <div className="absolute inset-x-0 bottom-0 p-7 z-30 flex flex-col justify-end">
                         <div className="flex items-end justify-between gap-4">
                           <div className="space-y-2">
-                            <div className="flex flex-wrap gap-1.5">
+                            {/* <div className="flex flex-wrap gap-1.5">
                               {sortedCategories.slice(0, 2).map((cat, idx) => (
                                 <span key={idx} className="text-[9px] capitalize font-mono tracking-widest font-black text-[#FFF] px-2 py-0.5 bg-[#3835A4] rounded-md group-hover:bg-[#C6007E]">
                                   {cat}
                                 </span>
                               ))}
-                            </div>
-                            <h3 className="font-display text-2xl sm:text-3xl font-black text-white leading-none">
+                            </div> */}
+                            <h3
+                              className="font-display text-2xl sm:text-3xl font-black text-white leading-none cursor-pointer hover:text-[#C6007E] transition-colors w-fit"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (talent.username) navigate(`/talent/${talent.username}`);
+                              }}
+                            >
                               {talent.name}
                             </h3>
                             <div className="flex items-center gap-1.5 text-xs text-[#FFF] font-bold">

@@ -94,10 +94,10 @@ const PublicJobPage = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#fdfbf7]">
         <div className="relative">
-          <div className="w-16 h-16 border-4 border-[#0500ca] border-t-[#ff24b0] rounded-full animate-spin" />
-          <div className="absolute inset-0 flex items-center justify-center text-[10px] font-black font-mono text-[#0500ca]">GO</div>
+          <div className="w-16 h-16 border-4 border-[#008dc9] border-t-[#ff24b0] rounded-full animate-spin" />
+          <div className="absolute inset-0 flex items-center justify-center text-[10px] font-black font-mono text-[#008dc9]">GO</div>
         </div>
-        <span className="mt-4 text-[9px] font-black tracking-[0.3em] text-[#0500ca]/60 capitalize font-mono animate-pulse">
+        <span className="mt-4 text-[9px] font-black tracking-[0.3em] text-[#008dc9]/60 capitalize font-mono animate-pulse">
           Loading Creative Brief...
         </span>
       </div>
@@ -107,12 +107,12 @@ const PublicJobPage = () => {
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#fdfbf7] p-4">
-        <div className="bg-white border-4 border-[#0500ca] p-8 rotate-1 max-w-md text-center space-y-4 shadow-[8px_8px_0px_0px_#ff24b0]">
+        <div className="bg-white border-4 border-[#008dc9] p-8 rotate-1 max-w-md text-center space-y-4 shadow-[8px_8px_0px_0px_#ff24b0]">
           <span className="text-4xl block animate-bounce">⚡</span>
-          <p className="text-sm font-black text-[#0500ca] tracking-wider capitalize font-mono bg-red-100 px-2 py-1 inline-block">
+          <p className="text-sm font-black text-[#008dc9] tracking-wider capitalize font-mono bg-red-100 px-2 py-1 inline-block">
             {error}
           </p>
-          <Link to="/" className="block text-[10px] font-black tracking-widest capitalize bg-[#0500ca] text-white px-6 py-3 transition-transform active:scale-95 hover:-translate-y-0.5">
+          <Link to="/" className="block text-[10px] font-black tracking-widest capitalize bg-[#008dc9] text-white px-6 py-3 transition-transform active:scale-95 hover:-translate-y-0.5">
             ← Return to Hub
           </Link>
         </div>
@@ -141,14 +141,14 @@ const PublicJobPage = () => {
 
   return (
     <div className="min-h-screen bg-[#fdfbf7] text-stone-900 selection:bg-[#ff24b0]/30 selection:text-stone-900 pb-32 relative overflow-hidden font-sans">
-      <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-tr from-[#0500ca]/10 to-[#ff24b0]/10 blur-[120px] pointer-events-none -z-10" />
+      <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-tr from-[#008dc9]/10 to-[#ff24b0]/10 blur-[120px] pointer-events-none -z-10" />
       <div className="absolute bottom-[10%] right-[-5%] w-[40vw] h-[40vw] rounded-full bg-gradient-to-br from-[#ff24b0]/10 to-cyan-200/40 blur-[100px] pointer-events-none -z-10" />
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0500ca05_1px,transparent_1px),linear-gradient(to_bottom,#0500ca05_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none -z-10" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#008dc905_1px,transparent_1px),linear-gradient(to_bottom,#008dc905_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none -z-10" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-16 space-y-16 relative z-10">
 
         {(userPlan || '').toLowerCase() === 'basic' && (
-          <div className="bg-gradient-to-br from-[#ff24b0]/10 via-[#ff24b0]/5 to-[#0500ca]/10 border-2 border-dashed border-[#ff24b0]/40 rounded-3xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="bg-gradient-to-br from-[#ff24b0]/10 via-[#ff24b0]/5 to-[#008dc9]/10 border-2 border-dashed border-[#ff24b0]/40 rounded-3xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="space-y-1">
               <h3 className="text-base font-black text-[#ff24b0]">Unlock More with Premium</h3>
               <p className="text-xs text-stone-600 font-medium">Upgrade your plan for unlimited job applications and advanced features.</p>
@@ -166,11 +166,11 @@ const PublicJobPage = () => {
 
             {/* Hero Image */}
             <div className="relative group w-full">
-              <div className="absolute inset-0 bg-[#0500ca] rounded-[32px] translate-x-3 translate-y-3 transition-transform group-hover:translate-x-4 group-hover:translate-y-4 duration-300" />
-              <div className="relative bg-white border-2 border-[#0500ca] rounded-[32px] overflow-hidden shadow-sm z-10">
+              <div className="absolute inset-0 bg-[#008dc9] rounded-[32px] translate-x-3 translate-y-3 transition-transform group-hover:translate-x-4 group-hover:translate-y-4 duration-300" />
+              <div className="relative bg-white border-2 border-[#008dc9] rounded-[32px] overflow-hidden shadow-sm z-10">
                 <img src={job.image || getCategoryImage(catName)} alt={catName} onError={(e) => { const fallback = getCategoryImage(catName); if (e.currentTarget.src !== fallback) e.currentTarget.src = fallback; }} className="w-full h-56 sm:h-72 object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                <span className="absolute bottom-4 left-4 bg-white/95 text-stone-900 text-[10px] font-black tracking-widest capitalize px-4 py-2 rounded-xl border border-[#0500ca] shadow-[2px_2px_0px_0px_#0500ca]">
+                <span className="absolute bottom-4 left-4 bg-white/95 text-stone-900 text-[10px] font-black tracking-widest capitalize px-4 py-2 rounded-xl border border-[#008dc9] shadow-[2px_2px_0px_0px_#008dc9]">
                   {catName || 'General'}
                 </span>
               </div>
@@ -184,7 +184,7 @@ const PublicJobPage = () => {
                 </span> */}
               </div>
               <h1 className="text-4xl sm:text-5xl font-black tracking-tight capitalize leading-[0.95] font-display text-stone-900">
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0500ca] via-[#ff24b0] to-amber-500">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#008dc9] via-[#ff24b0] to-amber-500">
                   {job.title || 'Untitled Casting'}
                 </span>
               </h1>
@@ -194,7 +194,7 @@ const PublicJobPage = () => {
                   {job.castingCity ? `${job.castingCity.name}${job.castingCity.country ? `, ${job.castingCity.country.name}` : ''}` : '—'}
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <Briefcase className="w-3.5 h-3.5 text-[#0500ca]" />
+                  <Briefcase className="w-3.5 h-3.5 text-[#008dc9]" />
                   {catName || '—'}
                 </span>
               </div>
@@ -209,15 +209,15 @@ const PublicJobPage = () => {
             </div>
 
             {/* Description Card */}
-            <div className="bg-white border-2 border-[#0500ca] rounded-[32px] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#0500ca] space-y-5">
-              <div className="flex items-center justify-between border-b-2 border-[#0500ca] pb-4">
-                <h3 className="text-xs font-black tracking-[0.25em] text-[#0500ca] capitalize font-sans">Brief Description</h3>
+            <div className="bg-white border-2 border-[#008dc9] rounded-[32px] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#008dc9] space-y-5">
+              <div className="flex items-center justify-between border-b-2 border-[#008dc9] pb-4">
+                <h3 className="text-xs font-black tracking-[0.25em] text-[#008dc9] capitalize font-sans">Brief Description</h3>
               </div>
               {job.subTitle && (
                 <p className="text-sm font-bold text-stone-700">{job.subTitle}</p>
               )}
               {job.description && (
-                <div className="text-sm text-stone-600 leading-relaxed font-medium [&_h1]:text-lg [&_h1]:font-black [&_h2]:text-base [&_h2]:font-black [&_h3]:text-sm [&_h3]:font-bold [&_strong]:font-black [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:text-[#0500ca] [&_a]:underline [&_p]:mb-2" dangerouslySetInnerHTML={{ __html: job.description }} />
+                <div className="text-sm text-stone-600 leading-relaxed font-medium [&_h1]:text-lg [&_h1]:font-black [&_h2]:text-base [&_h2]:font-black [&_h3]:text-sm [&_h3]:font-bold [&_strong]:font-black [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:text-[#008dc9] [&_a]:underline [&_p]:mb-2" dangerouslySetInnerHTML={{ __html: job.description }} />
               )}
               {job.usage && (
                 <div className="pt-3 border-t border-stone-200">
@@ -229,23 +229,23 @@ const PublicJobPage = () => {
 
             {/* Casting Roles */}
             {job.roles && job.roles.length > 0 && (
-              <div className="bg-white border-2 border-[#0500ca] rounded-[32px] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#ff24b0] space-y-6">
-                <div className="flex items-center justify-between border-b-2 border-[#0500ca] pb-4">
-                  <h3 className="text-xs font-black tracking-[0.25em] text-[#0500ca] capitalize font-sans">
+              <div className="bg-white border-2 border-[#008dc9] rounded-[32px] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#ff24b0] space-y-6">
+                <div className="flex items-center justify-between border-b-2 border-[#008dc9] pb-4">
+                  <h3 className="text-xs font-black tracking-[0.25em] text-[#008dc9] capitalize font-sans">
                     Casting Roles <span className="text-stone-400 font-medium">({job.roles.length})</span>
                   </h3>
                 </div>
 
                 {/* Role Tabs Segment Controller */}
-                <div className="flex flex-wrap bg-stone-100 p-1.5 rounded-2xl border-2 border-[#0500ca]">
+                <div className="flex flex-wrap bg-stone-100 p-1.5 rounded-2xl border-2 border-[#008dc9]">
                   {job.roles.map((role: any, idx: number) => (
                     <button
                       key={role.id}
                       onClick={() => setSelectedRoleIndex(idx)}
                       className={`flex-1 md:flex-none px-5 py-2.5 text-[10px] font-bold tracking-widest capitalize rounded-xl transition-all font-display ${
                         idx === selectedRoleIndex
-                          ? 'bg-[#0500ca] text-white shadow-md'
-                          : 'text-stone-400 hover:text-[#0500ca]'
+                          ? 'bg-[#008dc9] text-white shadow-md'
+                          : 'text-stone-400 hover:text-[#008dc9]'
                       }`}
                     >
                       {role.title || `Role ${idx + 1}`}
@@ -298,7 +298,7 @@ const PublicJobPage = () => {
                       </div>
 
                       {role.description && (
-                        <div className="text-sm text-stone-600 leading-relaxed [&_h1]:text-lg [&_h1]:font-black [&_h2]:text-base [&_h2]:font-black [&_h3]:text-sm [&_h3]:font-bold [&_strong]:font-black [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:text-[#0500ca] [&_a]:underline [&_p]:mb-2" dangerouslySetInnerHTML={{ __html: role.description }} />
+                        <div className="text-sm text-stone-600 leading-relaxed [&_h1]:text-lg [&_h1]:font-black [&_h2]:text-base [&_h2]:font-black [&_h3]:text-sm [&_h3]:font-bold [&_strong]:font-black [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:text-[#008dc9] [&_a]:underline [&_p]:mb-2" dangerouslySetInnerHTML={{ __html: role.description }} />
                       )}
 
                       {(() => {
@@ -339,9 +339,9 @@ const PublicJobPage = () => {
                       {(role.question1 || role.question2 || role.question3) && (
                         <div className="bg-stone-50 border-2 border-stone-200 rounded-2xl p-4 space-y-2">
                           <span className="text-[9px] font-black tracking-widest text-stone-500 capitalize">Questions</span>
-                          {role.question1 && <p className="text-xs text-stone-700"><span className="font-bold text-[#0500ca]">Q1:</span> {role.question1}</p>}
-                          {role.question2 && <p className="text-xs text-stone-700"><span className="font-bold text-[#0500ca]">Q2:</span> {role.question2}</p>}
-                          {role.question3 && <p className="text-xs text-stone-700"><span className="font-bold text-[#0500ca]">Q3:</span> {role.question3}</p>}
+                          {role.question1 && <p className="text-xs text-stone-700"><span className="font-bold text-[#008dc9]">Q1:</span> {role.question1}</p>}
+                          {role.question2 && <p className="text-xs text-stone-700"><span className="font-bold text-[#008dc9]">Q2:</span> {role.question2}</p>}
+                          {role.question3 && <p className="text-xs text-stone-700"><span className="font-bold text-[#008dc9]">Q3:</span> {role.question3}</p>}
                         </div>
                       )}
                     </div>
@@ -355,8 +355,8 @@ const PublicJobPage = () => {
           <div className="lg:col-span-5 space-y-8 lg:sticky lg:top-8">
 
             {/* Job Overview */}
-            <div className="bg-[#0500ca] text-stone-100 rounded-[32px] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#ff24b0] space-y-6">
-              <div className="flex items-center justify-between border-b border-[#0500ca]/30 pb-4">
+            <div className="bg-[#008dc9] text-stone-100 rounded-[32px] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#ff24b0] space-y-6">
+              <div className="flex items-center justify-between border-b border-[#008dc9]/30 pb-4">
                 <h3 className="text-xs font-black tracking-[0.25em] text-white capitalize font-sans">Job Overview</h3>
               </div>
               <div className="space-y-4">
@@ -394,15 +394,15 @@ const PublicJobPage = () => {
 
             {/* About Company */}
             {job.company && (
-              <div className="bg-white border-2 border-[#0500ca] rounded-[32px] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#0500ca] space-y-5">
-                <div className="flex items-center justify-between border-b-2 border-[#0500ca] pb-4">
-                  <h3 className="text-xs font-black tracking-[0.25em] text-[#0500ca] capitalize font-sans">About Company</h3>
+              <div className="bg-white border-2 border-[#008dc9] rounded-[32px] p-6 sm:p-8 shadow-[8px_8px_0px_0px_#008dc9] space-y-5">
+                <div className="flex items-center justify-between border-b-2 border-[#008dc9] pb-4">
+                  <h3 className="text-xs font-black tracking-[0.25em] text-[#008dc9] capitalize font-sans">About Company</h3>
                 </div>
                 <div className="flex items-center gap-4">
                   {job.company?.user?.image ? (
-                    <img src={job.company.user.image} alt="" className="w-14 h-14 rounded-xl object-cover border-2 border-[#0500ca]" />
+                    <img src={job.company.user.image} alt="" className="w-14 h-14 rounded-xl object-cover border-2 border-[#008dc9]" />
                   ) : (
-                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#0500ca] to-[#ff24b0] text-white flex items-center justify-center font-black text-lg border-2 border-[#0500ca]">
+                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#008dc9] to-[#ff24b0] text-white flex items-center justify-center font-black text-lg border-2 border-[#008dc9]">
                       {job.company?.companyName?.[0] || 'C'}
                     </div>
                   )}
@@ -418,7 +418,7 @@ const PublicJobPage = () => {
                     <span className="text-stone-500">Member since {formatDate(job.company.user.createdAt)}</span>
                   )}
                   {job.company._count?.jobs != null && (
-                    <span className="font-bold text-[#0500ca]">{job.company._count.jobs} jobs</span>
+                    <span className="font-bold text-[#008dc9]">{job.company._count.jobs} jobs</span>
                   )}
                 </div>
                 {/* {job.company.user?.email && (
@@ -448,12 +448,12 @@ const PublicJobPage = () => {
 };
 
 const StatCard = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) => (
-  <div className="bg-white border-2 border-[#0500ca] p-4 rounded-2xl shadow-[4px_4px_0px_0px_#0500ca] flex flex-col justify-between h-24 text-left transform -rotate-1">
+  <div className="bg-white border-2 border-[#008dc9] p-4 rounded-2xl shadow-[4px_4px_0px_0px_#008dc9] flex flex-col justify-between h-24 text-left transform -rotate-1">
     <div className="flex items-center gap-1.5 text-stone-400">
       {icon}
       <span className="text-[8px] font-black tracking-widest capitalize font-sans">{label}</span>
     </div>
-    <p className="text-lg font-black font-display text-[#0500ca]">{value}</p>
+    <p className="text-lg font-black font-display text-[#008dc9]">{value}</p>
   </div>
 );
 
@@ -533,11 +533,11 @@ const PaymentChips = ({ payment, type }: { payment: any; type: string }) => {
 
 const StatusMessage = ({ icon, title, message }: { icon: string; title: string; message: string }) => (
   <div className="min-h-screen flex items-center justify-center bg-[#fdfbf7] p-4">
-    <div className="bg-white border-4 border-[#0500ca] p-8 rotate-1 max-w-md text-center space-y-4 shadow-[8px_8px_0px_0px_#ff24b0]">
+    <div className="bg-white border-4 border-[#008dc9] p-8 rotate-1 max-w-md text-center space-y-4 shadow-[8px_8px_0px_0px_#ff24b0]">
       <span className="text-5xl block">{icon}</span>
       <h2 className="text-lg font-black text-stone-900">{title}</h2>
       <p className="text-sm text-stone-500 font-medium">{message}</p>
-      <Link to="/dashboard/recruiter/jobs" className="inline-block text-[10px] font-black tracking-widest capitalize bg-[#0500ca] text-white px-6 py-3 transition-transform active:scale-95 hover:-translate-y-0.5">← Back to Manage Jobs</Link>
+      <Link to="/dashboard/recruiter/jobs" className="inline-block text-[10px] font-black tracking-widest capitalize bg-[#008dc9] text-white px-6 py-3 transition-transform active:scale-95 hover:-translate-y-0.5">← Back to Manage Jobs</Link>
     </div>
   </div>
 );

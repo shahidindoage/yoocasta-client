@@ -11,9 +11,139 @@ import {
   FaPaintBrush,
   FaCamera,
   FaMusic,
+  FaPlay,
+  FaPause,
+  FaVolumeUp,
+  FaVolumeMute,
   IconType,
 } from 'react-icons/fa';
 import { FaPersonDress } from 'react-icons/fa6';
+
+
+const getYoutubeId = (url: string | null | undefined): string | null => {
+  const m = (url || '').match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : null;
+};
+
+const getVimeoId = (url: string | null | undefined): string | null => {
+  const m = (url || '').match(/vimeo\.com\/(\d+)/);
+  return m ? m[1] : null;
+};
+
+const isDirectVideoUrl = (url: string | null | undefined): boolean =>
+  /\.(mp4|webm|ogg|m4v|mov|ogv)(\?.*)?$/i.test((url || '').trim());
+
+
+function AudioCard({ src, title }: { src: string; title?: string }) {
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const progressRef = useRef<HTMLDivElement>(null);
+  const [playing, setPlaying] = useState(false);
+  const [volume, setVolume] = useState(1);
+  const [showVolume, setShowVolume] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const a = audioRef.current;
+    if (!a) return;
+    const handlePlay = () => setPlaying(true);
+    const handlePause = () => setPlaying(false);
+    const handleTime = () => {
+      if (a.duration) setProgress((a.currentTime / a.duration) * 100);
+    };
+    a.addEventListener('play', handlePlay);
+    a.addEventListener('pause', handlePause);
+    a.addEventListener('timeupdate', handleTime);
+    return () => {
+      a.removeEventListener('play', handlePlay);
+      a.removeEventListener('pause', handlePause);
+      a.removeEventListener('timeupdate', handleTime);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (audioRef.current) audioRef.current.volume = volume;
+  }, [volume]);
+
+  const togglePlay = () => {
+    const a = audioRef.current;
+    if (!a) return;
+    if (a.paused) a.play();
+    else a.pause();
+  };
+
+  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+    const a = audioRef.current;
+    const bar = progressRef.current;
+    if (!a || !bar || !a.duration) return;
+    const rect = bar.getBoundingClientRect();
+    const ratio = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
+    a.currentTime = ratio * a.duration;
+    setProgress(ratio * 100);
+  };
+
+  return (
+    <div className="relative w-full">
+      <audio ref={audioRef} src={src} preload="metadata" className="hidden" />
+      {title && (
+        <p className="text-[10px] font-black text-stone-800 font-mono truncate mb-1.5">{title}</p>
+      )}
+      <div className="flex items-center gap-2 bg-white border-2 border-[#008dc9] rounded-xl px-2 py-1.5 shadow-sm">
+        <button
+          type="button"
+          onClick={togglePlay}
+          className="w-8 h-8 shrink-0 rounded-full bg-[#008dc9] text-white flex items-center justify-center hover:bg-[#ff24b0] transition-colors cursor-pointer"
+          aria-label={playing ? 'Pause' : 'Play'}
+        >
+          {playing ? <FaPause className="text-[10px]" /> : <FaPlay className="text-[10px] ml-0.5" />}
+        </button>
+
+        <div
+          ref={progressRef}
+          onClick={handleSeek}
+          className="flex-1 h-2 bg-stone-200 rounded-full overflow-hidden cursor-pointer group relative"
+          role="slider"
+          aria-label="Seek"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(progress)}
+        >
+          <div className="h-full bg-[#ff24b0] rounded-full" style={{ width: `${progress}%` }} />
+          <div className="absolute top-[4px] bottom-0 w-2 h-2 rounded-full bg-[#ff24b0] shadow ring-2 ring-white -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity" style={{ left: `calc(${progress}% - 5px)` }} />
+        </div>
+
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setShowVolume((v) => !v)}
+            onMouseEnter={() => setShowVolume(true)}
+            className="w-8 h-8 shrink-0 flex items-center justify-center text-stone-600 hover:text-[#008dc9] transition-colors cursor-pointer"
+            aria-label="Volume"
+          >
+            {volume === 0 ? <FaVolumeMute className="text-sm" /> : <FaVolumeUp className="text-sm" />}
+          </button>
+          {showVolume && (
+            <div
+              className="absolute bottom-full mb-2 right-0 z-50 bg-white border-2 border-[#008dc9] rounded-lg p-2 shadow-xl flex items-center justify-center"
+              onMouseLeave={() => setShowVolume(false)}
+            >
+              <input
+                type="range"
+                min={0}
+                max={1}
+                step={0.01}
+                value={volume}
+                onChange={(e) => setVolume(Number(e.target.value))}
+                style={{ writingMode: 'vertical-lr', direction: 'rtl', height: '88px', accentColor: '#008dc9' }}
+                className="cursor-pointer"
+                aria-label="Volume slider"
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 
 const ATTRIBUTE_VALUE_LABELS: Record<string, Record<string, string>> = {
@@ -459,7 +589,7 @@ const PublicTalentProfile = () => {
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
                   {visible.map((item: any) => (
-                    <div key={item.id} className="group relative aspect-[3/4] bg-stone-50 border-2 border-[#008dc9] rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                    <div key={item.id} className={`group relative aspect-[3/4] bg-stone-50 border-2 border-[#008dc9] rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 ${item.type === 'AUDIO' ? 'overflow-visible z-50' : 'overflow-hidden'}`}>
                   
                   {item.type === 'IMAGE' && (
                     <button onClick={() => setLightboxImage(item.url)} className="w-full h-full block text-left">
@@ -471,26 +601,82 @@ const PublicTalentProfile = () => {
                     </button>
                   )}
                   
-                  {(item.type === 'ACTING_VIDEO' || item.type === 'VIDEO') && (
-                    <video 
-                      src={item.url} 
-                      controls 
-                      className="w-full h-full object-cover bg-stone-950" 
-                    />
-                  )}
+                  {(item.type === 'ACTING_VIDEO' || item.type === 'VIDEO') && (() => {
+                    const url = item.url || '';
+                    const youtubeId = getYoutubeId(url);
+                    const vimeoId = getVimeoId(url);
+                    if (youtubeId) {
+                      return (
+                        <iframe
+                          src={`https://www.youtube.com/embed/${youtubeId}`}
+                          title={item.caption || 'YouTube video'}
+                          className="w-full h-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      );
+                    }
+                    if (vimeoId) {
+                      return (
+                        <iframe
+                          src={`https://player.vimeo.com/video/${vimeoId}`}
+                          title={item.caption || 'Vimeo video'}
+                          className="w-full h-full"
+                          allow="autoplay; fullscreen; picture-in-picture"
+                          allowFullScreen
+                        />
+                      );
+                    }
+                    if (isDirectVideoUrl(url)) {
+                      return (
+                        <video src={url} controls className="w-full h-full object-cover bg-stone-950" />
+                      );
+                    }
+                    if (/^https?:\/\//.test(url)) {
+                      return (
+                        <div className="w-full h-full flex flex-col justify-between p-6 bg-[#008dc9] text-white font-mono">
+                          <span className="text-3xl">💎</span>
+                          <div className="space-y-3">
+                            <p className="text-[10px] font-bold leading-relaxed text-white/70">{item.caption || 'External Link'}</p>
+                            <a
+                              href={url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-block text-[9px] font-black bg-[#ff24b0] text-white px-3 py-2 rounded-lg border border-[#008dc9] shadow-[2px_2px_0px_0px_#008dc9]"
+                            >
+                              Open Link →
+                            </a>
+                          </div>
+                        </div>
+                      );
+                    }
+                    return <video src={url} controls className="w-full h-full object-cover bg-stone-950" />;
+                  })()}
                   
                   {item.type === 'VIDEO_LINK' && (
                     <div className="w-full h-full relative bg-stone-950 rounded-2xl overflow-hidden">
                       {(() => {
                         const url = item.videoLink || item.url;
-                        const youtubeMatch = url?.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-                        if (youtubeMatch) {
+                        const youtubeId = getYoutubeId(url);
+                        const vimeoId = getVimeoId(url);
+                        if (youtubeId) {
                           return (
                             <iframe
-                              src={`https://www.youtube.com/embed/${youtubeMatch[1]}`}
+                              src={`https://www.youtube.com/embed/${youtubeId}`}
                               title={item.caption || 'YouTube video'}
                               className="w-full h-full"
                               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                            />
+                          );
+                        }
+                        if (vimeoId) {
+                          return (
+                            <iframe
+                              src={`https://player.vimeo.com/video/${vimeoId}`}
+                              title={item.caption || 'Vimeo video'}
+                              className="w-full h-full"
+                              allow="autoplay; fullscreen; picture-in-picture"
                               allowFullScreen
                             />
                           );
@@ -531,8 +717,7 @@ const PublicTalentProfile = () => {
                         <span className="text-[8px] font-black  text-amber-700 bg-amber-200/60 px-2 py-0.5 rounded  font-mono">Audio</span>
                       </div>
                       <div className="space-y-3 w-full">
-                        <p className="text-[10px] font-black text-stone-800 font-mono truncate">{item.caption || item.title || 'Untitled Track'}</p>
-                        <audio src={item.url} controls className="w-full scale-95 origin-bottom" />
+                        <AudioCard src={item.url} title={item.caption || item.title || 'Untitled Track'} />
                       </div>
                     </div>
                   )}

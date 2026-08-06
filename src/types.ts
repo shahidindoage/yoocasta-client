@@ -1,5 +1,6 @@
 export interface Talent {
   id: string;
+  username?: string;
   name: string;
   gender: 'Male' | 'Female' | 'Non-binary';
   categories: string[];

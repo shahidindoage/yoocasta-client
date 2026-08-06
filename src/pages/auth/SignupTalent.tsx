@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate, Link } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
 import { registerTalent } from '../../api/auth.api';
 import { useAuthStore } from '../../store/authStore';
 import { countryCodes } from '../../constants/countryCodes';
@@ -28,9 +29,12 @@ const SignupTalent = () => {
  const { setAuth } = useAuthStore();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [phoneCode, setPhoneCode] = useState('+1');
   const [selectedCountry, setSelectedCountry] = useState(countryCodes.find((c) => c.code === '+1') || countryCodes[0]);
   const [open, setOpen] = useState(false);
+  const [countrySearch, setCountrySearch] = useState('');
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -187,12 +191,22 @@ const SignupTalent = () => {
         <label className="text-[10px] font-extrabold text-neutral-400 group-focus-within:text-neutral-950 tracking-widest transition-colors duration-200">
          Password
         </label>
-        <input
-         type="password"
-         {...register('password')}
-         placeholder="••••••••"
-         className={`w-full bg-transparent border-b-2 ${errors.password ? 'border-red-400 focus:border-red-500' : 'border-neutral-100 focus:border-neutral-950'} py-2.5 text-sm text-neutral-900 placeholder-neutral-200 outline-none transition-all duration-200 font-medium`}
-        />
+        <div className="relative">
+         <input
+          type={showPassword ? 'text' : 'password'}
+          {...register('password')}
+          placeholder="••••••••"
+          className={`w-full bg-transparent border-b-2 ${errors.password ? 'border-red-400 focus:border-red-500' : 'border-neutral-100 focus:border-neutral-950'} py-2.5 pr-10 text-sm text-neutral-900 placeholder-neutral-200 outline-none transition-all duration-200 font-medium`}
+         />
+         <button
+          type="button"
+          onClick={() => setShowPassword((v) => !v)}
+          className="absolute right-0 top-1/2 -translate-y-1/2 p-1 text-neutral-400 hover:text-neutral-950 transition-colors cursor-pointer"
+          aria-label={showPassword ? 'Hide password' : 'Show password'}
+         >
+          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+         </button>
+        </div>
         {errors.password && (
          <p className="text-xs text-red-500 font-medium pt-1">{errors.password.message}</p>
         )}
@@ -203,12 +217,22 @@ const SignupTalent = () => {
         <label className="text-[10px] font-extrabold text-neutral-400 group-focus-within:text-neutral-950 tracking-widest transition-colors duration-200">
          Confirm Password
         </label>
-        <input
-         type="password"
-         {...register('confirmPassword')}
-         placeholder="••••••••"
-         className={`w-full bg-transparent border-b-2 ${errors.confirmPassword ? 'border-red-400 focus:border-red-500' : 'border-neutral-100 focus:border-neutral-950'} py-2.5 text-sm text-neutral-900 placeholder-neutral-200 outline-none transition-all duration-200 font-medium`}
-        />
+        <div className="relative">
+         <input
+          type={showConfirmPassword ? 'text' : 'password'}
+          {...register('confirmPassword')}
+          placeholder="••••••••"
+          className={`w-full bg-transparent border-b-2 ${errors.confirmPassword ? 'border-red-400 focus:border-red-500' : 'border-neutral-100 focus:border-neutral-950'} py-2.5 pr-10 text-sm text-neutral-900 placeholder-neutral-200 outline-none transition-all duration-200 font-medium`}
+         />
+         <button
+          type="button"
+          onClick={() => setShowConfirmPassword((v) => !v)}
+          className="absolute right-0 top-1/2 -translate-y-1/2 p-1 text-neutral-400 hover:text-neutral-950 transition-colors cursor-pointer"
+          aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+         >
+          {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+         </button>
+        </div>
         {errors.confirmPassword && (
          <p className="text-xs text-red-500 font-medium pt-1">{errors.confirmPassword.message}</p>
         )}
@@ -233,19 +257,42 @@ const SignupTalent = () => {
           <span className="ml-auto text-neutral-300 text-xs">▾</span>
          </button>
          {open && (
-          <div ref={dropdownRef} className="absolute top-full left-0 mt-1 z-50 bg-white border border-neutral-200 rounded-xl shadow-lg max-h-48 overflow-y-auto w-64">
-           {countryCodes.map((c) => (
-            <button
-             key={c.code + c.name}
-             type="button"
-             onClick={() => { setPhoneCode(c.code); setSelectedCountry(c); setOpen(false); }}
-             className={`flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-neutral-50 transition-colors ${c.code === phoneCode ? 'bg-neutral-50 font-bold' : ''}`}
-            >
-             <span>{c.flag}</span>
-             <span>{c.code}</span>
-             <span className="text-neutral-500">{c.name}</span>
-            </button>
-           ))}
+          <div ref={dropdownRef} className="absolute top-full left-0 mt-1 z-50 bg-white border border-neutral-200 rounded-xl shadow-lg max-h-64 overflow-hidden w-72">
+           <div className="p-2 border-b border-neutral-100">
+            <input
+             type="text"
+             autoFocus
+             value={countrySearch}
+             onChange={(e) => setCountrySearch(e.target.value)}
+             placeholder="Search country or code..."
+             className="w-full bg-neutral-50 border border-neutral-200 rounded-lg px-3 py-2 text-xs text-neutral-900 placeholder-neutral-300 outline-none focus:border-neutral-950 transition-colors"
+            />
+           </div>
+           <div className="max-h-48 overflow-y-auto">
+            {countryCodes
+             .filter((c) =>
+              !countrySearch.trim() ||
+              `${c.code} ${c.name}`.toLowerCase().includes(countrySearch.toLowerCase())
+             )
+             .map((c) => (
+              <button
+               key={c.code + c.name}
+               type="button"
+               onClick={() => { setPhoneCode(c.code); setSelectedCountry(c); setOpen(false); setCountrySearch(''); }}
+               className={`flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-neutral-50 transition-colors ${c.code === phoneCode ? 'bg-neutral-50 font-bold' : ''}`}
+              >
+               <span>{c.flag}</span>
+               <span>{c.code}</span>
+               <span className="text-neutral-500 truncate">{c.name}</span>
+              </button>
+             ))}
+            {countryCodes.filter((c) =>
+              !countrySearch.trim() ||
+              `${c.code} ${c.name}`.toLowerCase().includes(countrySearch.toLowerCase())
+             ).length === 0 && (
+              <p className="px-3 py-4 text-xs text-neutral-400 text-center">No matching country</p>
+             )}
+           </div>
           </div>
          )}
         </div>

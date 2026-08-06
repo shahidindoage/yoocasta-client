@@ -41,6 +41,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import ContactUs from './pages/ContactUs';
 import FAQ from './pages/FAQ';
 import CastBags from './pages/recruiter/CastBags';
+import CastBagFeedbacks from './pages/recruiter/CastBagFeedbacks';
 import Favourites from './pages/recruiter/Favourites';
 import SentInvitations from './pages/recruiter/SentInvitations';
 import PublicJobInvitation from './pages/jobs/PublicJobInvitation';
@@ -149,6 +150,7 @@ function App() {
             <Route path="/dashboard/recruiter/jobs" element={<ManageJobs />} />
             <Route path="/dashboard/recruiter/jobs/:jobId/edit" element={<EditJob />} />
             <Route path="/dashboard/recruiter/cast-bags" element={<CastBags />} />
+            <Route path="/dashboard/recruiter/cast-bags/:bagId/feedbacks" element={<CastBagFeedbacks />} />
             <Route path="/dashboard/recruiter/favourites" element={<Favourites />} />
             <Route path="/dashboard/recruiter/sent-invitations" element={<SentInvitations />} />
             <Route path="/dashboard/recruiter/jobs/:jobId/applications" element={<JobApplications />} />

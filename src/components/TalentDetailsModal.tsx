@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Talent } from '../types';
 import { X, MapPin, Send } from 'lucide-react';
 
@@ -9,10 +10,14 @@ interface TalentDetailsModalProps {
 
 export default function TalentDetailsModal({ talent, onClose }: TalentDetailsModalProps) {
   const [activePhoto, setActivePhoto] = useState(talent.profileImage);
+  const [showAllCategories, setShowAllCategories] = useState(false);
+  const navigate = useNavigate();
 
   const handleViewDetails = () => {
-    // Action trigger when clicking the main CTA button
-    console.log(`Viewing full profile details for: ${talent.name}`);
+    if (talent.username) {
+      navigate(`/talent/${talent.username}`);
+    }
+    onClose();
   };
 
   return (
@@ -66,19 +71,27 @@ export default function TalentDetailsModal({ talent, onClose }: TalentDetailsMod
           <div className="space-y-6">
             {/* Title Name and categories */}
             <div>
-              <div className="flex flex-wrap gap-1 mb-1">
-                {talent.categories.map((cat, idx) => (
+              <div className="flex flex-wrap items-center gap-1 mb-1">
+                {talent.categories.slice(0, showAllCategories ? talent.categories.length : 2).map((cat, idx) => (
                   <span key={idx} className="text-[10px] uppercase font-mono text-amber-700 font-bold tracking-wider">
                     {idx > 0 && ' • '} {cat}
                   </span>
                 ))}
+                {talent.categories.length > 2 && !showAllCategories && (
+                  <button
+                    onClick={() => setShowAllCategories(true)}
+                    className="text-[10px] uppercase font-mono text-[#3835A4] font-black tracking-wider cursor-pointer hover:underline ml-1"
+                  >
+                    +{talent.categories.length - 2} more
+                  </button>
+                )}
               </div>
               <h1 className="font-display text-3xl font-black text-neutral-900">{talent.name}</h1>
               <div className="mt-1 flex items-center gap-1.5 text-xs text-neutral-600">
                 <MapPin className="h-4 w-4 text-neutral-400" />
                 <span>Based in {talent.location}</span>
                 <span className="text-neutral-300">•</span>
-                <span className="text-amber-750 font-mono font-bold">Verified Com Card</span>
+                <span className="text-amber-750 font-mono font-bold">Verified</span>
               </div>
             </div>
 
@@ -122,18 +135,6 @@ export default function TalentDetailsModal({ talent, onClose }: TalentDetailsMod
               </div>
             </div>
 
-            {/* Filmography details */}
-            <div>
-              <h3 className="text-xs font-mono uppercase tracking-widest text-neutral-500 mb-2">Selected Accomplishments</h3>
-              <ul className="space-y-1.5">
-                {talent.experience.map((exp, i) => (
-                  <li key={i} className="text-xs text-neutral-700 flex items-start gap-2 leading-relaxed">
-                    <span className="text-amber-500 shrink-0 mt-1">•</span>
-                    <span>{exp}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
           </div>
 
           {/* Clean Layout Action Footer */}

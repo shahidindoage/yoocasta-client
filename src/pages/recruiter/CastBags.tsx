@@ -112,6 +112,12 @@ export default function CastBags() {
           </td>
           <td className="px-5 py-4 text-right">
            <div className="flex items-center justify-end gap-2">
+            <Link
+             to={`/dashboard/recruiter/cast-bags/${bag.id}/feedbacks`}
+             className="text-[9px] font-black  bg-emerald-600 text-white px-3 py-2 rounded-lg hover:bg-emerald-700 transition-all"
+            >
+             💬 Feedbacks
+            </Link>
             <button
              onClick={() => setShowShare(bag)}
              className="text-[9px] font-black  bg-[#3835A4] text-white px-3 py-2 rounded-lg hover:bg-[#2a2899] transition-all"

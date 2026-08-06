@@ -191,9 +191,9 @@ export default function BlogsSection() {
                         {blog.title}
                       </h3>
 
-                      <p className="text-xs text-neutral-500 leading-relaxed line-clamp-3 font-medium">
+                      {/* <p className="text-xs text-neutral-500 leading-relaxed line-clamp-3 font-medium">
                         {blog.description}
-                      </p>
+                      </p> */}
                     </div>
 
                     <div className="mt-8 pt-5 border-t border-neutral-100 flex items-center justify-between text-xs text-neutral-500 font-bold group-hover:text-neutral-900 transition-colors duration-300">

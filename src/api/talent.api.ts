@@ -6,3 +6,4 @@ export const getPublicProfile = (username: string) => api.get(`/talents/${userna
 export const getTalentFilterOptions = () => api.get('/talents/search/options');
 export const searchTalents = (filters: any) => api.post('/talents/search', filters);
 export const getTalentCategoryCounts = () => api.get('/talents/category-counts');
+export const getFeaturedTalents = () => api.get('/talents/featured');

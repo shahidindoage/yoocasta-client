@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getPublicCastBag } from '../api/castBag.api';
-import { MapPin } from 'lucide-react';
+import { getPublicCastBag, castBagFeedbackLogin, submitCastBagFeedback } from '../api/castBag.api';
+import { MapPin, Star, X, MessageSquareText } from 'lucide-react';
+
+type FeedbackStep = 'login' | 'form' | 'taken' | 'done';
 
 export default function PublicCastBag() {
   const { token } = useParams<{ token: string }>();
@@ -10,6 +12,17 @@ export default function PublicCastBag() {
   const [error, setError] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [zcardLoading, setZcardLoading] = useState(false);
+
+  const [feedbackTalent, setFeedbackTalent] = useState<any>(null);
+  const [fbStep, setFbStep] = useState<FeedbackStep>('login');
+  const [fbEmail, setFbEmail] = useState('');
+  const [fbPassword, setFbPassword] = useState('');
+  const [fbGuestToken, setFbGuestToken] = useState('');
+  const [fbRating, setFbRating] = useState(0);
+  const [fbComment, setFbComment] = useState('');
+  const [fbDecision, setFbDecision] = useState('');
+  const [fbLoading, setFbLoading] = useState(false);
+  const [fbError, setFbError] = useState('');
 
   useEffect(() => {
     if (!token) return;
@@ -60,6 +73,71 @@ export default function PublicCastBag() {
       alert('Z Card failed: ' + (err?.message || 'Unknown error'));
     } finally {
       setZcardLoading(false);
+    }
+  };
+
+  const openFeedback = (talent: any) => {
+    setFeedbackTalent(talent);
+    setFbStep('login');
+    setFbEmail('');
+    setFbPassword('');
+    setFbGuestToken('');
+    setFbRating(0);
+    setFbComment('');
+    setFbDecision('');
+    setFbError('');
+  };
+
+  const closeFeedback = () => {
+    setFeedbackTalent(null);
+    setFbLoading(false);
+  };
+
+  const handleFeedbackLogin = async () => {
+    if (!fbEmail.trim() || !fbPassword) {
+      setFbError('Please enter your email and password.');
+      return;
+    }
+    setFbLoading(true);
+    setFbError('');
+    try {
+      const res = await castBagFeedbackLogin(token!, fbEmail.trim(), fbPassword);
+      const d = res.data.data;
+      setFbGuestToken(d.guestToken);
+      setFbEmail(d.email);
+      setFbStep(d.alreadySubmitted ? 'taken' : 'form');
+    } catch (err: any) {
+      setFbError(err?.response?.data?.message || 'Invalid credentials. Please try again.');
+    } finally {
+      setFbLoading(false);
+    }
+  };
+
+  const handleFeedbackSubmit = async () => {
+    if (!fbRating) {
+      setFbError('Please select a rating.');
+      return;
+    }
+    if (!fbDecision) {
+      setFbError('Please mark the talent as Preferred, Reserve or Pass.');
+      return;
+    }
+    setFbLoading(true);
+    setFbError('');
+    try {
+      await submitCastBagFeedback(token!, {
+        guestToken: fbGuestToken,
+        talentUserId: feedbackTalent.id,
+        rating: fbRating,
+        comment: fbComment,
+        decision: fbDecision,
+      });
+      setFbStep('done');
+    } catch (err: any) {
+      if (err?.response?.status === 409) setFbStep('taken');
+      else setFbError(err?.response?.data?.message || 'Failed to submit feedback. Please try again.');
+    } finally {
+      setFbLoading(false);
     }
   };
 
@@ -150,7 +228,7 @@ export default function PublicCastBag() {
                   <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/60 to-transparent to-20% z-10" />
                 </div>
 
-                <div className="absolute top-6 left-6 right-6 flex items-start z-30">
+                <div className="absolute top-6 left-6 right-6 flex items-start justify-between z-30">
                   <div className="flex items-center gap-2">
                     <div
                       onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleSelect(talent.id); }}
@@ -176,6 +254,14 @@ export default function PublicCastBag() {
                       </div>
                     ) : <div />}
                   </div>
+
+                  <button
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); openFeedback(talent); }}
+                    className="inline-flex items-center gap-1.5 bg-white/90 text-[#3835A4] text-[9px] uppercase font-mono font-black tracking-[0.18em] px-3.5 py-2 rounded-xl shadow-lg hover:bg-white hover:text-[#C6007E] transition-all"
+                  >
+                    <MessageSquareText className="h-3.5 w-3.5" />
+                    <span>Feedback</span>
+                  </button>
                 </div>
 
                 <div className="absolute inset-x-0 bottom-0 p-7 z-30 flex flex-col justify-end">
@@ -216,6 +302,155 @@ export default function PublicCastBag() {
           </div>
         )}
       </div>
+
+      {feedbackTalent && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={closeFeedback}>
+          <div
+            className="w-full max-w-md bg-white border-4 border-[#3835A4] rounded-3xl shadow-[8px_8px_0px_0px_#C6007E] overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-6 py-4 bg-[#f6f5ff] border-b-2 border-stone-100">
+              <div>
+                <p className="text-[9px] font-mono font-black uppercase tracking-widest text-[#C6007E]">Feedback</p>
+                <p className="text-sm font-black text-[#3835A4] uppercase">{feedbackTalent.firstName} {feedbackTalent.lastName || ''}</p>
+              </div>
+              <button onClick={closeFeedback} className="p-2 rounded-xl hover:bg-white text-stone-400 hover:text-[#C6007E] transition-colors">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="p-6">
+              {fbStep === 'login' && (
+                <div className="space-y-4">
+                  <p className="text-xs font-semibold text-stone-500">
+                    Enter the credentials you received via email to submit feedback for this cast bag.
+                  </p>
+                  <div>
+                    <label className="block text-[10px] font-mono font-black uppercase tracking-widest text-[#3835A4] mb-1.5">Email</label>
+                    <input
+                      type="email"
+                      value={fbEmail}
+                      onChange={(e) => setFbEmail(e.target.value)}
+                      placeholder="you@example.com"
+                      className="w-full px-4 py-2.5 rounded-xl border-2 border-stone-200 text-sm font-semibold outline-none focus:border-[#3835A4] transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-mono font-black uppercase tracking-widest text-[#3835A4] mb-1.5">Password</label>
+                    <input
+                      type="password"
+                      value={fbPassword}
+                      onChange={(e) => setFbPassword(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleFeedbackLogin()}
+                      placeholder="••••••••"
+                      className="w-full px-4 py-2.5 rounded-xl border-2 border-stone-200 text-sm font-semibold outline-none focus:border-[#3835A4] transition-colors"
+                    />
+                  </div>
+                  {fbError && <p className="text-xs font-bold text-red-500">{fbError}</p>}
+                  <button
+                    onClick={handleFeedbackLogin}
+                    disabled={fbLoading}
+                    className="w-full py-3 rounded-xl bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white font-mono text-[11px] font-black uppercase tracking-widest hover:opacity-90 disabled:opacity-40 transition-opacity"
+                  >
+                    {fbLoading ? 'Verifying...' : 'Validate Credentials'}
+                  </button>
+                </div>
+              )}
+
+              {fbStep === 'form' && (
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-[10px] font-mono font-black uppercase tracking-widest text-[#3835A4] mb-2">Rating</p>
+                    <div className="flex items-center gap-1">
+                      {[1, 2, 3, 4, 5].map(n => (
+                        <button key={n} onClick={() => setFbRating(n)} className="p-1 transition-transform hover:scale-110">
+                          <Star className={`h-7 w-7 ${n <= fbRating ? 'fill-[#C6007E] text-[#C6007E]' : 'text-stone-300'}`} />
+                        </button>
+                      ))}
+                      {fbRating > 0 && <span className="ml-2 text-xs font-black text-[#3835A4]">{fbRating}/5</span>}
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-[10px] font-mono font-black uppercase tracking-widest text-[#3835A4] mb-2">Decision</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {['Preferred', 'Reserve', 'Pass'].map(d => (
+                        <button
+                          key={d}
+                          onClick={() => setFbDecision(d)}
+                          className={`py-2.5 rounded-xl border-2 text-[10px] font-mono font-black uppercase tracking-widest transition-all ${
+                            fbDecision === d
+                              ? d === 'Preferred'
+                                ? 'border-[#C6007E] bg-[#C6007E] text-white'
+                                : d === 'Reserve'
+                                ? 'border-[#3835A4] bg-[#3835A4] text-white'
+                                : 'border-stone-900 bg-stone-900 text-white'
+                              : 'border-stone-200 bg-white text-stone-500 hover:border-stone-400'
+                          }`}
+                        >
+                          {d}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-mono font-black uppercase tracking-widest text-[#3835A4] mb-1.5">Comment</label>
+                    <textarea
+                      value={fbComment}
+                      onChange={(e) => setFbComment(e.target.value)}
+                      rows={3}
+                      placeholder="Add your comments about this talent..."
+                      className="w-full px-4 py-2.5 rounded-xl border-2 border-stone-200 text-sm font-semibold outline-none focus:border-[#3835A4] transition-colors resize-none"
+                    />
+                  </div>
+
+                  {fbError && <p className="text-xs font-bold text-red-500">{fbError}</p>}
+                  <button
+                    onClick={handleFeedbackSubmit}
+                    disabled={fbLoading}
+                    className="w-full py-3 rounded-xl bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white font-mono text-[11px] font-black uppercase tracking-widest hover:opacity-90 disabled:opacity-40 transition-opacity"
+                  >
+                    {fbLoading ? 'Submitting...' : 'Submit Feedback'}
+                  </button>
+                </div>
+              )}
+
+              {fbStep === 'taken' && (
+                <div className="text-center py-6 space-y-3">
+                  <span className="text-5xl block">✅</span>
+                  <p className="text-sm font-black text-[#3835A4]">Feedback Already Taken</p>
+                  <p className="text-xs font-medium text-stone-500">
+                    Your feedback for this cast bag has already been submitted. Only one feedback per guest is allowed.
+                  </p>
+                  <button
+                    onClick={closeFeedback}
+                    className="mt-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white font-mono text-[11px] font-black uppercase tracking-widest hover:opacity-90 transition-opacity"
+                  >
+                    Close
+                  </button>
+                </div>
+              )}
+
+              {fbStep === 'done' && (
+                <div className="text-center py-6 space-y-3">
+                  <span className="text-5xl block">🎉</span>
+                  <p className="text-sm font-black text-[#3835A4]">Feedback Submitted</p>
+                  <p className="text-xs font-medium text-stone-500">
+                    Thank you! Your feedback for <strong>{feedbackTalent.firstName}</strong> has been recorded.
+                  </p>
+                  <button
+                    onClick={closeFeedback}
+                    className="mt-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white font-mono text-[11px] font-black uppercase tracking-widest hover:opacity-90 transition-opacity"
+                  >
+                    Close
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

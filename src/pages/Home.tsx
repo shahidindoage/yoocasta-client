@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 // import Header from '../components/Header';
 import Hero from '../components/Hero';
 import CategoryBrowser from '../components/CategoryBrowser';
@@ -24,11 +24,44 @@ import { Talent, CastingCall } from '../types';
 import { X, Sparkles, Check, Mail, Phone, Lock, Calendar, DollarSign, ArrowRight } from 'lucide-react';
 import TalentAndCastingSection from '../components/Talentandcastingsection';
 import BackToTopButton from '../components/BackToTopButton';
+import { getFeaturedTalents } from '../api/talent.api';
+import { getCachedFeaturedTalents, setCachedFeaturedTalents, clearCachedFeaturedTalents } from '../utils/featuredCache';
+
+// Hard refresh (page reload) invalidates the featured cache so a fresh random set loads
+const isPageReload = (() => {
+  try {
+    const nav = performance.getEntriesByType?.('navigation')?.[0] as any;
+    if (nav?.type) return nav.type === 'reload';
+    return (performance as any).navigation?.type === 1;
+  } catch {
+    return false;
+  }
+})();
+if (isPageReload) clearCachedFeaturedTalents();
 
 export default function Home() {
   // Live dataset states
-  const [talents, setTalents] = useState<Talent[]>(INITIAL_TALENTS);
+  const [talents, setTalents] = useState<Talent[]>(getCachedFeaturedTalents() ?? []);
   const [castings, setCastings] = useState<CastingCall[]>(INITIAL_CASTINGS);
+  const [featuredLoading, setFeaturedLoading] = useState(() => !getCachedFeaturedTalents());
+
+  // Load dynamic featured talents (3 random premium + 3 basic, topped up with basic).
+  // Cached per session: shown instantly and NOT re-randomized on SPA navigation;
+  // a hard refresh clears the cache so a fresh random set loads.
+  useEffect(() => {
+    if (getCachedFeaturedTalents()) return;
+    getFeaturedTalents()
+      .then(res => {
+        if (res.data?.success && Array.isArray(res.data?.data) && res.data.data.length) {
+          setTalents(res.data.data);
+          setCachedFeaturedTalents(res.data.data);
+        } else {
+          setTalents(INITIAL_TALENTS);
+        }
+      })
+      .catch(() => setTalents(INITIAL_TALENTS))
+      .finally(() => setFeaturedLoading(false));
+  }, []);
 
   // Home page filter state (for FeaturedTalent component)
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -117,6 +150,7 @@ export default function Home() {
       {/* 4. Filterable Talent Grid portfolio */}
       <FeaturedTalent
         talents={talents}
+        loading={featuredLoading}
         onTalentClick={setActiveTalentDetails}
         selectedCategory={selectedCategory}
         selectedGender={selectedGender}
@@ -148,11 +182,7 @@ export default function Home() {
       <FAQSection />
 
       {/* 10. Creative High-Impact Call to Action Section */}
-      <CreativeCTA
-        onPostCastingClick={() => setIsCastingWizardOpen(true)}
-        onCreateProfileClick={() => setIsTalentWizardOpen(true)}
-        onPremiumClick={() => setIsPremiumOpen(true)}
-      />
+      <CreativeCTA />
 
       {/* 11. Gorgeous Brand partner Footer & office registries (Moved to App.tsx) */}
 <BackToTopButton />

@@ -1,18 +1,14 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { ArrowUpRight } from 'lucide-react';
+import { useAuthStore } from '../store/authStore';
 
-interface CreativeCTAProps {
-  onPostCastingClick: () => void;
-  onCreateProfileClick: () => void;
-  onPremiumClick: () => void;
-}
-
-export default function CreativeCTA({
-  onPostCastingClick,
-  onCreateProfileClick,
-  onPremiumClick,
-}: CreativeCTAProps) {
+export default function CreativeCTA() {
+  const navigate = useNavigate();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const user = useAuthStore((s) => s.user);
+  const isTalent = user?.role === 'TALENT';
   
   // Custom infinite scrolling tags for the background marquee
   const marqueeWordsLeft = [
@@ -107,9 +103,10 @@ export default function CreativeCTA({
         </motion.p>
 
         {/* Primary Centered Action Suite */}
+        {!isAuthenticated && (
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-lg mx-auto">
           <button
-            onClick={onCreateProfileClick}
+            onClick={() => navigate('/signup/talent')}
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4.5 bg-neutral-950 hover:bg-white hover:text-neutral-950 text-white rounded-2xl font-black text-xs  tracking-wider transition-all duration-300 shadow-xl cursor-pointer group"
           >
             <span>Join as Talent</span>
@@ -117,13 +114,57 @@ export default function CreativeCTA({
           </button>
 
           <button
-            onClick={onPostCastingClick}
+            onClick={() => navigate('/signup/recruiter')}
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4.5 bg-white text-neutral-950 hover:bg-neutral-950 hover:text-white rounded-2xl font-black text-xs  tracking-wider transition-all duration-300 shadow-md cursor-pointer group"
           >
             <span>Join as Recruiter</span>
             <ArrowUpRight className="h-4.5 w-4.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 animate-pulse" />
           </button>
         </div>
+        )}
+
+        {/* Authenticated Role-Based Actions */}
+        {isAuthenticated && (
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-lg mx-auto">
+          {isTalent ? (
+            <>
+              <button
+                onClick={() => navigate('/browse-jobs')}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4.5 bg-neutral-950 hover:bg-white hover:text-neutral-950 text-white rounded-2xl font-black text-xs  tracking-wider transition-all duration-300 shadow-xl cursor-pointer group"
+              >
+                <span>Browse Jobs</span>
+                <ArrowUpRight className="h-4.5 w-4.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </button>
+
+              <button
+                onClick={() => navigate('/dashboard/talent/applications')}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4.5 bg-white text-neutral-950 hover:bg-neutral-950 hover:text-white rounded-2xl font-black text-xs  tracking-wider transition-all duration-300 shadow-md cursor-pointer group"
+              >
+                <span>My Applications</span>
+                <ArrowUpRight className="h-4.5 w-4.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => navigate('/dashboard/recruiter/jobs')}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4.5 bg-neutral-950 hover:bg-white hover:text-neutral-950 text-white rounded-2xl font-black text-xs  tracking-wider transition-all duration-300 shadow-xl cursor-pointer group"
+              >
+                <span>Manage Jobs</span>
+                <ArrowUpRight className="h-4.5 w-4.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </button>
+
+              <button
+                onClick={() => navigate('/dashboard/recruiter/post-job')}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4.5 bg-white text-neutral-950 hover:bg-neutral-950 hover:text-white rounded-2xl font-black text-xs  tracking-wider transition-all duration-300 shadow-md cursor-pointer group"
+              >
+                <span>Post a Job</span>
+                <ArrowUpRight className="h-4.5 w-4.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </button>
+            </>
+          )}
+        </div>
+        )}
 
       </div>
     </section>

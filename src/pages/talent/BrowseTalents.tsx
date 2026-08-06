@@ -70,7 +70,7 @@ const MultiSelectDropdown = ({
 
       {open && (
         <div style={{
-          position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, zIndex: 20,
+          position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, zIndex: 50,
           background: '#fff', border: '1px solid #f5d0e3', borderRadius: '8px',
           maxHeight: '220px', overflowY: 'auto', padding: '8px', boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
         }}>
@@ -198,6 +198,7 @@ const BrowseTalents = () => {
   const [detailTalent, setDetailTalent] = useState<any>(null);
   const [detailPhoto, setDetailPhoto] = useState<string>('');
   const [bioExpanded, setBioExpanded] = useState(false);
+  const [showAllCats, setShowAllCats] = useState(false);
 
   const [showFilters, setShowFilters] = useState(false); // now: Professional Attributes only
 const [showPhysicalFilters, setShowPhysicalFilters] = useState(false); // new: Physical Filters tab
@@ -774,8 +775,8 @@ const setProfessionalText = (key: string, val: string) => {
                           };
 
                           return (
-                            <div key={category} style={{ display: 'flex', flexDirection: 'column', background: '#fef1f5', borderRadius: '8px', overflow: 'hidden', width: '100%' }}>
-                              <div style={{ background: '#3835A4', color: '#fcfcfcff', fontWeight: 900, fontSize: '13px', padding: '10px 20px', width: '100%' }}>
+                            <div key={category} style={{ display: 'flex', flexDirection: 'column', background: '#fef1f5', borderRadius: '8px', width: '100%' }}>
+                              <div style={{ background: '#3835A4', color: '#fcfcfcff', fontWeight: 900, fontSize: '13px', padding: '10px 20px', width: '100%', borderRadius: '8px 8px 0 0' }}>
                                 {category}
                               </div>
                               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', padding: '12px' }}>
@@ -1167,7 +1168,7 @@ const setProfessionalText = (key: string, val: string) => {
                   </div>
 
                     <div
-                    onClick={(e) => { e.stopPropagation(); e.preventDefault(); setDetailTalent(talent); setDetailPhoto(talent.image); setBioExpanded(false); }}
+                    onClick={(e) => { e.stopPropagation(); e.preventDefault(); setDetailTalent(talent); setDetailPhoto(talent.image); setBioExpanded(false); setShowAllCats(false); }}
                     className="p-4 rounded-2xl bg-[#3835A4] text-white transition-all duration-300 shadow-xl group-hover:bg-[#C6007E] shrink-0 border border-white/10 cursor-pointer"
                   >
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
@@ -1380,12 +1381,20 @@ const setProfessionalText = (key: string, val: string) => {
               <div className="w-full md:w-[55%] flex flex-col justify-between md:overflow-y-auto p-6 md:p-8">
                 <div className="space-y-5">
                   <div>
-                    <div className="flex flex-wrap gap-1 mb-1">
-                      {(detailTalent.categories || []).map((cat: string, idx: number) => (
+                    <div className="flex flex-wrap items-center gap-1 mb-1">
+                      {(detailTalent.categories || []).slice(0, showAllCats ? detailTalent.categories.length : 2).map((cat: string, idx: number) => (
                         <span key={idx} className="text-[10px] uppercase font-mono text-[#C6007E] font-bold tracking-wider">
                           {idx > 0 && ' • '} {cat}
                         </span>
                       ))}
+                      {(detailTalent.categories || []).length > 2 && !showAllCats && (
+                        <button
+                          onClick={() => setShowAllCats(true)}
+                          className="text-[10px] uppercase font-mono text-[#3835A4] font-black tracking-wider cursor-pointer hover:underline ml-1"
+                        >
+                          +{(detailTalent.categories || []).length - 2} more
+                        </button>
+                      )}
                     </div>
                     <h1 className="font-display text-3xl font-black text-neutral-900">
                       {detailTalent.firstName} {detailTalent.lastName}

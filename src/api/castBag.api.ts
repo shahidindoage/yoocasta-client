@@ -6,6 +6,9 @@ export const createCastBag = (name: string) =>
 export const getCastBags = () =>
   api.get('/recruiter/cast-bags');
 
+export const getCastBagFeedbacks = (bagId: string) =>
+  api.get(`/recruiter/cast-bags/${bagId}/feedbacks`);
+
 export const deleteCastBag = (bagId: string) =>
   api.delete(`/recruiter/cast-bags/${bagId}`);
 
@@ -17,3 +20,12 @@ export const shareCastBag = (bagId: string, emails: string[], validityDays: numb
 
 export const getPublicCastBag = (token: string) =>
   api.get(`/cast-bags/public/${token}`);
+
+export const castBagFeedbackLogin = (token: string, email: string, password: string) =>
+  api.post(`/cast-bags/public/${token}/feedback/login`, { email, password });
+
+export const submitCastBagFeedback = (
+  token: string,
+  payload: { guestToken: string; talentUserId: string; rating: number; comment: string; decision: string }
+) =>
+  api.post(`/cast-bags/public/${token}/feedback`, payload);
