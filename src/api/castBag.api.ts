@@ -21,8 +21,8 @@ export const shareCastBag = (bagId: string, emails: string[], validityDays: numb
 export const getPublicCastBag = (token: string) =>
   api.get(`/cast-bags/public/${token}`);
 
-export const castBagFeedbackLogin = (token: string, email: string, password: string) =>
-  api.post(`/cast-bags/public/${token}/feedback/login`, { email, password });
+export const castBagFeedbackLogin = (token: string, email: string, password: string, talentUserId: string) =>
+  api.post(`/cast-bags/public/${token}/feedback/login`, { email, password, talentUserId });
 
 export const submitCastBagFeedback = (
   token: string,

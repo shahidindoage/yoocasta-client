@@ -101,7 +101,7 @@ export default function PublicCastBag() {
     setFbLoading(true);
     setFbError('');
     try {
-      const res = await castBagFeedbackLogin(token!, fbEmail.trim(), fbPassword);
+      const res = await castBagFeedbackLogin(token!, fbEmail.trim(), fbPassword, feedbackTalent.id);
       const d = res.data.data;
       setFbGuestToken(d.guestToken);
       setFbEmail(d.email);
