@@ -4,10 +4,10 @@ import { useAuthStore } from '../../store/authStore';
 import {
   Users, Building2, Briefcase, Globe, MapPin,
   Languages, IdCard, Dna, Settings, Folder, BarChart3,
-  LogOut, UserCircle, Mail, UserCog, FileText,
+  LogOut, UserCircle, Mail, UserCog, FileText, Wrench, ChevronDown,
 } from 'lucide-react';
 
-const NAV_ITEMS = [
+const SINGLE_ITEMS = [
   { label: 'Manage Talents', path: '/admin/talents', key: 'talents', icon: Users },
   { label: 'Manage Companies', path: '/admin/companies', key: 'companies', icon: Building2 },
   { label: 'Manage Jobs', path: '/admin/jobs', key: 'jobs', icon: Briefcase },
@@ -18,10 +18,15 @@ const NAV_ITEMS = [
   { label: 'Manage Ethnicity', path: '/admin/ethnicity', key: 'ethnicity', icon: Dna },
   { label: 'Manage Work', path: '/admin/work', key: 'work', icon: Settings },
   { label: 'Manage Category', path: '/admin/category', key: 'category', icon: Folder },
+];
+
+const TOOLS_ITEMS = [
   { label: 'Manage Templates', path: '/admin/templates', key: 'templates', icon: Mail },
   { label: 'CMS', path: '/admin/cms', key: 'cms', icon: FileText },
   { label: 'Report', path: '/admin/report', key: 'report', icon: BarChart3 },
 ];
+
+const ALL_ITEMS = [...SINGLE_ITEMS, ...TOOLS_ITEMS];
 
 const AdminLayout = () => {
   const navigate = useNavigate();
@@ -32,16 +37,25 @@ const AdminLayout = () => {
   const isSuperAdmin = user?.adminRole === 'SUPER_ADMIN' || !user?.adminRole;
   const perms = user?.permissions || [];
 
-  const visibleNav = isSuperAdmin
-    ? NAV_ITEMS
-    : NAV_ITEMS.filter((item) => perms.includes(item.key));
+  const visibleSingles = isSuperAdmin
+    ? SINGLE_ITEMS
+    : SINGLE_ITEMS.filter((item) => perms.includes(item.key));
+  const visibleTools = isSuperAdmin
+    ? TOOLS_ITEMS
+    : TOOLS_ITEMS.filter((item) => perms.includes(item.key));
+  const visibleAll = [...visibleSingles, ...visibleTools];
+
+  const [toolsOpen, setToolsOpen] = useState(true);
+  const toolActive = visibleTools.some(
+    (i) => pathname === i.path || pathname.startsWith(i.path + '/')
+  );
 
   const handleLogout = () => {
     clearAuth();
     navigate('/admin/login');
   };
 
-  if (!isSuperAdmin && !visibleNav.some((i) => pathname === i.path || pathname.startsWith(i.path + '/'))) {
+  if (!isSuperAdmin && !visibleAll.some((i) => pathname === i.path || pathname.startsWith(i.path + '/'))) {
     return (
       <div className="min-h-screen bg-[#f4f4f6] flex items-center justify-center">
         <div className="bg-white border border-stone-200 p-8 text-center max-w-sm">
@@ -71,8 +85,8 @@ const AdminLayout = () => {
           </Link>
         </div>
 
-        {/* Nav Items - full height, no scroll */}
-        <nav className="flex-1 flex flex-col px-2 space-y-1 overflow-hidden pt-6">
+        {/* Nav Items - full height, scrolls if needed */}
+        <nav className="flex-1 flex flex-col px-2 space-y-1 overflow-x-hidden overflow-y-auto pt-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
            {isSuperAdmin && (
             <Link
               to="/admin/sub-admins"
@@ -87,7 +101,7 @@ const AdminLayout = () => {
               {sidebarOpen && <span className="truncate">Manage Sub Admins</span>}
             </Link>
           )}
-          {visibleNav.map((item) => {
+          {visibleSingles.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.path;
             return (
@@ -106,6 +120,49 @@ const AdminLayout = () => {
               </Link>
             );
           })}
+
+          {visibleTools.length > 0 && (
+            <div>
+              <button
+                type="button"
+                onClick={() => setToolsOpen(!toolsOpen)}
+                className={`w-full flex items-center gap-3 px-3 py-[9px] rounded-lg text-sm font-bold transition-all cursor-pointer ${
+                  toolActive ? 'text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'
+                }`}
+                title={!sidebarOpen ? 'Tools' : undefined}
+              >
+                <Wrench className="w-5 h-5 shrink-0" />
+                {sidebarOpen && <span className="truncate flex-1 text-left">Tools</span>}
+                {sidebarOpen && (
+                  <ChevronDown className={`w-4 h-4 shrink-0 transition-transform duration-200 ${toolsOpen ? '' : '-rotate-90'}`} />
+                )}
+              </button>
+              {toolsOpen && (
+                <div className="space-y-0.5 mt-0.5">
+                  {visibleTools.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = pathname === item.path;
+                    const label = item.label.startsWith('Manage ') ? item.label.replace('Manage ', '') : item.label;
+                    return (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        className={`flex items-center gap-3 pl-7 pr-3 py-[6px] rounded-lg text-xs font-bold transition-all ${
+                          isActive
+                            ? 'bg-white/20 text-white'
+                            : 'text-white/60 hover:bg-white/10 hover:text-white'
+                        }`}
+                        title={!sidebarOpen ? item.label : undefined}
+                      >
+                        <Icon className="w-4 h-4 shrink-0" />
+                        {sidebarOpen && <span className="truncate">{label}</span>}
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
          
         </nav>
 
@@ -135,7 +192,7 @@ const AdminLayout = () => {
               </svg>
             </button>
             <h2 className="text-sm font-bold text-stone-500 hidden sm:block">
-              {NAV_ITEMS.find(i => i.path === pathname)?.label || 'Dashboard'}
+              {ALL_ITEMS.find(i => i.path === pathname)?.label || 'Dashboard'}
             </h2>
           </div>
           <div className="flex items-center gap-4">

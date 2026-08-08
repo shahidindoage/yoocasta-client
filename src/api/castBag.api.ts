@@ -24,6 +24,9 @@ export const getPublicCastBag = (token: string) =>
 export const castBagFeedbackLogin = (token: string, email: string, password: string, talentUserId: string) =>
   api.post(`/cast-bags/public/${token}/feedback/login`, { email, password, talentUserId });
 
+export const castBagFeedbackStatus = (token: string, guestToken: string, talentUserId: string) =>
+  api.post(`/cast-bags/public/${token}/feedback/status`, { guestToken, talentUserId });
+
 export const submitCastBagFeedback = (
   token: string,
   payload: { guestToken: string; talentUserId: string; rating: number; comment: string; decision: string }
