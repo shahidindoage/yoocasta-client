@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getPublicCastBag, castBagFeedbackLogin, submitCastBagFeedback } from '../api/castBag.api';
+import { getPublicCastBag, castBagFeedbackLogin, castBagFeedbackStatus, submitCastBagFeedback } from '../api/castBag.api';
 import { MapPin, Star, X, MessageSquareText } from 'lucide-react';
 
-type FeedbackStep = 'login' | 'form' | 'taken' | 'done';
+type FeedbackStep = 'login' | 'loading' | 'form' | 'taken' | 'done';
 
 export default function PublicCastBag() {
   const { token } = useParams<{ token: string }>();
@@ -78,14 +78,33 @@ export default function PublicCastBag() {
 
   const openFeedback = (talent: any) => {
     setFeedbackTalent(talent);
-    setFbStep('login');
     setFbEmail('');
     setFbPassword('');
-    setFbGuestToken('');
     setFbRating(0);
     setFbComment('');
     setFbDecision('');
     setFbError('');
+    const stored = token ? localStorage.getItem(`castbag-guest:${token}`) : null;
+    if (stored) {
+      setFbGuestToken(stored);
+      setFbStep('loading');
+      castBagFeedbackStatus(token, stored, talent.id)
+        .then(res => {
+          const d = res.data.data || {};
+          if (!d.valid) {
+            localStorage.removeItem(`castbag-guest:${token}`);
+            setFbGuestToken('');
+            setFbStep('login');
+            return;
+          }
+          if (d.alreadySubmitted) setFbStep('taken');
+          else setFbStep('form');
+        })
+        .catch(() => setFbStep('login'));
+    } else {
+      setFbGuestToken('');
+      setFbStep('login');
+    }
   };
 
   const closeFeedback = () => {
@@ -105,6 +124,7 @@ export default function PublicCastBag() {
       const d = res.data.data;
       setFbGuestToken(d.guestToken);
       setFbEmail(d.email);
+      if (token) localStorage.setItem(`castbag-guest:${token}`, d.guestToken);
       setFbStep(d.alreadySubmitted ? 'taken' : 'form');
     } catch (err: any) {
       setFbError(err?.response?.data?.message || 'Invalid credentials. Please try again.');
@@ -134,7 +154,12 @@ export default function PublicCastBag() {
       });
       setFbStep('done');
     } catch (err: any) {
-      if (err?.response?.status === 409) setFbStep('taken');
+      if (err?.response?.status === 401) {
+        if (token) localStorage.removeItem(`castbag-guest:${token}`);
+        setFbGuestToken('');
+        setFbStep('login');
+        setFbError('Your feedback session has expired. Please enter your credentials again.');
+      } else if (err?.response?.status === 409) setFbStep('taken');
       else setFbError(err?.response?.data?.message || 'Failed to submit feedback. Please try again.');
     } finally {
       setFbLoading(false);
@@ -354,6 +379,13 @@ export default function PublicCastBag() {
                   >
                     {fbLoading ? 'Verifying...' : 'Validate Credentials'}
                   </button>
+                </div>
+              )}
+
+              {fbStep === 'loading' && (
+                <div className="py-10 flex flex-col items-center justify-center space-y-3">
+                  <div className="w-8 h-8 border-4 border-[#C6007E] border-t-[#3835A4] rounded-full animate-spin" />
+                  <p className="text-xs font-bold text-stone-500">Checking your feedback status...</p>
                 </div>
               )}
 

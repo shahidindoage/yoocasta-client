@@ -1,20 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { INITIAL_TESTIMONIALS } from '../data';
 import { Star, CheckCircle, ChevronLeft, ChevronRight, Quote, Sparkles, Trophy } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import api from '../api/axios';
+import { getCachedCms, setCachedCms } from '../utils/cmsCache';
 
 export default function TestimonialsSection() {
+  const [items, setItems] = useState(INITIAL_TESTIMONIALS);
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  useEffect(() => {
+    let active = true;
+    api.get('/cms/home')
+      .then((res) => {
+        if (!active || !res.data?.success || !res.data?.data) return;
+        const cms = res.data.data;
+        setCachedCms('home', cms);
+        if (active) {
+          const section = cms?.testimonialsSection;
+          if (section && Array.isArray(section) && section.length > 0) {
+            setItems(section);
+            setCurrentIndex(0);
+          }
+        }
+      })
+      .catch(() => {
+        const cached = getCachedCms('home');
+        if (active && cached?.testimonialsSection && Array.isArray(cached.testimonialsSection) && cached.testimonialsSection.length > 0) {
+          setItems(cached.testimonialsSection);
+          setCurrentIndex(0);
+        }
+      });
+    return () => { active = false; };
+  }, []);
+
   const prevTestimonial = () => {
-    setCurrentIndex((prev) => (prev === 0 ? INITIAL_TESTIMONIALS.length - 1 : prev - 1));
+    setCurrentIndex((prev) => (prev === 0 ? items.length - 1 : prev - 1));
   };
 
   const nextTestimonial = () => {
-    setCurrentIndex((prev) => (prev === INITIAL_TESTIMONIALS.length - 1 ? 0 : prev + 1));
+    setCurrentIndex((prev) => (prev === items.length - 1 ? 0 : prev + 1));
   };
 
-  const active = INITIAL_TESTIMONIALS[currentIndex];
+  const active = items[currentIndex];
 
   return (
     <div id="testimonials" className="w-full bg-[#fef1f5] text-stone-900 py-12 border-b border-[#f5d0e3] relative overflow-hidden">
@@ -97,7 +125,7 @@ export default function TestimonialsSection() {
                       {[...Array(active.rating)].map((_, i) => (
                         <Star key={i} className="h-4.5 w-4.5 fill-[#C6007E] text-[#C6007E]" />
                       ))}
-                      <span className="ml-2 text-xs font-mono font-bold text-[#C6007E]">5.0 Star Booking</span>
+                      <span className="ml-2 text-xs font-mono font-bold text-[#C6007E]">{active.rating}.0 Star Booking</span>
                     </div>
 
                     {/* Quote */}
@@ -124,7 +152,7 @@ export default function TestimonialsSection() {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pt-8 border-t border-[#f5d0e3]">
                 {/* Thumbnails */}
                 <div className="flex items-center gap-3">
-                  {INITIAL_TESTIMONIALS.map((t, idx) => {
+                  {items.map((t, idx) => {
                     const isSelected = idx === currentIndex;
                     return (
                       <button
@@ -151,7 +179,7 @@ export default function TestimonialsSection() {
                   </button>
                   
                   <span className="text-xs font-mono text-stone-400 tracking-wider">
-                    {String(currentIndex + 1).padStart(2, '0')} / {String(INITIAL_TESTIMONIALS.length).padStart(2, '0')}
+                    {String(currentIndex + 1).padStart(2, '0')} / {String(items.length).padStart(2, '0')}
                   </span>
 
                   <button

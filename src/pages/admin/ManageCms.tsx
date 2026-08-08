@@ -138,10 +138,10 @@ const ManageCms = () => {
           <h2 className="text-2xl font-black text-[#3835A4]">CMS</h2>
           <p className="text-xs text-stone-400">{items.length} total pages</p>
         </div>
-        <button onClick={openAdd}
+        {/* <button onClick={openAdd}
           className="inline-flex items-center gap-2 bg-[#C6007E] text-white px-5 py-2.5 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-[#a10065] transition-colors cursor-pointer">
           <Plus className="w-4 h-4" /> Add Page
-        </button>
+        </button> */}
       </div>
 
       {error && !modalOpen && <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-xs font-bold">{error}</div>}
@@ -166,8 +166,8 @@ const ManageCms = () => {
                   <td className="px-4 py-3 text-center whitespace-nowrap">
                     <button onClick={() => openEdit(item.pageKey)}
                       className="inline-flex items-center gap-1 px-3 py-1 text-xs font-bold text-blue-500 bg-blue-50 hover:bg-blue-100 transition-colors cursor-pointer mr-2"><Pencil className="w-3.5 h-3.5" /> Edit</button>
-                    <button onClick={() => handleDelete(item.pageKey)}
-                      className="inline-flex items-center gap-1 px-3 py-1 text-xs font-bold text-red-500 bg-red-50 hover:bg-red-100 transition-colors cursor-pointer"><Trash2 className="w-3.5 h-3.5" /> Delete</button>
+                    {/* <button onClick={() => handleDelete(item.pageKey)}
+                      className="inline-flex items-center gap-1 px-3 py-1 text-xs font-bold text-red-500 bg-red-50 hover:bg-red-100 transition-colors cursor-pointer"><Trash2 className="w-3.5 h-3.5" /> Delete</button> */}
                   </td>
                 </tr>
               ))}

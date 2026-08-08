@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { getSubAdmins, createSubAdmin, updateSubAdminPassword, updateSubAdminPermissions, deleteSubAdmin } from '../../api/admin.api';
 import { Plus, X, KeyRound, ShieldCheck, Trash2, Eye } from 'lucide-react';
 
-const PERMISSION_OPTIONS = [
+const MAIN_PERMISSION_OPTIONS = [
   { key: 'talents', label: 'Manage Talents' },
   { key: 'companies', label: 'Manage Companies' },
   { key: 'jobs', label: 'Manage Jobs' },
@@ -13,6 +13,9 @@ const PERMISSION_OPTIONS = [
   { key: 'ethnicity', label: 'Manage Ethnicity' },
   { key: 'work', label: 'Manage Work' },
   { key: 'category', label: 'Manage Category' },
+];
+
+const TOOL_PERMISSION_OPTIONS = [
   { key: 'templates', label: 'Manage Templates' },
   { key: 'cms', label: 'CMS' },
   { key: 'report', label: 'Report' },
@@ -68,6 +71,34 @@ const ManageSubAdmins = () => {
     if (list.includes(key)) setList(list.filter((k) => k !== key));
     else setList([...list, key]);
   };
+
+  const permissionGrid = (checked: string[], toggle: (key: string) => void) => (
+    <>
+      <div className="grid grid-cols-2 gap-2">
+        {MAIN_PERMISSION_OPTIONS.map((opt) => (
+          <label key={opt.key} className="flex items-center gap-2 text-xs text-stone-600 cursor-pointer">
+            <input type="checkbox" checked={checked.includes(opt.key)}
+              onChange={() => toggle(opt.key)}
+              className="accent-[#C6007E] cursor-pointer" />
+            {opt.label}
+          </label>
+        ))}
+      </div>
+      <div className="pt-2 border-t border-stone-100">
+        <span className="block text-[10px] font-bold text-stone-500 uppercase mb-2 mt-3">Tools</span>
+        <div className="grid grid-cols-2 gap-2">
+          {TOOL_PERMISSION_OPTIONS.map((opt) => (
+            <label key={opt.key} className="flex items-center gap-2 text-xs text-stone-600 cursor-pointer">
+              <input type="checkbox" checked={checked.includes(opt.key)}
+                onChange={() => toggle(opt.key)}
+                className="accent-[#C6007E] cursor-pointer" />
+              {opt.label}
+            </label>
+          ))}
+        </div>
+      </div>
+    </>
+  );
 
   const openCreate = () => {
     setName(''); setEmail(''); setPassword(''); setSelectedPerms([]);
@@ -250,16 +281,7 @@ const ManageSubAdmins = () => {
               </div>
               <div>
                 <label className="block text-[10px] font-bold text-stone-500 uppercase mb-2">Permissions</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {PERMISSION_OPTIONS.map((opt) => (
-                    <label key={opt.key} className="flex items-center gap-2 text-xs text-stone-600 cursor-pointer">
-                      <input type="checkbox" checked={selectedPerms.includes(opt.key)}
-                        onChange={() => togglePerm(selectedPerms, setSelectedPerms, opt.key)}
-                        className="accent-[#C6007E] cursor-pointer" />
-                      {opt.label}
-                    </label>
-                  ))}
-                </div>
+                {permissionGrid(selectedPerms, (key) => togglePerm(selectedPerms, setSelectedPerms, key))}
               </div>
               <div className="flex justify-end gap-3">
                 <button type="button" onClick={closeCreate}
@@ -320,16 +342,7 @@ const ManageSubAdmins = () => {
             <form onSubmit={handlePermissions} className="space-y-5">
               <div>
                 <label className="block text-[10px] font-bold text-stone-500 uppercase mb-2">Allowed Tabs</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {PERMISSION_OPTIONS.map((opt) => (
-                    <label key={opt.key} className="flex items-center gap-2 text-xs text-stone-600 cursor-pointer">
-                      <input type="checkbox" checked={permValues.includes(opt.key)}
-                        onChange={() => togglePerm(permValues, setPermValues, opt.key)}
-                        className="accent-[#C6007E] cursor-pointer" />
-                      {opt.label}
-                    </label>
-                  ))}
-                </div>
+                {permissionGrid(permValues, (key) => togglePerm(permValues, setPermValues, key))}
               </div>
               <div className="flex justify-end gap-3">
                 <button type="button" onClick={closePermissions}
@@ -360,7 +373,7 @@ const ManageSubAdmins = () => {
             ) : (
               <div className="grid grid-cols-2 gap-2">
                 {viewAdmin.permissions.map((p) => {
-                  const opt = PERMISSION_OPTIONS.find((o) => o.key === p);
+                  const opt = [...MAIN_PERMISSION_OPTIONS, ...TOOL_PERMISSION_OPTIONS].find((o) => o.key === p);
                   return (
                     <div key={p} className="flex items-center gap-2 px-3 py-2 bg-stone-50 border border-stone-100 text-xs text-stone-700 font-semibold">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#C6007E] shrink-0" />

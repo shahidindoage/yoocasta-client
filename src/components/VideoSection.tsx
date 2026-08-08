@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Play, Pause, Volume2, VolumeX, Film, Disc } from 'lucide-react';
+import api from '../api/axios';
+import { getCachedCms, setCachedCms } from '../utils/cmsCache';
 
 interface VideoClip {
   id: string;
@@ -62,12 +64,38 @@ const VIDEO_CLIPS: VideoClip[] = [
 ];
 
 export default function VideoSection() {
+  const [clips, setClips] = useState<VideoClip[]>(VIDEO_CLIPS);
   const [activeClipId, setActiveClipId] = useState<string>(VIDEO_CLIPS[0].id);
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [isMuted, setIsMuted] = useState<boolean>(true);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  const activeClip = VIDEO_CLIPS.find(clip => clip.id === activeClipId) || VIDEO_CLIPS[0];
+  useEffect(() => {
+    let active = true;
+    api.get('/cms/home')
+      .then((res) => {
+        if (!active || !res.data?.success || !res.data?.data) return;
+        const cms = res.data.data;
+        setCachedCms('home', cms);
+        if (active) {
+          const section = cms?.videoSection;
+          if (section && Array.isArray(section) && section.length > 0) {
+            setClips(section as VideoClip[]);
+            setActiveClipId(section[0]?.id || VIDEO_CLIPS[0].id);
+          }
+        }
+      })
+      .catch(() => {
+        const cached = getCachedCms('home');
+        if (active && cached?.videoSection && Array.isArray(cached.videoSection) && cached.videoSection.length > 0) {
+          setClips(cached.videoSection as VideoClip[]);
+          setActiveClipId(cached.videoSection[0]?.id || VIDEO_CLIPS[0].id);
+        }
+      });
+    return () => { active = false; };
+  }, []);
+
+  const activeClip = clips.find(clip => clip.id === activeClipId) || clips[0];
 
   useEffect(() => {
     if (videoRef.current) {
@@ -137,7 +165,7 @@ export default function VideoSection() {
                 ref={videoRef}
                 key={activeClip.id}
                 src={activeClip.videoUrl}
-                poster={activeClip.posterUrl}
+                poster={activeClip.posterUrl || undefined}
                 autoPlay
                 loop
                 muted={isMuted}
@@ -234,11 +262,11 @@ export default function VideoSection() {
                 <Disc className="h-4 w-4 animate-spin-slow text-[#C6007E]" />
                 Select Reel
               </h4>
-              <span className="text-[9px] font-mono text-stone-400 font-bold">{VIDEO_CLIPS.length} Reels</span>
+              <span className="text-[9px] font-mono text-stone-400 font-bold">{clips.length} Reels</span>
             </div>
 
             <div className="space-y-3.5">
-              {VIDEO_CLIPS.map((clip) => {
+              {clips.map((clip) => {
                 const isActive = clip.id === activeClipId;
                 return (
                   <motion.button
@@ -262,12 +290,18 @@ export default function VideoSection() {
 
                     {/* Poster Thumbnail */}
                     <div className="h-14 w-14 rounded-2xl overflow-hidden shrink-0 relative bg-stone-100 border border-[#f5d0e3]">
-                      <img 
-                        src={clip.posterUrl} 
-                        alt={clip.talentName} 
-                        className="h-full w-full object-cover" 
-                        referrerPolicy="no-referrer"
-                      />
+                      {clip.posterUrl ? (
+                        <img 
+                          src={clip.posterUrl} 
+                          alt={clip.talentName} 
+                          className="h-full w-full object-cover" 
+                          referrerPolicy="no-referrer"
+                        />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center bg-gradient-to-tr from-[#C6007E]/20 to-[#3835A4]/20">
+                          <Film className="h-5 w-5 text-[#C6007E]/60" />
+                        </div>
+                      )}
                       {isActive ? (
                         <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
                           <span className="flex gap-1 items-end">

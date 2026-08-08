@@ -1,10 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FAQS } from '../data';
 import { ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import api from '../api/axios';
+import { getCachedCms, setCachedCms } from '../utils/cmsCache';
 
 export default function FAQSection() {
+  const [items, setItems] = useState(FAQS);
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+
+  useEffect(() => {
+    let active = true;
+    api.get('/cms/home')
+      .then((res) => {
+        if (!active || !res.data?.success || !res.data?.data) return;
+        const cms = res.data.data;
+        setCachedCms('home', cms);
+        if (active) {
+          const section = cms?.faqSection;
+          if (section && Array.isArray(section) && section.length > 0) {
+            setItems(section);
+            setOpenIndex(0);
+          }
+        }
+      })
+      .catch(() => {
+        const cached = getCachedCms('home');
+        if (active && cached?.faqSection && Array.isArray(cached.faqSection) && cached.faqSection.length > 0) {
+          setItems(cached.faqSection);
+          setOpenIndex(0);
+        }
+      });
+    return () => { active = false; };
+  }, []);
 
   const toggleAccordion = (idx: number) => {
     setOpenIndex(openIndex === idx ? null : idx);
@@ -36,7 +64,7 @@ export default function FAQSection() {
 
           {/* Right Column: Dynamic Framer Motion Accordion Deck (60%) */}
           <div className="lg:col-span-3 space-y-4 w-full">
-            {FAQS.map((faq, idx) => {
+            {items.map((faq, idx) => {
               const isOpen = openIndex === idx;
 
               return (
