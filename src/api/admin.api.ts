@@ -54,6 +54,12 @@ export const getAdminJobs = (page: number, limit: number = 20, search?: string, 
 export const updateAdminJobStatus = (jobId: string, status: 'APPROVED' | 'PENDING' | 'REJECTED') =>
   api.patch(`/admin/jobs/${jobId}/status`, { status });
 
+export const getAdminJobApplications = (jobId: string) =>
+  api.get(`/admin/jobs/${jobId}/applications`);
+
+export const updateAdminApplicationStatus = (applicationId: string, status: string) =>
+  api.patch(`/admin/applications/${applicationId}/status`, { status });
+
 export const loginAsRecruiter = (companyId: string) =>
   api.post(`/admin/companies/${companyId}/login`);
 

@@ -51,7 +51,11 @@ import AdminLayout from './pages/admin/AdminLayout';
 import ManageTalents from './pages/admin/ManageTalents';
 import ManageCompanies from './pages/admin/ManageCompanies';
 import AdminManageJobs from './pages/admin/ManageJobs';
+import ManageContracts from './pages/admin/ManageContracts';
+import CreateContract from './pages/admin/CreateContract';
+import ContractDetails from './pages/admin/ContractDetails';
 import JobPaymentDetails from './pages/admin/JobPaymentDetails';
+import AdminJobApplications from './pages/admin/AdminJobApplications';
 import AdminJobEdit from './pages/admin/AdminJobEdit';
 import TalentSubscription from './pages/admin/TalentSubscription';
 import Report from './pages/admin/Report';
@@ -114,7 +118,11 @@ function App() {
               <Route path="/admin/talents/:id/subscription" element={<TalentSubscription />} />
               <Route path="/admin/companies" element={<ManageCompanies />} />
               <Route path="/admin/jobs" element={<AdminManageJobs />} />
+              <Route path="/admin/contracts" element={<ManageContracts />} />
+              <Route path="/admin/contracts/create" element={<CreateContract />} />
+              <Route path="/admin/contracts/:id" element={<ContractDetails />} />
               <Route path="/admin/jobs/:id/payment" element={<JobPaymentDetails />} />
+              <Route path="/admin/jobs/:id/applications" element={<AdminJobApplications />} />
               <Route path="/admin/jobs/:id/edit" element={<AdminJobEdit />} />
               <Route path="/admin/work" element={<ManageWork />} />
               <Route path="/admin/language" element={<ManageLanguage />} />

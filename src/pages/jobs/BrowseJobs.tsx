@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, CSSProperties } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { getPublicJobs } from '../../api/job.api';
 
 import { getMyApplications } from '../../api/application.api';
@@ -149,6 +149,12 @@ const JobCardSkeleton = () => (
 
 const BrowseJobs = () => {
   const { user } = useAuthStore();
+  const navigate = useNavigate();
+  const [toast, setToast] = useState<string | null>(null);
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  };
   const [cms, setCms] = useState<any>(() => getCachedCms('browse-jobs'));
   const [videoSrc, setVideoSrc] = useState<string | null>(() => {
     const cached = getCachedCms('browse-jobs');
@@ -603,7 +609,7 @@ const BrowseJobs = () => {
                               onClick={async (e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                if (!user) { alert('Please login to apply'); return; }
+                                if (!user) { showToast('Please login to apply for this job'); setTimeout(() => navigate('/login'), 1200); return; }
                                 if (user.role === 'RECRUITER') {
                                   setQuickJob(job);
                                   setLimitMessage('This feature is for talent only. Please register as a talent to apply for jobs.');
@@ -667,17 +673,19 @@ const BrowseJobs = () => {
             {pagination.totalPages > 1 && (
               <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '40px' }}>
                 <button
+                className='px-4 py-2 rounded-xl bg-[#3835A4] text-white font-bold cursor-pointer hover:bg-[#C6007E] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed'
                   disabled={pagination.page === 1}
                   onClick={() => setPagination(p => ({ ...p, page: p.page - 1 }))}
-                  style={{ padding: '10px 20px', background: '#fff', border: '1px solid #ddd', borderRadius: '10px', cursor: pagination.page === 1 ? 'not-allowed' : 'pointer', fontWeight: 'bold', color: '#3835A4' }}
+                //   style={{ padding: '10px 20px', background: '#fff', border: '1px solid #ddd', borderRadius: '10px', cursor: pagination.page === 1 ? 'not-allowed' : 'pointer', fontWeight: 'bold', color: '#3835A4' }}
                 >
                   Previous
                 </button>
                 <span style={{ padding: '10px', color: '#666', fontSize: '14px' }}>Page {pagination.page} of {pagination.totalPages}</span>
                 <button
+                className='px-4 py-2 rounded-xl bg-[#3835A4] text-white font-bold cursor-pointer hover:bg-[#C6007E] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed'
                   disabled={pagination.page === pagination.totalPages}
                   onClick={() => setPagination(p => ({ ...p, page: p.page + 1 }))}
-                  style={{ padding: '10px 20px', background: '#fff', border: '1px solid #ddd', borderRadius: '10px', cursor: pagination.page === pagination.totalPages ? 'not-allowed' : 'pointer', fontWeight: 'bold', color: '#3835A4' }}
+                //   style={{ padding: '10px 20px', background: '#fff', border: '1px solid #ddd', borderRadius: '10px', cursor: pagination.page === pagination.totalPages ? 'not-allowed' : 'pointer', fontWeight: 'bold', color: '#3835A4' }}
                 >
                   Next
                 </button>
@@ -772,6 +780,14 @@ const BrowseJobs = () => {
           onClose={() => setApplyRole(null)}
           onApplied={() => { setApplyRole(null); setQuickJob(null); }}
         />
+      )}
+
+      {/* Toast notification */}
+      {toast && (
+        <div className="fixed bottom-6 right-6 z-[100] bg-[#3835A4] text-white px-5 py-3 rounded-xl shadow-2xl text-sm font-bold flex items-center gap-2 animate-fadeIn">
+          <span className="h-2 w-2 rounded-full bg-green-400 shrink-0" />
+          {toast}
+        </div>
       )}
     </div>
   );

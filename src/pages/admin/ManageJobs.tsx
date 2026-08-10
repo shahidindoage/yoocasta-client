@@ -347,6 +347,12 @@ const ManageJobs = () => {
                         <td className="px-4 py-3 text-center">
                           <div className="flex items-center justify-center gap-2">
                             <Link
+                              to={`/admin/jobs/${j.id}/applications`}
+                              className="px-3 py-1 text-xs font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 cursor-pointer transition-colors inline-block"
+                            >
+                              Applications
+                            </Link>
+                            <Link
                               to={`/admin/jobs/${j.id}/payment`}
                               className="px-3 py-1 text-xs font-bold text-white bg-[#3835A4] cursor-pointer hover:bg-[#2a2899] transition-colors inline-block"
                             >

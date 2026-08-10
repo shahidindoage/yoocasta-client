@@ -124,6 +124,13 @@ export default function BlogsPage() {
     name,
   }));
 
+  const mobileStart = Math.max(1, page - 1);
+  const mobilePages: number[] = [];
+  for (let p = mobileStart; p <= Math.min(mobileStart + 1, totalPages); p++) mobilePages.push(p);
+  const mobileLastShown = mobilePages[mobilePages.length - 1];
+  const showMobileDots = totalPages - mobileLastShown > 1;
+  const showMobileLast = totalPages > mobileLastShown;
+
   return (
     <div className="w-full bg-white py-12 border-b border-[#f2f2f2] min-h-screen relative overflow-hidden">
       <div className="absolute right-0 top-0 h-96 w-96 rounded-full bg-[#3835A4]/[0.03] filter blur-[120px] pointer-events-none" />
@@ -238,19 +245,53 @@ export default function BlogsPage() {
             >
               Previous
             </button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-              <button
-                key={p}
-                onClick={() => setPage(p)}
-                className={`w-9 h-9 rounded-xl text-xs font-black transition-all cursor-pointer ${
-                  p === page
-                    ? 'bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white shadow-md'
-                    : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200'
-                }`}
-              >
-                {p}
-              </button>
-            ))}
+            {/* Desktop: all pages */}
+            <div className="hidden md:flex items-center gap-2">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setPage(p)}
+                  className={`w-9 h-9 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                    p === page
+                      ? 'bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white shadow-md'
+                      : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200'
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+            {/* Mobile: pages ending at current + dots + last number */}
+            <div className="flex md:hidden items-center gap-2">
+              {mobilePages.map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setPage(p)}
+                  className={`w-9 h-9 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                    p === page
+                      ? 'bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white shadow-md'
+                      : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200'
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
+              {showMobileDots && (
+                <span className="text-neutral-400 font-black px-1">...</span>
+              )}
+              {showMobileLast && (
+                <button
+                  onClick={() => setPage(totalPages)}
+                  className={`w-9 h-9 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                    totalPages === page
+                      ? 'bg-gradient-to-r from-[#C6007E] to-[#3835A4] text-white shadow-md'
+                      : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200'
+                  }`}
+                >
+                  {totalPages}
+                </button>
+              )}
+            </div>
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}

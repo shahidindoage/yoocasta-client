@@ -1204,17 +1204,19 @@ const setProfessionalText = (key: string, val: string) => {
         {pagination.totalPages > 1 && (
               <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '40px' }}>
                 <button 
+                className='px-4 py-2 rounded-xl bg-[#3835A4] text-white font-bold cursor-pointer hover:bg-[#C6007E] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed'
                   disabled={pagination.page === 1} 
                   onClick={() => setPagination(p => ({ ...p, page: p.page - 1 }))} 
-                  style={{ padding: '10px 20px', background: '#fff', border: '1px solid #ddd', borderRadius: '10px', cursor: pagination.page === 1 ? 'not-allowed' : 'pointer', fontWeight: 'bold', color: '#3835A4' }}
+                //   style={{ padding: '10px 20px', background: '#fff', border: '1px solid #ddd', borderRadius: '10px', cursor: pagination.page === 1 ? 'not-allowed' : 'pointer', fontWeight: 'bold', color: '#3835A4' }}
                 >
                   Previous
                 </button>
                 <span style={{ padding: '10px', color: '#666', fontSize: '14px' }}>Page {pagination.page} of {pagination.totalPages}</span>
                 <button 
+                className='px-4 py-2 rounded-xl bg-[#3835A4] text-white font-bold cursor-pointer hover:bg-[#C6007E] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed'
                   disabled={pagination.page === pagination.totalPages} 
                   onClick={() => setPagination(p => ({ ...p, page: p.page + 1 }))} 
-                  style={{ padding: '10px 20px', background: '#fff', border: '1px solid #ddd', borderRadius: '10px', cursor: pagination.page === pagination.totalPages ? 'not-allowed' : 'pointer', fontWeight: 'bold', color: '#3835A4' }}
+                //   style={{ padding: '10px 20px', background: '#fff', border: '1px solid #ddd', borderRadius: '10px', cursor: pagination.page === pagination.totalPages ? 'not-allowed' : 'pointer', fontWeight: 'bold', color: '#3835A4' }}
                 >
                   Next
                 </button>

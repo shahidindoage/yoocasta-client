@@ -6,6 +6,7 @@ const MAIN_PERMISSION_OPTIONS = [
   { key: 'talents', label: 'Manage Talents' },
   { key: 'companies', label: 'Manage Companies' },
   { key: 'jobs', label: 'Manage Jobs' },
+  { key: 'contracts', label: 'Manage Contracts' },
   { key: 'country', label: 'Manage Country' },
   { key: 'city', label: 'Manage City' },
   { key: 'language', label: 'Manage Language' },

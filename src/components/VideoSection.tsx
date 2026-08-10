@@ -155,7 +155,7 @@ export default function VideoSection() {
           
           {/* Main Trendy Video Player (Takes 7 Cols on Large Screens) */}
           <div className="lg:col-span-8 flex flex-col justify-between">
-            <div className="relative aspect-video rounded-[2.5rem] overflow-hidden bg-white border border-[#f5d0e3] shadow-xl group flex flex-col justify-end">
+            <div className="relative aspect-[4/5] sm:aspect-video rounded-3xl sm:rounded-[2.5rem] overflow-hidden bg-white border border-[#f5d0e3] shadow-xl group flex flex-col justify-end">
               
               {/* Hair-thin visual premium lens flare frame */}
               <div className="absolute inset-4 border border-[#C6007E]/10 rounded-[2rem] pointer-events-none z-20" />
@@ -178,7 +178,7 @@ export default function VideoSection() {
               <div className="absolute inset-0 bg-gradient-to-t from-[#C6007E]/25 via-[#C6007E]/3 to-transparent z-10 pointer-events-none" />
 
               {/* Status Ribbon & Badge */}
-              <div className="absolute top-6 left-6 z-20 flex items-center gap-2">
+              <div className="absolute top-4 left-4 right-4 z-20 flex items-center gap-1.5 flex-wrap pr-24 sm:top-6 sm:left-6 sm:right-auto sm:pr-0 sm:gap-2">
                 <div className="flex items-center gap-1.5 bg-[#C6007E] text-white text-[9px] capitalize font-mono font-black tracking-widest px-3 py-1.5 rounded-xl shadow-lg">
                   <Film className="h-3 w-3 animate-spin-slow" />
                   <span>Playing</span>
@@ -189,26 +189,26 @@ export default function VideoSection() {
               </div>
 
               {/* Interactive Player Controls floating overlay */}
-              <div className="absolute top-6 right-6 z-20 flex items-center gap-2">
+              <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5 sm:top-6 sm:right-6 sm:gap-2">
                 {/* Volume Toggle */}
                 <button
                   onClick={toggleMute}
-                  className="p-3 rounded-full bg-white/80 backdrop-blur-md hover:bg-white border border-[#f5d0e3] transition-all scale-95 hover:scale-100 cursor-pointer"
+                  className="p-2 sm:p-3 rounded-full bg-white/80 backdrop-blur-md hover:bg-white border border-[#f5d0e3] transition-all scale-95 hover:scale-100 cursor-pointer"
                   title={isMuted ? 'Unmute' : 'Mute'}
                 >
-                  {isMuted ? <VolumeX className="h-4.5 w-4.5 text-stone-400" /> : <Volume2 className="h-4.5 w-4.5 text-[#C6007E]" />}
+                  {isMuted ? <VolumeX className="h-4 w-4 sm:h-4.5 sm:w-4.5 text-stone-400" /> : <Volume2 className="h-4 w-4 sm:h-4.5 sm:w-4.5 text-[#C6007E]" />}
                 </button>
                 {/* Pause/Play Toggle */}
                 <button
                   onClick={togglePlay}
-                  className="p-3 rounded-full bg-white/80 backdrop-blur-md hover:bg-white border border-[#f5d0e3] transition-all scale-95 hover:scale-100 cursor-pointer"
+                  className="p-2 sm:p-3 rounded-full bg-white/80 backdrop-blur-md hover:bg-white border border-[#f5d0e3] transition-all scale-95 hover:scale-100 cursor-pointer"
                 >
-                  {isPlaying ? <Pause className="h-4.5 w-4.5 text-stone-400" /> : <Play className="h-4.5 w-4.5 text-[#C6007E]" />}
+                  {isPlaying ? <Pause className="h-4 w-4 sm:h-4.5 sm:w-4.5 text-stone-400" /> : <Play className="h-4 w-4 sm:h-4.5 sm:w-4.5 text-[#C6007E]" />}
                 </button>
               </div>
 
               {/* Inside Metadata Overlay Details */}
-              <div className="relative z-20 p-8 sm:p-10 pointer-events-none max-w-xl">
+              <div className="relative z-20 p-6 sm:p-10 pointer-events-none max-w-xl">
                 <div className="flex flex-wrap gap-1.5 mb-3.5">
                   {activeClip.tags.map((tag, idx) => (
                     <span 
@@ -224,7 +224,7 @@ export default function VideoSection() {
                   <span className="text-xs font-mono font-bold tracking-wider text-[#C6007E] block">
                     {activeClip.category}
                   </span>
-                  <h3 className="font-display text-2xl sm:text-3xl font-black text-white tracking-tight leading-none">
+                  <h3 className="font-display text-xl sm:text-3xl font-black text-white tracking-tight leading-none">
                     {activeClip.title}
                   </h3>
                   

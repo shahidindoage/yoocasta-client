@@ -16,7 +16,7 @@ const schema = z.object({
   .min(8, 'Password must be at least 8 characters')
   .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Must contain a capital letter, lowercase and number'),
  confirmPassword: z.string(),
- phone: z.string().optional(),
+ phone: z.string().min(7, 'Phone number is too short').max(15, 'Phone number is too long').regex(/^[\d\s\-().+]+$/, 'Phone number contains invalid characters'),
 }).refine(data => data.password === data.confirmPassword, {
  message: 'Passwords do not match',
  path: ['confirmPassword'],
@@ -242,7 +242,7 @@ const SignupTalent = () => {
       {/* Phone with Country Code */}
       <div className="space-y-1.5 relative group">
        <label className="text-[10px] font-extrabold text-neutral-400 group-focus-within:text-neutral-950 tracking-widest transition-colors duration-200">
-        Phone Number <span className="text-neutral-300 lowercase font-normal italic">(optional)</span>
+        Phone Number
        </label>
        <div className="flex gap-2">
         <div className="relative w-36">
@@ -300,9 +300,12 @@ const SignupTalent = () => {
          type="text"
          {...register('phone')}
          placeholder="555-000-0000"
-         className="flex-1 bg-transparent border-b-2 border-neutral-100 focus:border-neutral-950 py-2.5 text-sm text-neutral-900 placeholder-neutral-200 outline-none transition-all duration-200 font-medium"
+         className={`flex-1 bg-transparent border-b-2 ${errors.phone ? 'border-red-400 focus:border-red-500' : 'border-neutral-100 focus:border-neutral-950'} py-2.5 text-sm text-neutral-900 placeholder-neutral-200 outline-none transition-all duration-200 font-medium`}
         />
        </div>
+       {errors.phone && (
+        <p className="text-xs text-red-500 font-medium pt-1">{errors.phone.message}</p>
+       )}
       </div>
 
       {/* Action Row Submit Structure */}

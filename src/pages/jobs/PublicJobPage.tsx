@@ -331,7 +331,7 @@ const PublicJobPage = () => {
                         <div className="flex flex-wrap gap-2">
                           {role.gender && <RoleChip label="Gender" value={role.gender} />}
                           {role.ageMin && <RoleChip label="Age" value={`${role.ageMin}${role.ageMax ? `-${role.ageMax}` : '+'}`} />}
-                          {role.payment && <PaymentChips payment={role.payment} type={role.paymentType} />}
+                          {role.payment && user?.role === 'TALENT' && <PaymentChips payment={role.payment} type={role.paymentType} />}
                         </div>
                       </div>
                       )}
