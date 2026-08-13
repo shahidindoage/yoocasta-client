@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { getJobApplications, bulkUpdateStatus } from '../../api/application.api';
 import { getCastBags, addTalentsToBag, createCastBag } from '../../api/castBag.api';
 import { getFavouriteIds, addFavourite, removeFavourite } from '../../api/favourites.api';
@@ -110,12 +110,14 @@ const STATUS_DEFAULTS: Record<string, { subject: string; body: string }> = {
 const JobApplications = () => {
   const { jobId } = useParams<{ jobId: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user } = useAuthStore();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [selectedRole, setSelectedRole] = useState<string>('all');
   const [matchFilter, setMatchFilter] = useState<string>('all');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const initialStatus = searchParams.get('status') || 'all';
+  const [statusFilter, setStatusFilter] = useState<string>(initialStatus);
   const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [modalStatus, setModalStatus] = useState<string | null>(null);
@@ -188,6 +190,12 @@ const JobApplications = () => {
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [jobId]);
+
+  useEffect(() => {
+    const s = searchParams.get('status');
+    if (s && ['SHORTLISTED', 'SELECTED', 'REJECTED'].includes(s)) setStatusFilter(s);
+    else setStatusFilter('all');
+  }, [searchParams]);
 
   useEffect(() => {
     if (!data) { setFilteredApplications([]); return; }

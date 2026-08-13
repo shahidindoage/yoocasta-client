@@ -30,19 +30,20 @@ const CareerCourseTab = ({ existingProfile }: Props) => {
   setEditingCourseId(null);
  };
 
- const handleAddCareer = async () => {
-  if (!newCareer.title) return setError('Career title is required');
-  try {
-   setError('');
-   await addCareerHistory(newCareer);
-   setCareers(prev => [...prev, { id: 'temp-' + Date.now(), ...newCareer, startDate: newCareer.startDate || null, endDate: newCareer.endDate || null }]);
-   setSuccess('Career added.');
-   resetForms();
-   setTimeout(() => setSuccess(''), 3000);
-  } catch (err: any) {
-   setError(err.response?.data?.message || 'Failed to add career.');
-  }
- };
+const handleAddCareer = async () => {
+   if (!newCareer.title) return setError('Career title is required');
+   try {
+    setError('');
+    const res = await addCareerHistory(newCareer);
+    const created = res.data?.data?.history;
+    setCareers(prev => [...prev, { ...newCareer, ...(created || {}), startDate: newCareer.startDate || null, endDate: newCareer.endDate || null }]);
+    setSuccess('Career added.');
+    resetForms();
+    setTimeout(() => setSuccess(''), 3000);
+   } catch (err: any) {
+    setError(err.response?.data?.message || 'Failed to add career.');
+   }
+  };
 
  const handleUpdateCareer = async (historyId: string) => {
   try {
@@ -70,19 +71,20 @@ const CareerCourseTab = ({ existingProfile }: Props) => {
   }
  };
 
- const handleAddCourse = async () => {
-  if (!newCourse.title) return setError('Course title is required');
-  try {
-   setError('');
-   await addCourse({ ...newCourse, year: newCourse.year ? parseInt(newCourse.year) : undefined });
-   setCourses(prev => [...prev, { id: 'temp-' + Date.now(), ...newCourse }]);
-   setSuccess('Course added.');
-   resetForms();
-   setTimeout(() => setSuccess(''), 3000);
-  } catch (err: any) {
-   setError(err.response?.data?.message || 'Failed to add course.');
-  }
- };
+const handleAddCourse = async () => {
+   if (!newCourse.title) return setError('Course title is required');
+   try {
+    setError('');
+    const res = await addCourse({ ...newCourse, year: newCourse.year ? parseInt(newCourse.year) : undefined });
+    const created = res.data?.data?.course;
+    setCourses(prev => [...prev, { ...newCourse, ...(created || {}) }]);
+    setSuccess('Course added.');
+    resetForms();
+    setTimeout(() => setSuccess(''), 3000);
+   } catch (err: any) {
+    setError(err.response?.data?.message || 'Failed to add course.');
+   }
+  };
 
  const handleUpdateCourse = async (courseId: string) => {
   try {

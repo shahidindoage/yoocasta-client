@@ -46,6 +46,7 @@ function MultiSelectDropdown({
  placeholder?: string;
 }) {
  const [open, setOpen] = useState(false);
+ const [query, setQuery] = useState('');
  const ref = useRef<HTMLDivElement>(null);
 
  // Close on outside click
@@ -65,6 +66,10 @@ function MultiSelectDropdown({
   : values.length === 1
   ? (items.find(i => i.id === values[0])?.name ?? values[0])
   : `${values.length} selected`;
+
+ const filteredItems = (items || []).filter(item =>
+  item.name.toLowerCase().includes(query.trim().toLowerCase())
+ );
 
  return (
   <div className="space-y-1.5" ref={ref}>
@@ -92,6 +97,16 @@ function MultiSelectDropdown({
     {/* Dropdown Panel */}
     {open && (
      <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-white border border-[#3835A4]/20 rounded-xl shadow-xl overflow-hidden">
+      {/* Search */}
+      <div className="sticky top-0 z-10 bg-white px-3 py-2 border-b border-[#3835A4]/10">
+       <input
+        type="text"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder={`Search ${label.toLowerCase()}...`}
+        className="w-full bg-[#3835A4]/5 border border-[#3835A4]/10 rounded-lg px-3 py-1.5 text-sm text-[#3835A4] outline-none focus:border-[#3835A4]"
+       />
+      </div>
       <div className="max-h-52 overflow-y-auto divide-y divide-[#3835A4]/5">
        {/* Any option */}
        <label className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-[#C6007E]/5 transition-colors">
@@ -104,7 +119,10 @@ function MultiSelectDropdown({
         <span className="text-sm font-bold text-[#C6007E]">{anyLabel}</span>
        </label>
        {/* Individual items */}
-       {items?.map(item => (
+       {filteredItems.length === 0 && !isAny && (
+        <p className="px-4 py-3 text-xs text-[#3835A4]/40">No options found</p>
+       )}
+       {filteredItems.map(item => (
         <label
          key={item.id}
          className={`flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors ${

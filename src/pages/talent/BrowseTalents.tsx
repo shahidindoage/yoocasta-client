@@ -38,6 +38,7 @@ const MultiSelectDropdown = ({
   onToggle: (id: string) => void;
 }) => {
   const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -49,6 +50,7 @@ const MultiSelectDropdown = ({
   }, []);
 
   const summary = selected.length === 0 ? `All ${label}` : `${selected.length} selected`;
+  const filteredOptions = options.filter(opt => opt.name.toLowerCase().includes(query.trim().toLowerCase()));
 
   return (
     <div ref={ref} style={{ position: 'relative' }}>
@@ -72,14 +74,32 @@ const MultiSelectDropdown = ({
         <div style={{
           position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, zIndex: 50,
           background: '#fff', border: '1px solid #f5d0e3', borderRadius: '8px',
-          maxHeight: '220px', overflowY: 'auto', padding: '8px', boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+          overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
         }}>
-          {options.map(opt => (
-            <label key={opt.id} style={{ fontSize: '12px', color: '#555', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '6px 4px' }}>
-              <input type="checkbox" checked={selected.includes(opt.id)} onChange={() => onToggle(opt.id)} />
-              {opt.name}
-            </label>
-          ))}
+          <div style={{ padding: '8px', borderBottom: '1px solid #f5d0e3' }}>
+            <input
+              autoFocus
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={`Search ${label}...`}
+              style={{
+                width: '100%', border: '1px solid #f5d0e3', borderRadius: '6px', padding: '6px 10px',
+                fontSize: '12px', color: '#333', outline: 'none', boxSizing: 'border-box',
+              }}
+            />
+          </div>
+          <div style={{ maxHeight: '220px', overflowY: 'auto', padding: '8px' }}>
+            {filteredOptions.length === 0 && (
+              <p style={{ fontSize: '12px', color: '#999', padding: '6px 4px' }}>No options found</p>
+            )}
+            {filteredOptions.map(opt => (
+              <label key={opt.id} style={{ fontSize: '12px', color: '#555', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '6px 4px' }}>
+                <input type="checkbox" checked={selected.includes(opt.id)} onChange={() => onToggle(opt.id)} />
+                {opt.name}
+              </label>
+            ))}
+          </div>
         </div>
       )}
     </div>

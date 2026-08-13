@@ -32,6 +32,8 @@ export default function ManageJobs() {
    if (filter === 'active') return job.status === 'APPROVED' && !isExpired;
    if (filter === 'inactive') return job.status === 'PENDING' && !isExpired;
    if (filter === 'expired') return isExpired;
+   // 'all': hide expired jobs only when sorting by expiring soon
+   if (filter === 'all' && sort === 'expiring_soon' && isExpired) return false;
    return true; // 'all'
   })
   .sort((a, b) => {
@@ -156,8 +158,16 @@ export default function ManageJobs() {
              {job.totalApplications || 0}
             </Link>
            </td>
-           <td className="p-4 text-center font-bold text-orange-500">{job.shortlistedCount || 0}</td>
-           <td className="p-4 text-center font-bold text-green-600">{job.selectedCount || 0}</td>
+           <td className="p-4 text-center font-bold text-orange-500">
+            <Link to={`/dashboard/recruiter/jobs/${job.id}/applications?status=SHORTLISTED`} className="hover:text-[#3835A4] transition-colors">
+             {job.shortlistedCount || 0}
+            </Link>
+           </td>
+           <td className="p-4 text-center font-bold text-green-600">
+            <Link to={`/dashboard/recruiter/jobs/${job.id}/applications?status=SELECTED`} className="hover:text-[#3835A4] transition-colors">
+             {job.selectedCount || 0}
+            </Link>
+           </td>
            <td className="p-4 text-center text-sm text-[#3835A4]/70">{job.views || 0}</td>
            <td className="p-4 text-xs text-[#3835A4]/70 font-medium whitespace-nowrap">
             {new Date(job.createdAt).toLocaleDateString()}

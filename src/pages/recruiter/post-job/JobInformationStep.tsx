@@ -267,6 +267,9 @@ export default function JobInformationStep({ data, updateData, options, onNext }
         </span>
        ))}
       </div>
+      <p className="text-[10px] text-[#3835A4]/40 leading-relaxed">
+       Note: Please add all casting dates for this job. Click &ldquo;Add&rdquo; after selecting a date. You can remove any date by clicking the &times; button.
+      </p>
      </div>
     </div>
 
@@ -306,6 +309,9 @@ export default function JobInformationStep({ data, updateData, options, onNext }
         </span>
        ))}
       </div>
+      <p className="text-[10px] text-[#3835A4]/40 leading-relaxed">
+       Note: Please add all shoot / project dates for this job. Click &ldquo;Add&rdquo; after selecting a date. You can remove any date by clicking the &times; button.
+      </p>
      </div>
     </div>
    </div>

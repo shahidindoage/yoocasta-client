@@ -351,6 +351,9 @@ const AdminJobEdit = () => {
                   </span>
                 ))}
               </div>
+              <p className="text-[10px] text-stone-400 mt-1 leading-relaxed">
+                Note: Please add all casting dates for this job. Click &ldquo;Add&rdquo; after selecting a date. You can remove any date by clicking the &times; button.
+              </p>
             </div>
             <div>
               <label className="block text-[10px] font-bold text-stone-500 uppercase mb-1">Shooting Dates</label>
@@ -367,6 +370,9 @@ const AdminJobEdit = () => {
                   </span>
                 ))}
               </div>
+              <p className="text-[10px] text-stone-400 mt-1 leading-relaxed">
+                Note: Please add all shoot / project dates for this job. Click &ldquo;Add&rdquo; after selecting a date. You can remove any date by clicking the &times; button.
+              </p>
             </div>
           </div>
 
